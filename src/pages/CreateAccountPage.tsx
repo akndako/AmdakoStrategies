@@ -20,6 +20,22 @@ const Page = styled.section`
   justify-content: center;
   align-items: center;
   background: linear-gradient(180deg, rgba(124,108,246,0.08) 0%, transparent 100%);
+
+  @media (max-width: 1024px) {
+    padding: 80px 60px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 50px 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 40px 16px;
+  }
 `;
 
 const Card = styled.div`
@@ -29,19 +45,49 @@ const Card = styled.div`
   border-radius: 24px;
   padding: 52px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+
+  @media (max-width: 768px) {
+    padding: 40px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 32px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 28px;
+    border-radius: 16px;
+  }
 `;
 
 const Header = styled.div`
   margin-bottom: 30px;
 
+  @media (max-width: 480px) {
+    margin-bottom: 24px;
+  }
+
   h2 {
     font-size: 36px;
     margin-bottom: 12px;
+
+    @media (max-width: 768px) {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 24px;
+    }
   }
 
   p {
     color: rgba(255, 255, 255, 0.75);
     line-height: 1.6;
+
+    @media (max-width: 480px) {
+      font-size: 15px;
+    }
   }
 `;
 
@@ -71,6 +117,11 @@ const Input = styled.input`
     border-color: rgba(124, 108, 246, 0.8);
     box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
   }
+
+  @media (max-width: 480px) {
+    padding: 14px 16px;
+    font-size: 16px;
+  }
 `;
 
 const Button = styled.button`
@@ -86,6 +137,18 @@ const Button = styled.button`
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 16px 32px rgba(124, 108, 246, 0.25);
+  }
+
+  @media (max-width: 600px) {
+    padding: 15px 22px;
+    font-size: 16px;
+    width: 100%;
+  }
+
+  @media (max-width: 480px) {
+    padding: 14px 20px;
+    font-size: 16px;
+    width: 100%;
   }
 `;
 
@@ -125,7 +188,7 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/api/register", {
+      const response = await fetch("http://localhost:4000/api/auth/register", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -140,7 +203,7 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
         return;
       }
 
-      onAuthSuccess({ token: data.token, user: data.user });
+      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, email: data.email } });
     } catch (err) {
       setError("Unable to connect to the server.");
     } finally {

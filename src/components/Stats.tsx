@@ -3,78 +3,267 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tool
 import { motion } from "framer-motion";
 
 const Section = styled.section`
-  padding: 100px 80px;
+  padding: 120px 100px;
   background: linear-gradient(180deg, rgba(124,108,246,0.05) 0%, transparent 100%);
+
+  @media (max-width: 1200px) {
+    padding: 100px 80px;
+  }
+
+  @media (max-width: 1024px) {
+    padding: 90px 60px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 70px 30px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 60px 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 50px 16px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 40px 12px;
+  }
 `;
 
 const Title = styled.h2`
-  font-size: 42px;
-  margin-bottom: 20px;
+  font-size: 2.75rem;
+  margin-bottom: 24px;
   text-align: center;
+
+  @media (max-width: 1200px) {
+    font-size: 2.5rem;
+    margin-bottom: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 18px;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 1.75rem;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.625rem;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 360px) {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
 `;
 
 const Subtitle = styled.p`
-  font-size: 18px;
-  opacity: 0.7;
+  font-size: 1.125rem;
+  opacity: 0.75;
   text-align: center;
-  margin-bottom: 60px;
-  max-width: 600px;
+  margin-bottom: 70px;
+  max-width: 650px;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 1200px) {
+    font-size: 1.0625rem;
+    margin-bottom: 65px;
+  }
+
+  @media (max-width: 1024px) {
+    font-size: 1rem;
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9375rem;
+    margin-bottom: 50px;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 0.875rem;
+    margin-bottom: 45px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.8125rem;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 360px) {
+    font-size: 0.75rem;
+    margin-bottom: 35px;
+  }
 `;
 
 const Container = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 60px;
+  gap: 70px;
   align-items: center;
   
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
+    gap: 50px;
+  }
+
+  @media (max-width: 768px) {
     gap: 40px;
+  }
+
+  @media (max-width: 600px) {
+    gap: 35px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 30px;
   }
 `;
 
 const StatsContainer = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 28px;
+
+  @media (max-width: 600px) {
+    gap: 24px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 20px;
+  }
 `;
 
 const StatRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+  }
+
+  @media (max-width: 600px) {
+    gap: 18px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 16px;
+  }
 `;
 
 const Card = styled(motion.div)`
   flex: 1;
-  padding: 32px;
-  border-radius: 16px;
+  padding: 36px;
+  border-radius: 18px;
   background: rgba(124, 108, 246, 0.15);
   border: 1px solid rgba(168, 85, 247, 0.3);
   backdrop-filter: blur(12px);
   text-align: left;
   
+  @media (max-width: 1024px) {
+    padding: 32px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 28px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 24px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 20px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 16px;
+  }
+  
   h4 {
-    font-size: 16px;
+    font-size: 1rem;
     opacity: 0.7;
-    margin-bottom: 12px;
+    margin-bottom: 14px;
     font-weight: 500;
+
+    @media (max-width: 768px) {
+      font-size: 0.9375rem;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 0.875rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.8125rem;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 0.75rem;
+      margin-bottom: 6px;
+    }
   }
   
   .value {
-    font-size: 42px;
+    font-size: 2.75rem;
     font-weight: 700;
     background: linear-gradient(90deg, #a78bfa, #f472b6);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
+
+    @media (max-width: 1024px) {
+      font-size: 2.5rem;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 2.25rem;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 2rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.75rem;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 1.5rem;
+    }
   }
   
   p {
-    font-size: 14px;
+    font-size: 0.875rem;
     opacity: 0.6;
+
+    @media (max-width: 768px) {
+      font-size: 0.8125rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.75rem;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 0.6875rem;
+    }
   }
 `;
 
@@ -85,9 +274,63 @@ const ChartBox = styled(motion.div)`
   border: 1px solid rgba(124, 108, 246, 0.2);
   backdrop-filter: blur(12px);
   
+  @media (max-width: 1200px) {
+    padding: 36px;
+  }
+  
+  @media (max-width: 1024px) {
+    padding: 32px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 30px;
+  }
+  
+  @media (max-width: 600px) {
+    padding: 28px;
+  }
+  
+  @media (max-width: 480px) {
+    padding: 24px;
+  }
+  
+  @media (max-width: 360px) {
+    padding: 20px;
+  }
+  
   h3 {
     font-size: 20px;
     margin-bottom: 24px;
+
+    @media (max-width: 1200px) {
+      font-size: 19px;
+      margin-bottom: 22px;
+    }
+    
+    @media (max-width: 1024px) {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 768px) {
+      font-size: 17px;
+      margin-bottom: 20px;
+    }
+    
+    @media (max-width: 600px) {
+      font-size: 16px;
+      margin-bottom: 18px;
+    }
+    
+    @media (max-width: 480px) {
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
+    
+    @media (max-width: 360px) {
+      font-size: 14px;
+      margin-bottom: 14px;
+    }
   }
 `;
 

@@ -2,44 +2,142 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 
 const Section = styled.section`
-  padding: 100px 80px;
+  padding: 120px 100px;
   background: linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.05) 100%);
+
+  @media (max-width: 1200px) {
+    padding: 100px 80px;
+  }
+
+  @media (max-width: 1024px) {
+    padding: 90px 60px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 70px 30px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 60px 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 50px 16px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 40px 12px;
+  }
 `;
 
 const Title = styled.h2`
-  font-size: 42px;
-  margin-bottom: 20px;
+  font-size: 2.75rem;
+  margin-bottom: 24px;
   text-align: center;
+
+  @media (max-width: 1200px) {
+    font-size: 2.5rem;
+    margin-bottom: 22px;
+  }
+
+  @media (max-width: 1024px) {
+    font-size: 2.25rem;
+    margin-bottom: 20px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 18px;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 1.75rem;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 1.625rem;
+    margin-bottom: 14px;
+  }
+
+  @media (max-width: 360px) {
+    font-size: 1.5rem;
+    margin-bottom: 12px;
+  }
 `;
 
 const Subtitle = styled.p`
-  font-size: 18px;
-  opacity: 0.7;
+  font-size: 1.125rem;
+  opacity: 0.75;
   text-align: center;
-  margin-bottom: 60px;
-  max-width: 600px;
+  margin-bottom: 70px;
+  max-width: 650px;
   margin-left: auto;
   margin-right: auto;
+
+  @media (max-width: 1200px) {
+    font-size: 1.0625rem;
+    margin-bottom: 65px;
+  }
+
+  @media (max-width: 1024px) {
+    font-size: 1rem;
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 768px) {
+    font-size: 0.9375rem;
+    margin-bottom: 50px;
+  }
+
+  @media (max-width: 600px) {
+    font-size: 0.875rem;
+    margin-bottom: 45px;
+  }
+
+  @media (max-width: 480px) {
+    font-size: 0.8125rem;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 360px) {
+    font-size: 0.75rem;
+    margin-bottom: 35px;
+  }
 `;
 
 const Grid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 32px;
-  margin-bottom: 40px;
+  gap: 36px;
+  margin-bottom: 50px;
   
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+    margin-bottom: 45px;
   }
   
   @media (max-width: 768px) {
     grid-template-columns: 1fr;
+    gap: 28px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 600px) {
+    gap: 24px;
+    margin-bottom: 35px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 20px;
+    margin-bottom: 30px;
   }
 `;
 
 const Card = styled(motion.div)`
-  padding: 40px;
-  border-radius: 16px;
+  padding: 45px;
+  border-radius: 18px;
   background: linear-gradient(135deg,rgba(124,108,246,0.25),rgba(168,85,247,0.25));
   border: 1px solid rgba(124, 108, 246, 0.3);
   backdrop-filter: blur(12px);
@@ -50,35 +148,115 @@ const Card = styled(motion.div)`
     border-color: rgba(168, 85, 247, 0.6);
     background: linear-gradient(135deg,rgba(124,108,246,0.4),rgba(168,85,247,0.4));
   }
+
+  @media (max-width: 1024px) {
+    padding: 40px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 35px;
+  }
+
+  @media (max-width: 600px) {
+    padding: 30px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 25px;
+  }
+
+  @media (max-width: 360px) {
+    padding: 20px;
+  }
   
   h3 {
-    font-size: 24px;
-    margin-bottom: 12px;
+    font-size: 1.375rem;
+    margin-bottom: 14px;
+
+    @media (max-width: 1024px) {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 768px) {
+      font-size: 1.1875rem;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 1.125rem;
+      margin-bottom: 8px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 1.0625rem;
+      margin-bottom: 6px;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 1rem;
+      margin-bottom: 4px;
+    }
   }
   
   p {
-    opacity: 0.7;
+    opacity: 0.75;
     line-height: 1.6;
-    font-size: 15px;
-    margin-bottom: 20px;
+    font-size: 0.9375rem;
+    margin-bottom: 22px;
+
+    @media (max-width: 768px) {
+      font-size: 0.875rem;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      margin-bottom: 18px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.8125rem;
+      margin-bottom: 16px;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 0.75rem;
+      margin-bottom: 14px;
+    }
   }
   
   .roi {
-    font-size: 18px;
+    font-size: 1.125rem;
     font-weight: 600;
     color: #a78bfa;
+
+    @media (max-width: 768px) {
+      font-size: 1.0625rem;
+    }
+
+    @media (max-width: 600px) {
+      font-size: 1rem;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 0.9375rem;
+    }
+
+    @media (max-width: 360px) {
+      font-size: 0.875rem;
+    }
   }
 `;
 
 const Button = styled(motion.button)`
-  margin-top: 40px;
-  padding: 16px 36px;
-  border-radius: 12px;
-  border: 2px solid rgba(124, 108, 246, 0.5);
+  margin-top: 50px;
+  padding: 18px 42px;
+  border-radius: 16px;
+  border: 2px solid rgba(124, 108, 246, 0.6);
   background: transparent;
   color: white;
   font-weight: 600;
-  font-size: 16px;
+  font-size: 1.0625rem;
   cursor: pointer;
   transition: all 0.3s ease;
   display: block;
@@ -90,8 +268,38 @@ const Button = styled(motion.button)`
     border-color: transparent;
   }
   
+  @media (max-width: 1024px) {
+    margin-top: 45px;
+    padding: 16px 38px;
+    font-size: 1rem;
+  }
+
   @media (max-width: 768px) {
-    padding: 14px 28px;
+    margin-top: 40px;
+    padding: 15px 34px;
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 600px) {
+    margin-top: 35px;
+    padding: 14px 30px;
+    width: 100%;
+    max-width: 320px;
+    font-size: 0.9375rem;
+  }
+
+  @media (max-width: 480px) {
+    margin-top: 30px;
+    padding: 13px 26px;
+    max-width: 300px;
+    font-size: 0.875rem;
+  }
+
+  @media (max-width: 360px) {
+    margin-top: 25px;
+    padding: 12px 22px;
+    max-width: 280px;
+    font-size: 0.8125rem;
   }
 `;
 

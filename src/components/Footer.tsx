@@ -5,6 +5,18 @@ const Section = styled.section`
   padding: 100px 80px;
   background: linear-gradient(180deg, transparent 0%, rgba(20, 26, 60, 0.8) 100%);
   border-top: 1px solid rgba(255, 255, 255, 0.1);
+
+  @media (max-width: 1024px) {
+    padding: 80px 60px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 60px 20px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 40px 16px;
+  }
 `;
 
 const Container = styled.div`
@@ -16,15 +28,49 @@ const CTASection = styled.div`
   text-align: center;
   margin-bottom: 80px;
   
+  @media (max-width: 1024px) {
+    margin-bottom: 70px;
+  }
+
+  @media (max-width: 768px) {
+    margin-bottom: 60px;
+  }
+
+  @media (max-width: 600px) {
+    margin-bottom: 50px;
+  }
+
+  @media (max-width: 480px) {
+    margin-bottom: 40px;
+  }
+  
   h2 {
     font-size: 42px;
     margin-bottom: 16px;
+
+    @media (max-width: 768px) {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 28px;
+    }
   }
   
   p {
     font-size: 18px;
     opacity: 0.7;
     margin-bottom: 30px;
+
+    @media (max-width: 768px) {
+      font-size: 16px;
+      margin-bottom: 24px;
+    }
+
+    @media (max-width: 480px) {
+      font-size: 15px;
+    }
   }
 `;
 
@@ -33,6 +79,15 @@ const ButtonGroup = styled.div`
   gap: 16px;
   justify-content: center;
   flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    gap: 14px;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    align-items: center;
+  }
 `;
 
 const Button = styled(motion.button)<{ primary?: boolean }>`
@@ -50,6 +105,12 @@ const Button = styled(motion.button)<{ primary?: boolean }>`
     transform: translateY(-2px);
     ${({ primary }) => primary ? "box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);" : "border-color: rgba(168, 85, 247, 0.8);"}
   }
+
+  @media (max-width: 480px) {
+    padding: 14px 28px;
+    width: 100%;
+    max-width: 280px;
+  }
 `;
 
 const Links = styled.div`
@@ -58,9 +119,17 @@ const Links = styled.div`
   gap: 40px;
   margin-bottom: 60px;
   
+  @media (max-width: 1024px) {
+    gap: 32px;
+  }
+
   @media (max-width: 768px) {
     grid-template-columns: repeat(2, 1fr);
     gap: 30px;
+  }
+
+  @media (max-width: 600px) {
+    gap: 28px;
   }
 `;
 
@@ -93,14 +162,34 @@ const Newsletter = styled.div`
   margin-bottom: 60px;
   text-align: center;
   
+  @media (max-width: 768px) {
+    padding: 30px;
+    margin-bottom: 40px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px;
+    margin-bottom: 30px;
+  }
+  
   h3 {
     font-size: 24px;
     margin-bottom: 12px;
+
+    @media (max-width: 480px) {
+      font-size: 20px;
+      margin-bottom: 10px;
+    }
   }
   
   p {
     opacity: 0.7;
     margin-bottom: 20px;
+
+    @media (max-width: 480px) {
+      font-size: 15px;
+      margin-bottom: 16px;
+    }
   }
 `;
 
@@ -112,6 +201,11 @@ const NewsletterForm = styled.div`
   
   @media (max-width: 768px) {
     flex-direction: column;
+    gap: 16px;
+  }
+
+  @media (max-width: 600px) {
+    max-width: 100%;
   }
 `;
 
@@ -147,6 +241,10 @@ const SubscribeButton = styled(motion.button)`
   
   &:hover {
     box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+  }
+
+  @media (max-width: 768px) {
+    padding: 14px 24px;
   }
 `;
 
