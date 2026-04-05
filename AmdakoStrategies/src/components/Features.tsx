@@ -1,5 +1,5 @@
 import styled from "styled-components";
-
+import { motion } from "framer-motion"; 
 const Section = styled.section`
   padding: 80px;
 `;

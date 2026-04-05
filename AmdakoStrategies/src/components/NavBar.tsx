@@ -26,11 +26,13 @@ const Container = styled.div`
 //     primary ? "linear-gradient(90deg,#7C6CF6,#A855F7)" : "transparent"};
 //   color: white;
 // `;
+
+// const Button = styled.button<{ primary?: boolean }>`
 const Button = styled.button<{ primary?: boolean }>`
   padding: 10px 18px;
 gap: 20px;
   border-radius: 10px;
-  border: ${({ primary }) =>
+  border: $primary? =>
     primary ? "none" : "1px solid rgba(255,255,255,0.2)"};
 
   background: ${({ primary }) =>
