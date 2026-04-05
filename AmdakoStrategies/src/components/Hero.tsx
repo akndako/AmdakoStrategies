@@ -31,13 +31,40 @@ const Gradient = styled.span`
 `;
 
 const Button = styled(motion.button)`
-  padding: 14px 26px;
-  border-radius: 8px;
+  padding: 16px 36px;
+  border-radius: 12px;
   background: linear-gradient(90deg,#7C6CF6,#A855F7);
   border: none;
   color: white;
-  margin-top: 20px;
+  margin-top: 30px;
+  margin-right: 16px;
   cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+  }
+`;
+
+const SecondaryButton = styled(motion.button)`
+  padding: 16px 36px;
+  border-radius: 12px;
+  background: transparent;
+  border: 2px solid rgba(124, 108, 246, 0.5);
+  color: white;
+  margin-top: 30px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 16px;
+  transition: 0.3s ease;
+  
+  &:hover {
+    border-color: rgba(168, 85, 247, 1);
+    background: rgba(168, 85, 247, 0.1);
+  }
 `;
 
 const Right = styled.div`
@@ -105,13 +132,32 @@ export default function Hero() {
         <Title
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8 }}
         >
           Invest in the <Gradient>Future</Gradient> of Web3
         </Title>
 
-        <Button whileHover={{ scale: 1.1 }}>
-          Invest Now
-        </Button>
+        <motion.p 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
+          style={{ fontSize: "20px", lineHeight: "1.6", marginTop: "30px", marginBottom: "10px", opacity: 0.8 }}
+        >
+          Unlock unprecedented returns in decentralized finance, NFT ventures, and next-generation blockchain projects. Join thousands of investors already profiting.
+        </motion.p>
+
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.4 }}
+        >
+          <Button whileHover={{ scale: 1.05 }}>
+            Start Investing Now
+          </Button>
+          <SecondaryButton whileHover={{ scale: 1.05 }}>
+            Learn More
+          </SecondaryButton>
+        </motion.div>
       </div>
 
       <Right>

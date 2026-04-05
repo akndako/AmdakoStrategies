@@ -1,12 +1,12 @@
-import styled from "styled-components";
+﻿import styled from "styled-components";
 
-// const Container = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   padding: 20px 60px;
-//   border-bottom: 1px solid rgba(255,255,255,0.1);
-// `;
-//
+type NavbarProps = {
+  activePage: "home" | "login" | "create" | "contact" | "dashboard";
+  auth: { token: string; user: { id: string; name: string; email: string } } | null;
+  onNavigate: (page: "home" | "login" | "create" | "contact" | "dashboard") => void;
+  onLogout: () => void;
+};
+
 const Container = styled.div`
   display: flex;
   justify-content: space-between;
@@ -16,33 +16,44 @@ const Container = styled.div`
   background: rgba(10, 10, 25, 0.6);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.05);
-`;
-//
-// const Button = styled.button<{ primary?: boolean }>`
-//   padding: 10px 16px;
-//   border-radius: 6px;
-//   border: ${({ primary }) => (primary ? "none" : "1px solid #444")};
-//   background: ${({ primary }) =>
-//     primary ? "linear-gradient(90deg,#7C6CF6,#A855F7)" : "transparent"};
-//   color: white;
-// `;
 
-// const Button = styled.button<{ primary?: boolean }>`
+  @media (max-width: 760px) {
+    flex-direction: column;
+    gap: 18px;
+    align-items: stretch;
+  }
+`;
+
+const Brand = styled.h3`
+  font-size: 18px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  margin: 0;
+`;
+
+const Actions = styled.div`
+  display: flex;
+  gap: 14px;
+  align-items: center;
+
+  @media (max-width: 760px) {
+    justify-content: center;
+    width: 100%;
+    flex-wrap: wrap;
+  }
+`;
+
 const Button = styled.button<{ primary?: boolean }>`
   padding: 10px 18px;
-gap: 20px;
   border-radius: 10px;
-  border: $primary? =>
+  border: ${({ primary }) =>
     primary ? "none" : "1px solid rgba(255,255,255,0.2)"};
-
   background: ${({ primary }) =>
     primary
       ? "linear-gradient(135deg, #7f00ff, #e100ff)"
       : "transparent"};
-
   color: white;
   font-weight: 500;
-
   transition: 0.3s ease;
 
   &:hover {
@@ -52,16 +63,51 @@ gap: 20px;
   }
 `;
 
-export default function Navbar() {
+export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
   return (
     <Container>
-      <h3>AMDAKOSTRATEGIES</h3>
+      <Brand>AMDAKOSTRATEGIES</Brand>
 
-      <div>
-        <Button>Login</Button>
-        
-        <Button primary>Create Account to Get Started</Button>
-      </div>
+      <Actions>
+        <Button
+          onClick={() => onNavigate("home")}
+          primary={activePage === "home"}
+        >
+          Home
+        </Button>
+        <Button
+          onClick={() => onNavigate("contact")}
+          primary={activePage === "contact"}
+        >
+          Contact Us
+        </Button>
+        {auth ? (
+          <>
+            <Button
+              onClick={() => onNavigate("dashboard")}
+              primary={activePage === "dashboard"}
+            >
+              Dashboard
+            </Button>
+            <Button onClick={onLogout}>Logout</Button>
+          </>
+        ) : (
+          <>
+            <Button
+              onClick={() => onNavigate("login")}
+              primary={activePage === "login"}
+            >
+              Login
+            </Button>
+            <Button
+              onClick={() => onNavigate("create")}
+              primary={activePage === "create"}
+            >
+              Create Account
+            </Button>
+          </>
+        )}
+      </Actions>
     </Container>
   );
 }
