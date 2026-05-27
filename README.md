@@ -8,7 +8,9 @@ A modern, responsive Web3 investment platform built with React, TypeScript, and 
 - **Secure Authentication**: JWT-based auth with MongoDB storage
 - **Dashboard**: Investment tracking and performance metrics
 - **Mobile-First**: Optimized for all device sizes
-- **Production Ready**: Scalable backend architecture
+- **Production Ready**: Fully secured and optimized backend with comprehensive error handling
+- **Security**: Helmet.js protection, rate limiting, input validation
+- **Performance**: Code splitting, asset compression, database indexing
 
 ## 🛠 Tech Stack
 
@@ -17,13 +19,16 @@ A modern, responsive Web3 investment platform built with React, TypeScript, and 
 - **Styled Components** for styling
 - **Framer Motion** for animations
 - **Recharts** for data visualization
-- **Vite** for build tooling
+- **Vite** for optimized builds
 
 ### Backend
 - **Node.js** with Express
 - **MongoDB** with Mongoose
 - **JWT** for authentication
 - **bcryptjs** for password hashing
+- **Helmet.js** for security headers
+- **Express Rate Limit** for DDoS protection
+- **Morgan** for request logging
 
 ## 📁 Project Structure
 
@@ -38,21 +43,26 @@ amdakostrategies/
 │   │   └── auth.js         # Auth endpoints
 │   ├── middleware/
 │   │   └── auth.js         # JWT middleware
-│   ├── server.js           # Main server
-│   └── .env                # Environment config
+│   └── server.js           # Main server
 ├── src/                    # Frontend source
 │   ├── components/         # Reusable components
+│   │   └── ErrorBoundary.tsx # Error handling
 │   ├── pages/             # Page components
 │   ├── assets/            # Static assets
 │   └── ...
-├── package.json
-└── README.md
-```
+├── PRODUCTION.md
+├── CHECKLIST.md
+├── Dockerfile
+├── docker-compose.yml
+├── .env.example
+└── deploy.sh
+
 
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 16+
+- Node.js 20+ (LTS recommended)
+- npm or yarn
 - MongoDB (local or Atlas)
 
 ### Installation
@@ -64,73 +74,206 @@ cd amdakostrategies
 npm install
 ```
 
-2. **Set up MongoDB:**
-   - **Local:** Install MongoDB and start service
-   - **Atlas:** Create cluster and get connection string
-
-3. **Configure environment:**
+2. **Set up environment:**
 ```bash
-# Copy and edit backend/.env
-cp backend/.env.example backend/.env
-# Edit MONGO_URI and JWT_SECRET
+cp .env.example .env
+# Edit .env with your configuration
 ```
 
-4. **Start development servers:**
+3. **Start development servers:**
 ```bash
-# Terminal 1: Backend
+# Terminal 1: Backend (port 4000)
 npm run server
 
-# Terminal 2: Frontend
+# Terminal 2: Frontend (port 5173)
 npm run dev
 ```
 
-Visit `http://localhost:5173` for the frontend and `http://localhost:4000` for the API.
+Visit `http://localhost:5173` for the frontend.
+
+## 🚢 Production Deployment
+
+### Quick Docker Deployment
+
+```bash
+# Build Docker image
+docker build -t amdako:latest .
+
+# Run with docker-compose (includes MongoDB)
+docker-compose up -d
+
+# Or run manually
+docker run -d \
+  -e NODE_ENV=production \
+  -e MONGO_URI=mongodb://... \
+  -e JWT_SECRET=... \
+  -p 4000:4000 \
+  amdako:latest
+```
+
+### VPS/Traditional Deployment
+
+1. **Setup server:**
+```bash
+# SSH into your server
+ssh user@your-server.com
+
+# Clone repository
+git clone <repository-url>
+cd amdakostrategies
+
+# Install PM2 globally
+npm install -g pm2
+
+# Install dependencies
+npm ci --only=production
+
+# Build frontend
+npm run build
+```
+
+2. **Start application:**
+```bash
+# Start backend with PM2
+pm2 start server.js --name amdako-api
+
+# Save PM2 configuration
+pm2 save
+pm2 startup
+```
+
+3. **Configure web server:**
+See [PRODUCTION.md](PRODUCTION.md) for Nginx/Apache configuration
+
+### Deployment Platforms
+
+- **Vercel**: Frontend with auto-deploy from git
+- **Railway**: Full-stack deployment
+- **Heroku**: Traditional Node.js deployment
+- **DigitalOcean/Linode**: VPS with Docker
+
+**See [PRODUCTION.md](PRODUCTION.md) for detailed deployment guide**
+
+## 📋 Pre-Deployment Checklist
+
+Before going live, complete the [CHECKLIST.md](CHECKLIST.md):
+- [ ] Environment variables configured
+- [ ] Security headers enabled
+- [ ] SSL/HTTPS configured
+- [ ] Rate limiting tested
+- [ ] Database backups configured
+- [ ] Error monitoring setup
+- [ ] Performance optimized
 
 ## 📡 API Endpoints
 
 ### Authentication
-- `POST /api/auth/register` - Register new user
-- `POST /api/auth/login` - Login user
-- `GET /api/auth/me` - Get current user (protected)
-- `PUT /api/auth/profile` - Update profile (protected)
+- `POST /api/register` - Register new user
+- `POST /api/login` - Login user
+- `GET /api/profile` - Get current user (protected)
 
 ### Dashboard
 - `GET /api/dashboard` - Dashboard data (protected)
+- `GET /health` - Health check endpoint
+
+### Response Format
+```json
+{
+  "token": "jwt-token",
+  "user": {
+    "id": "user-id",
+    "name": "User Name",
+    "email": "user@email.com"
+  }
+}
+```
 
 ## 🔧 Development Scripts
 
 ```bash
-npm run dev      # Start frontend dev server
-npm run build    # Build for production
+npm run dev      # Start frontend dev server (Vite)
+npm run build    # Build frontend for production
+npm run preview  # Preview production build locally
 npm run server   # Start backend server
-npm run lint     # Run ESLint
+npm run lint     # Run ESLint checks
+npm start        # Alias for npm run server
 ```
-
-## 🚢 Production Deployment
-
-### Backend Deployment
-1. Set `NODE_ENV=production` in environment
-2. Use production MongoDB URI
-3. Deploy to Heroku, Railway, or VPS
-
-### Frontend Deployment
-1. Build the frontend: `npm run build`
-2. Deploy `dist/` folder to Netlify, Vercel, or CDN
 
 ## 🔒 Security Features
 
-- Password hashing with bcrypt
-- JWT token authentication
+✅ **Password Security**
+- bcryptjs hashing (10 salt rounds)
+- Password strength validation (8+ characters)
+
+✅ **Authentication**
+- JWT tokens (7-day expiration)
+- Bearer token validation
+- Secure token storage
+
+✅ **API Security**
+- Helmet.js headers protection
+- CORS restricted to your domain
+- Rate limiting (100 requests/15min)
 - Input validation and sanitization
-- CORS protection
-- Environment-based configuration
+- Error messages don't leak info
+
+✅ **Database**
+- MongoDB authentication
+- Connection encryption
+- Automated backups
+
+✅ **Environment**
+- Secrets never in version control
+- Separate dev/prod configurations
+
+## 📊 Performance Optimizations
+
+✅ **Frontend**
+- Code splitting (vendor, charts, motion)
+- Minification and compression
+- Asset optimization
+- No console logs in production
+
+✅ **Backend**
+- Gzip compression
+- Request logging
+- Database indexing
+- Connection pooling
+
+## 🐛 Troubleshooting
+
+**"Cannot find module" errors**
+```bash
+rm -rf node_modules package-lock.json
+npm install
+```
+
+**MongoDB connection failed**
+- Verify MONGO_URI in .env
+- Check database user credentials
+- Ensure IP is whitelisted (if Atlas)
+
+**CORS errors**
+- Update FRONTEND_URL in .env
+- Verify backend is running on same network
+- Clear browser cache
+
+**Port already in use**
+```bash
+# Find process using port 4000
+lsof -i :4000
+# Kill process
+kill -9 <PID>
+```
+
+**See [PRODUCTION.md](PRODUCTION.md) Troubleshooting section for more**
 
 ## 📱 Responsive Design
 
 - Mobile-first approach
-- Breakpoints: 480px, 600px, 768px, 1024px, 1200px
 - Touch-friendly interactions
-- Optimized performance
+- Breakpoints: 480px, 600px, 768px, 1024px, 1200px
+- Error boundary for graceful error handling
 
 ## 🤝 Contributing
 
@@ -139,6 +282,15 @@ npm run lint     # Run ESLint
 3. Commit changes: `git commit -m 'Add amazing feature'`
 4. Push to branch: `git push origin feature/amazing-feature`
 5. Open a Pull Request
+
+## 📧 Support
+
+For deployment help, see:
+- [PRODUCTION.md](PRODUCTION.md) - Complete deployment guide
+- [CHECKLIST.md](CHECKLIST.md) - Pre-launch checklist
+- [Docker Documentation](https://docs.docker.com)
+- [Express.js Documentation](https://expressjs.com)
+- [Vite Documentation](https://vitejs.dev)
 
 ## 📄 License
 

@@ -6,9 +6,13 @@ type DashboardPageProps = {
   user: {
     id: string;
     name: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
     email: string;
   };
   onLogout: () => void;
+  onNavigate: (page: string) => void;
 };
 
 const Page = styled.section`
@@ -171,7 +175,7 @@ const Message = styled.div`
   color: rgba(255, 255, 255, 0.85);
 `;
 
-export default function DashboardPage({ token, user, onLogout }: DashboardPageProps) {
+export default function DashboardPage({ token, user, onLogout, onNavigate }: DashboardPageProps) {
   const [dashboardData, setDashboardData] = useState<{ performance: string; balance: string; openPositions: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -202,10 +206,13 @@ export default function DashboardPage({ token, user, onLogout }: DashboardPagePr
       <Card>
         <Header>
           <div>
-            <h2>Welcome, {user.name}</h2>
+            <h2>Welcome, {user.name} 👋</h2>
             <p>Your dashboard is ready. Review your portfolio, manage your account, and keep track of market performance.</p>
           </div>
-          <Button onClick={onLogout}>Logout</Button>
+          <div style={{ display: 'flex', gap: '12px', flexDirection: 'column' }}>
+            <Button onClick={() => onNavigate('agreement')}>Fill Agreement Form</Button>
+            {/* <Button onClick={onLogout}>Logout</Button> */}
+          </div>
         </Header>
 
         {error ? (

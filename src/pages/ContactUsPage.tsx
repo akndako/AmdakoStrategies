@@ -206,13 +206,13 @@ export default function ContactUsPage() {
       <Wrapper>
         <InfoCard>
           <h2>Contact Us</h2>
-          <p>Need assistance or want to learn more about our Web3 investment strategies? Reach out and one of our advisors will respond within one business day.</p>
+          <p>Need assistance or want to learn more about our  investment strategies? Reach out and one of our advisors will respond within one business day.</p>
           <strong>Email</strong>
-          <p>support@amdakostrategies.com</p>
+          <p>Amdakostrategy@gmail.com</p>
           <strong>Phone</strong>
-          <p>+1 (800) 555-0133</p>
+          <p>08035817324</p>
           <strong>Office</strong>
-          <p>123 Crypto Avenue, Suite 420, San Francisco, CA</p>
+          <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
         </InfoCard>
 
         <FormCard onSubmit={(event) => event.preventDefault()}>

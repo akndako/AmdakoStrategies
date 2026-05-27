@@ -1,9 +1,13 @@
 import { FormEvent, useState } from "react";
 import styled from "styled-components";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 type AuthUser = {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
   email: string;
 };
 
@@ -169,7 +173,9 @@ const ErrorMessage = styled.div`
 `;
 
 export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPageProps) {
-  const [name, setName] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -193,7 +199,7 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ name, email, password }),
+        body: JSON.stringify({ firstName, lastName, phone, email, password }),
       });
 
       const data = await response.json();
@@ -203,7 +209,7 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
         return;
       }
 
-      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, email: data.email } });
+      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, firstName: data.firstName, lastName: data.lastName, phone: data.phone, email: data.email } });
     } catch (err) {
       setError("Unable to connect to the server.");
     } finally {
@@ -221,26 +227,37 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
 
         <Form onSubmit={handleSubmit}>
           <Field>
-            Full name
-            <Input value={name} onChange={(e) => setName(e.target.value)} type="text" placeholder="Your full name" required />
+            First name
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="Your first name" required disabled={loading} />
+          </Field>
+
+          <Field>
+            Last name
+            <Input value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" placeholder="Your last name" required disabled={loading} />
+          </Field>
+
+          <Field>
+            Phone number
+            <Input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="Your phone number" required disabled={loading} />
           </Field>
 
           <Field>
             Email address
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required />
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required disabled={loading} />
           </Field>
 
           <Field>
             Password
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Create a strong password" required />
+            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Create a strong password" required disabled={loading} />
           </Field>
 
           <Field>
             Confirm password
-            <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" placeholder="Re-enter your password" required />
+            <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" placeholder="Re-enter your password" required disabled={loading} />
           </Field>
 
           <Button type="submit" disabled={loading}>{loading ? "Creating account..." : "Create Account"}</Button>
+          {loading && <LoadingSpinner message="Creating your account..." />}
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <Notice>By creating an account, you agree to our terms of service and privacy policy.</Notice>
         </Form>

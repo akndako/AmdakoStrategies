@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { motion } from "framer-motion";
+// import { motion } from "framer-motion";
 
 const Section = styled.section`
   padding: 100px 80px;
@@ -24,94 +24,94 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const CTASection = styled.div`
-  text-align: center;
-  margin-bottom: 80px;
+// const CTASection = styled.div`
+//   text-align: center;
+//   margin-bottom: 80px;
   
-  @media (max-width: 1024px) {
-    margin-bottom: 70px;
-  }
+//   @media (max-width: 1024px) {
+//     margin-bottom: 70px;
+//   }
 
-  @media (max-width: 768px) {
-    margin-bottom: 60px;
-  }
+//   @media (max-width: 768px) {
+//     margin-bottom: 60px;
+//   }
 
-  @media (max-width: 600px) {
-    margin-bottom: 50px;
-  }
+//   @media (max-width: 600px) {
+//     margin-bottom: 50px;
+//   }
 
-  @media (max-width: 480px) {
-    margin-bottom: 40px;
-  }
+//   @media (max-width: 480px) {
+//     margin-bottom: 40px;
+//   }
   
-  h2 {
-    font-size: 42px;
-    margin-bottom: 16px;
+//   h2 {
+//     font-size: 42px;
+//     margin-bottom: 16px;
 
-    @media (max-width: 768px) {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
+//     @media (max-width: 768px) {
+//       font-size: 32px;
+//       margin-bottom: 12px;
+//     }
 
-    @media (max-width: 480px) {
-      font-size: 28px;
-    }
-  }
+//     @media (max-width: 480px) {
+//       font-size: 28px;
+//     }
+//   }
   
-  p {
-    font-size: 18px;
-    opacity: 0.7;
-    margin-bottom: 30px;
+//   p {
+//     font-size: 18px;
+//     opacity: 0.7;
+//     margin-bottom: 30px;
 
-    @media (max-width: 768px) {
-      font-size: 16px;
-      margin-bottom: 24px;
-    }
+//     @media (max-width: 768px) {
+//       font-size: 16px;
+//       margin-bottom: 24px;
+//     }
 
-    @media (max-width: 480px) {
-      font-size: 15px;
-    }
-  }
-`;
+//     @media (max-width: 480px) {
+//       font-size: 15px;
+//     }
+//   }
+// `;
 
-const ButtonGroup = styled.div`
-  display: flex;
-  gap: 16px;
-  justify-content: center;
-  flex-wrap: wrap;
+// const ButtonGroup = styled.div`
+//   display: flex;
+//   gap: 16px;
+//   justify-content: center;
+//   flex-wrap: wrap;
 
-  @media (max-width: 600px) {
-    gap: 14px;
-  }
+//   @media (max-width: 600px) {
+//     gap: 14px;
+//   }
 
-  @media (max-width: 480px) {
-    flex-direction: column;
-    align-items: center;
-  }
-`;
+//   @media (max-width: 480px) {
+//     flex-direction: column;
+//     align-items: center;
+//   }
+// `;
 
-const Button = styled(motion.button)<{ primary?: boolean }>`
-  padding: 16px 36px;
-  border-radius: 12px;
-  border: ${({ primary }) => primary ? "none" : "2px solid rgba(124, 108, 246, 0.5)"};
-  background: ${({ primary }) => primary ? "linear-gradient(90deg,#7C6CF6,#A855F7)" : "transparent"};
-  color: white;
-  font-weight: 600;
-  font-size: 16px;
-  cursor: pointer;
-  transition: all 0.3s ease;
+// const Button = styled(motion.button)<{ primary?: boolean }>`
+//   padding: 16px 36px;
+//   border-radius: 12px;
+//   border: ${({ primary }) => primary ? "none" : "2px solid rgba(124, 108, 246, 0.5)"};
+//   background: ${({ primary }) => primary ? "linear-gradient(90deg,#7C6CF6,#A855F7)" : "transparent"};
+//   color: white;
+//   font-weight: 600;
+//   font-size: 16px;
+//   cursor: pointer;
+//   transition: all 0.3s ease;
   
-  &:hover {
-    transform: translateY(-2px);
-    ${({ primary }) => primary ? "box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);" : "border-color: rgba(168, 85, 247, 0.8);"}
-  }
+//   &:hover {
+//     transform: translateY(-2px);
+//     ${({ primary }) => primary ? "box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);" : "border-color: rgba(168, 85, 247, 0.8);"}
+//   }
 
-  @media (max-width: 480px) {
-    padding: 14px 28px;
-    width: 100%;
-    max-width: 280px;
-  }
-`;
+//   @media (max-width: 480px) {
+//     padding: 14px 28px;
+//     width: 100%;
+//     max-width: 280px;
+//   }
+// `;
 
 const Links = styled.div`
   display: grid;
@@ -154,99 +154,99 @@ const LinkColumn = styled.div`
   }
 `;
 
-const Newsletter = styled.div`
-  background: rgba(124, 108, 246, 0.1);
-  border: 1px solid rgba(124, 108, 246, 0.3);
-  padding: 40px;
-  border-radius: 16px;
-  margin-bottom: 60px;
-  text-align: center;
+// const Newsletter = styled.div`
+//   background: rgba(124, 108, 246, 0.1);
+//   border: 1px solid rgba(124, 108, 246, 0.3);
+//   padding: 40px;
+//   border-radius: 16px;
+//   margin-bottom: 60px;
+//   text-align: center;
   
-  @media (max-width: 768px) {
-    padding: 30px;
-    margin-bottom: 40px;
-  }
+//   @media (max-width: 768px) {
+//     padding: 30px;
+//     margin-bottom: 40px;
+//   }
 
-  @media (max-width: 480px) {
-    padding: 24px;
-    margin-bottom: 30px;
-  }
+//   @media (max-width: 480px) {
+//     padding: 24px;
+//     margin-bottom: 30px;
+//   }
   
-  h3 {
-    font-size: 24px;
-    margin-bottom: 12px;
+//   h3 {
+//     font-size: 24px;
+//     margin-bottom: 12px;
 
-    @media (max-width: 480px) {
-      font-size: 20px;
-      margin-bottom: 10px;
-    }
-  }
+//     @media (max-width: 480px) {
+//       font-size: 20px;
+//       margin-bottom: 10px;
+//     }
+//   }
   
-  p {
-    opacity: 0.7;
-    margin-bottom: 20px;
+//   p {
+//     opacity: 0.7;
+//     margin-bottom: 20px;
 
-    @media (max-width: 480px) {
-      font-size: 15px;
-      margin-bottom: 16px;
-    }
-  }
-`;
+//     @media (max-width: 480px) {
+//       font-size: 15px;
+//       margin-bottom: 16px;
+//     }
+//   }
+// `;
 
-const NewsletterForm = styled.div`
-  display: flex;
-  gap: 12px;
-  max-width: 400px;
-  margin: 0 auto;
+// const NewsletterForm = styled.div`
+//   display: flex;
+//   gap: 12px;
+//   max-width: 400px;
+//   margin: 0 auto;
   
-  @media (max-width: 768px) {
-    flex-direction: column;
-    gap: 16px;
-  }
+//   @media (max-width: 768px) {
+//     flex-direction: column;
+//     gap: 16px;
+//   }
 
-  @media (max-width: 600px) {
-    max-width: 100%;
-  }
-`;
+//   @media (max-width: 600px) {
+//     max-width: 100%;
+//   }
+// `;
 
-const Input = styled.input`
-  flex: 1;
-  padding: 12px 20px;
-  border-radius: 8px;
-  border: 1px solid rgba(124, 108, 246, 0.3);
-  background: rgba(10, 10, 25, 0.8);
-  color: white;
-  font-size: 14px;
+// const Input = styled.input`
+//   flex: 1;
+//   padding: 12px 20px;
+//   border-radius: 8px;
+//   border: 1px solid rgba(124, 108, 246, 0.3);
+//   background: rgba(10, 10, 25, 0.8);
+//   color: white;
+//   font-size: 14px;
   
-  &::placeholder {
-    color: rgba(255, 255, 255, 0.5);
-  }
+//   &::placeholder {
+//     color: rgba(255, 255, 255, 0.5);
+//   }
   
-  &:focus {
-    outline: none;
-    border-color: rgba(168, 85, 247, 0.6);
-    background: rgba(10, 10, 25, 0.95);
-  }
-`;
+//   &:focus {
+//     outline: none;
+//     border-color: rgba(168, 85, 247, 0.6);
+//     background: rgba(10, 10, 25, 0.95);
+//   }
+// `;
 
-const SubscribeButton = styled(motion.button)`
-  padding: 12px 28px;
-  border-radius: 8px;
-  background: linear-gradient(90deg, #7C6CF6, #A855F7);
-  border: none;
-  color: white;
-  font-weight: 600;
-  cursor: pointer;
-  white-space: nowrap;
+// const SubscribeButton = styled(motion.button)`
+//   padding: 12px 28px;
+//   border-radius: 8px;
+//   background: linear-gradient(90deg, #7C6CF6, #A855F7);
+//   border: none;
+//   color: white;
+//   font-weight: 600;
+//   cursor: pointer;
+//   white-space: nowrap;
   
-  &:hover {
-    box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
-  }
+//   &:hover {
+//     box-shadow: 0 0 20px rgba(168, 85, 247, 0.4);
+//   }
 
-  @media (max-width: 768px) {
-    padding: 14px 24px;
-  }
-`;
+//   @media (max-width: 768px) {
+//     padding: 14px 24px;
+//   }
+// `;
 
 const Bottom = styled.div`
   display: flex;
@@ -291,7 +291,7 @@ export default function Footer() {
   return (
     <Section>
       <Container>
-        <CTASection>
+        {/* <CTASection>
           <h2>Ready to Start Investing?</h2>
           <p>Join thousands of investors already profiting from Web3. Get started in minutes.</p>
           
@@ -303,9 +303,9 @@ export default function Footer() {
               Schedule Consultation
             </Button>
           </ButtonGroup>
-        </CTASection>
+        </CTASection> */}
 
-        <Newsletter>
+        {/* <Newsletter>
           <h3>Stay Updated</h3>
           <p>Get the latest Web3 investment insights delivered to your inbox</p>
           <NewsletterForm>
@@ -314,15 +314,15 @@ export default function Footer() {
               Subscribe
             </SubscribeButton>
           </NewsletterForm>
-        </Newsletter>
+        </Newsletter> */}
 
         <Links>
           <LinkColumn>
-            <h4>Product</h4>
+            {/* <h4>Product</h4>
             <a href="#features">Features</a>
             <a href="#opportunities">Investments</a>
             <a href="#pricing">Pricing</a>
-            <a href="#security">Security</a>
+            <a href="#security">Security</a> */}
           </LinkColumn>
 
           <LinkColumn>
@@ -351,13 +351,13 @@ export default function Footer() {
         </Links>
 
         <Bottom>
-          <p>© 2024 Amdako Strategies. All rights reserved. | Trusted Web3 Investment Platform</p>
+          <p>© 2024 Amdako Strategies. All rights reserved. | Trusted Investment Platform</p>
           
           <Social>
             <a href="#twitter" title="Twitter">𝕏</a>
-            <a href="#discord" title="Discord">👾</a>
+            
             <a href="#telegram" title="Telegram">✈️</a>
-            <a href="#linkedin" title="LinkedIn">💼</a>
+            <a href="#facebook" title="facebook">𝑓</a>
           </Social>
         </Bottom>
       </Container>

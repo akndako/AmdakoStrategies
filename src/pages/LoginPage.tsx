@@ -1,9 +1,13 @@
-import { FormEvent, useState } from "react";
+import { type FormEvent, useState } from "react";
 import styled from "styled-components";
+import LoadingSpinner from "../components/LoadingSpinner";
 
 type AuthUser = {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
   email: string;
 };
 
@@ -199,7 +203,7 @@ export default function LoginPage({ onAuthSuccess }: LoginPageProps) {
         return;
       }
 
-      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, email: data.email } });
+      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, firstName: data.firstName, lastName: data.lastName, phone: data.phone, email: data.email } });
     } catch (err) {
       setError("Unable to connect to the server.");
     } finally {
@@ -218,18 +222,19 @@ export default function LoginPage({ onAuthSuccess }: LoginPageProps) {
         <Form onSubmit={handleSubmit}>
           <Field>
             Email address
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required />
+            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required disabled={loading} />
           </Field>
 
           <Field>
             Password
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required />
+            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required disabled={loading} />
           </Field>
 
           <Actions>
             <Secondary>Remember me</Secondary>
             <Button type="submit" disabled={loading}>{loading ? "Signing in..." : "Sign In"}</Button>
           </Actions>
+          {loading && <LoadingSpinner message="Signing you in..." />}
           {error && <ErrorMessage>{error}</ErrorMessage>}
         </Form>
       </Card>

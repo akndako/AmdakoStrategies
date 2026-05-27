@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 type NavbarProps = {
   activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard";
-  auth: { token: string; user: { id: string; name: string; email: string } } | null;
+  auth: { token: string; user: { id: string; name: string; firstName: string; lastName: string; phone: string; email: string } } | null;
   onNavigate: (page: "home" | "about" | "login" | "create" | "contact" | "dashboard") => void;
   onLogout: () => void;
 };
@@ -18,6 +18,11 @@ const Container = styled.div`
   background: rgba(10, 10, 25, 0.6);
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: all 0.3s ease;
+
+  &:hover {
+    border-bottom-color: rgba(168, 85, 247, 0.15);
+  }
 
   @media (max-width: 1024px) {
     padding: 20px 40px;
@@ -48,6 +53,15 @@ const Brand = styled.h3`
   letter-spacing: 1px;
   text-transform: uppercase;
   margin: 0;
+  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+
+  &:hover {
+    transform: scale(1.05);
+  }
 
   @media (max-width: 480px) {
     font-size: 16px;
@@ -77,19 +91,21 @@ const Button = styled.button<{ primary?: boolean }>`
   padding: 10px 18px;
   border-radius: 10px;
   border: ${({ primary }) =>
-    primary ? "none" : "1px solid rgba(255,255,255,0.2)"};
+    primary ? "none" : "1px solid rgba(168, 85, 247, 0.4)"};
   background: ${({ primary }) =>
     primary
-      ? "linear-gradient(135deg, #7f00ff, #e100ff)"
+      ? "linear-gradient(135deg, #7C6CF6, #A855F7)"
       : "transparent"};
   color: white;
   font-weight: 500;
-  transition: 0.3s ease;
+  transition: all 0.3s ease;
+  cursor: pointer;
 
   &:hover {
     transform: translateY(-2px);
     box-shadow: ${({ primary }) =>
-      primary ? "0 0 20px rgba(225,0,255,0.6)" : "none"};
+      primary ? "0 8px 24px rgba(168, 85, 247, 0.5)" : "0 8px 24px rgba(168, 85, 247, 0.2)"};
+    ${({ primary }) => !primary && "border-color: rgba(168, 85, 247, 0.8);"}
   }
 
   @media (max-width: 600px) {
@@ -190,6 +206,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         )}
         {auth ? (
           <>
+           
             <Button
               onClick={() => handleNavigate("dashboard")}
               primary={activePage === "dashboard"}
@@ -234,6 +251,9 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
           )}
           {auth ? (
             <>
+              <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', textAlign: 'center', marginBottom: '8px' }}>
+                Welcome, {auth.user.name} 👋
+              </div>
               <MobileAction onClick={() => handleNavigate("dashboard")} primary={activePage === "dashboard"}>
                 Dashboard
               </MobileAction>

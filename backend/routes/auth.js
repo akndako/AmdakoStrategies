@@ -17,12 +17,12 @@ const generateToken = (id) => {
 // @access  Public
 router.post("/register", async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    const { firstName, lastName, phone, email, password } = req.body;
 
     // Validation
-    if (!name || !email || !password) {
+    if (!firstName || !lastName || !phone || !email || !password) {
       return res.status(400).json({
-        message: "Please provide name, email, and password",
+        message: "Please provide first name, last name, phone, email, and password",
       });
     }
 
@@ -37,7 +37,9 @@ router.post("/register", async (req, res) => {
 
     // Create user
     const user = await User.create({
-      name,
+      firstName,
+      lastName,
+      phone,
       email: email.toLowerCase(),
       password,
     });
@@ -46,6 +48,9 @@ router.post("/register", async (req, res) => {
       res.status(201).json({
         _id: user._id,
         name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
         email: user.email,
         role: user.role,
         token: generateToken(user._id),
@@ -88,6 +93,9 @@ router.post("/login", async (req, res) => {
       res.json({
         _id: user._id,
         name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
         email: user.email,
         role: user.role,
         token: generateToken(user._id),
@@ -115,6 +123,9 @@ router.get("/me", protect, async (req, res) => {
     res.status(200).json({
       _id: user._id,
       name: user.name,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      phone: user.phone,
       email: user.email,
       role: user.role,
       createdAt: user.createdAt,

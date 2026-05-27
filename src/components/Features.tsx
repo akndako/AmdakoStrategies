@@ -137,10 +137,30 @@ const Card = styled(motion.div)`
   border: 1px solid rgba(124, 108, 246, 0.2);
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 108, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
     border-color: rgba(168, 85, 247, 0.5);
     background: rgba(124, 108, 246, 0.15);
+    transform: translateY(-5px);
+    box-shadow: 0 20px 40px rgba(168, 85, 247, 0.15);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 1024px) {
@@ -166,6 +186,8 @@ const Card = styled(motion.div)`
   h3 {
     font-size: 1.375rem;
     margin-bottom: 18px;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 1024px) {
       font-size: 1.25rem;
@@ -197,6 +219,8 @@ const Card = styled(motion.div)`
     opacity: 0.75;
     line-height: 1.6;
     font-size: 0.9375rem;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 768px) {
       font-size: 0.875rem;
@@ -215,6 +239,12 @@ const Card = styled(motion.div)`
 const IconBox = styled.div`
   font-size: 56px;
   margin-bottom: 24px;
+  display: inline-block;
+  background: rgba(168, 85, 247, 0.15);
+  padding: 16px;
+  border-radius: 12px;
+  position: relative;
+  z-index: 1;
 
   @media (max-width: 1024px) {
     font-size: 52px;
@@ -239,6 +269,7 @@ const IconBox = styled.div`
   @media (max-width: 360px) {
     font-size: 36px;
     margin-bottom: 14px;
+  }
 `;
 
 export default function Features() {

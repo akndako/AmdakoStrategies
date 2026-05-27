@@ -6,19 +6,26 @@ import { theme } from "./theme";
 import Navbar from "./components/NavBar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
+import Testimonials from "./components/Testimonials";
 import Opportunities from "./components/Opportunities";
 import Stats from "./components/Stats";
+import CTA from "./components/CTA";
 import Footer from "./components/Footer";
 import LoginPage from "./pages/LoginPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import DashboardPage from "./pages/DashboardPage";
+import AboutUsPage from "./pages/AboutUsPage";
+import AgreementFormPage from "./pages/AgreementFormPage";
 
-type PageView = "home" | "login" | "create" | "contact" | "dashboard";
+type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
 
 type AuthUser = {
   id: string;
   name: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
   email: string;
 };
 
@@ -59,17 +66,23 @@ export default function App() {
         return <LoginPage onAuthSuccess={handleAuthSuccess} />;
       case "create":
         return <CreateAccountPage onAuthSuccess={handleAuthSuccess} />;
+      case "about":
+        return <AboutUsPage />;
       case "contact":
         return <ContactUsPage />;
+      case "agreement":
+        return auth ? <AgreementFormPage user={auth.user} onNavigate={setPage} /> : <LoginPage onAuthSuccess={handleAuthSuccess} />;
       case "dashboard":
-        return auth ? <DashboardPage token={auth.token} user={auth.user} onLogout={handleLogout} /> : <LoginPage onAuthSuccess={handleAuthSuccess} />;
+        return auth ? <DashboardPage token={auth.token} user={auth.user} onLogout={handleLogout} onNavigate={setPage} /> : <LoginPage onAuthSuccess={handleAuthSuccess} />;
       default:
         return (
           <>
             <Hero />
             <Features />
+            <Testimonials />
             <Opportunities />
             <Stats />
+            <CTA onNavigate={setPage} />
           </>
         );
     }

@@ -138,15 +138,35 @@ const Grid = styled.div`
 const Card = styled(motion.div)`
   padding: 45px;
   border-radius: 18px;
-  background: linear-gradient(135deg,rgba(124,108,246,0.25),rgba(168,85,247,0.25));
+  background: rgba(20,26,60,0.7);
   border: 1px solid rgba(124, 108, 246, 0.3);
   backdrop-filter: blur(12px);
   cursor: pointer;
   transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(124, 108, 246, 0.1));
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
   
   &:hover {
     border-color: rgba(168, 85, 247, 0.6);
-    background: linear-gradient(135deg,rgba(124,108,246,0.4),rgba(168,85,247,0.4));
+    background: rgba(124, 108, 246, 0.15);
+    transform: translateY(-6px);
+    box-shadow: 0 20px 50px rgba(168, 85, 247, 0.2);
+    
+    &::before {
+      opacity: 1;
+    }
   }
 
   @media (max-width: 1024px) {
@@ -172,6 +192,8 @@ const Card = styled(motion.div)`
   h3 {
     font-size: 1.375rem;
     margin-bottom: 14px;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 1024px) {
       font-size: 1.25rem;
@@ -204,6 +226,8 @@ const Card = styled(motion.div)`
     line-height: 1.6;
     font-size: 0.9375rem;
     margin-bottom: 22px;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 768px) {
       font-size: 0.875rem;
@@ -228,7 +252,11 @@ const Card = styled(motion.div)`
   .roi {
     font-size: 1.125rem;
     font-weight: 600;
-    color: #a78bfa;
+    background: linear-gradient(90deg, #a78bfa, #f472b6);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    position: relative;
+    z-index: 1;
 
     @media (max-width: 768px) {
       font-size: 1.0625rem;
@@ -324,8 +352,9 @@ export default function Opportunities() {
 
   return (
     <Section>
-      <Title>Investment Opportunities</Title>
-      <Subtitle>Diversify your portfolio with our carefully curated Web3 investment categories</Subtitle>
+      <Title>Why Investors Are Choosing Amdako Strategy Nig. Ltd.</Title>
+      <Subtitle>In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd. stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency trading solutions from the heart of Nigeria.
+</Subtitle>
 
       <Grid>
         {opportunities.map((opp, idx) => (

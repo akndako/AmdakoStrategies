@@ -2,9 +2,19 @@ import mongoose from "mongoose";
 import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
-  name: {
+  firstName: {
     type: String,
-    required: [true, "Please add a name"],
+    required: [true, "Please add a first name"],
+    trim: true,
+  },
+  lastName: {
+    type: String,
+    required: [true, "Please add a last name"],
+    trim: true,
+  },
+  phone: {
+    type: String,
+    required: [true, "Please add a phone number"],
     trim: true,
   },
   email: {
@@ -45,16 +55,25 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-// Update the updatedAt field before saving
-userSchema.pre("save", function (next) {
-  this.updatedAt = Date.now();
-  next();
+// Virtual for full name
+userSchema.virtual('name').get(function() {
+  return `${this.firstName} ${this.lastName}`;
 });
 
+// Ensure virtual fields are serialized
+userSchema.set('toJSON', { virtuals: true });
+userSchema.set('toObject', { virtuals: true });
+
+// Update the updatedAt field before saving
+// userSchema.pre("save", function (next) {
+//   this.updatedAt = Date.now();
+//   next();
+// });
+
 // Hash password before saving
-userSchema.pre("save", async function (next) {
+userSchema.pre("save", async function () {
   if (!this.isModified("password")) {
-    next();
+    return;
   }
 
   const salt = await bcrypt.genSalt(10);
@@ -73,6 +92,6 @@ userSchema.methods.toJSON = function () {
   return userObject;
 };
 
-const User = mongoose.model("User", userSchema);
+const User = mongoose.model("User", userSchema, "akndako");
 
 export default User;

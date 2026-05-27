@@ -258,6 +258,10 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
+  background: radial-gradient(circle at 60% 40%, rgba(168, 85, 247, 0.15), transparent);
+  border-radius: 20px;
+  border: 1px solid rgba(168, 85, 247, 0.2);
+  backdrop-filter: blur(8px);
 
   @media (max-width: 1200px) {
     max-width: 500px;
@@ -290,6 +294,7 @@ const Right = styled.div`
 const Coin = styled(motion.img)`
   width: 90px;
   position: absolute;
+  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.4));
 
   @media (max-width: 1200px) {
     width: 85px;
@@ -325,8 +330,9 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
         >
-          Invest in the <Gradient>Future</Gradient> of Cryptocurrency
+          Redefining the Future of Cryptocurrency Trading in 
 
+           <Gradient>Africa</Gradient> 
         </Title>
 
         <Subtitle
