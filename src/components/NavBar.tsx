@@ -2,9 +2,9 @@
 import styled from "styled-components";
 
 type NavbarProps = {
-  activePage: "home" | "login" | "create" | "contact" | "dashboard";
+  activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard";
   auth: { token: string; user: { id: string; name: string; email: string } } | null;
-  onNavigate: (page: "home" | "login" | "create" | "contact" | "dashboard") => void;
+  onNavigate: (page: "home" | "about" | "login" | "create" | "contact" | "dashboard") => void;
   onLogout: () => void;
 };
 
@@ -156,7 +156,7 @@ const MobileAction = styled(Button)`
 export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleNavigate = (page: "home" | "login" | "create" | "contact" | "dashboard") => {
+  const handleNavigate = (page: "home" | "about" | "login" | "create" | "contact" | "dashboard") => {
     setMenuOpen(false);
     onNavigate(page);
   };
@@ -166,18 +166,28 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
       <Brand>AMDAKOSTRATEGIES</Brand>
 
       <Actions>
-        <Button
-          onClick={() => onNavigate("home")}
-          primary={activePage === "home"}
-        >
-          Home
-        </Button>
-        <Button
-          onClick={() => onNavigate("contact")}
-          primary={activePage === "contact"}
-        >
-          Contact Us
-        </Button>
+        {!auth && (
+          <>
+            <Button
+              onClick={() => onNavigate("home")}
+              primary={activePage === "home"}
+            >
+              Home
+            </Button>
+            <Button
+              onClick={() => onNavigate("about")}
+              primary={activePage === "about"}
+            >
+              About Us
+            </Button>
+            <Button
+              onClick={() => onNavigate("contact")}
+              primary={activePage === "contact"}
+            >
+              Contact Us
+            </Button>
+          </>
+        )}
         {auth ? (
           <>
             <Button
@@ -212,12 +222,16 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       {menuOpen && (
         <MobileMenu>
-          <MobileAction onClick={() => handleNavigate("home")} primary={activePage === "home"}>
-            Home
-          </MobileAction>
-          <MobileAction onClick={() => handleNavigate("contact")} primary={activePage === "contact"}>
-            Contact Us
-          </MobileAction>
+          {!auth && (
+            <>
+              <MobileAction onClick={() => handleNavigate("home")} primary={activePage === "home"}>
+                Home
+              </MobileAction>
+              <MobileAction onClick={() => handleNavigate("contact")} primary={activePage === "contact"}>
+                Contact Us
+              </MobileAction>
+            </>
+          )}
           {auth ? (
             <>
               <MobileAction onClick={() => handleNavigate("dashboard")} primary={activePage === "dashboard"}>
