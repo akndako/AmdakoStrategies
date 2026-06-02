@@ -1,17 +1,18 @@
-# 🚀 Custom Domain Deployment - Quick Start
+# 🚀 Smatweb Deployment - Quick Start
+
+**Domain:** amdakostrategies.com.ng
 
 ## ⚡ Quickest Path (5 Steps)
 
-1. **Point domain to hosting** - Update DNS with nameservers or A record (wait 24-48h)
+1. **Point domain to Smatweb** - Update nameservers at registrar (wait 24-48h)
 
-2. **Connect via SSH** - `ssh username@yourdomain.com`
+2. **Connect via SSH** - `ssh username@amdakostrategies.com.ng`
 
 3. **Clone and setup:**
 ```bash
-cd ~/public_html  # or appropriate folder
-git clone https://github.com/yourusername/AmdakoStrategies.git
-cd AmdakoStrategies
-nano .env  # Create .env with MONGO_URI, JWT_SECRET, FRONTEND_URL
+cd ~/public_html/amdako
+git clone https://github.com/yourusername/AmdakoStrategies.git .
+nano .env  # Create .env with MONGO_URI (from MongoDB Atlas), JWT_SECRET
 ```
 
 4. **Build and start:**
@@ -20,25 +21,28 @@ npm ci --only=production
 npm run build
 npm install -g pm2
 pm2 start server.js --name "amdako-api"
+pm2 save
 ```
 
-5. **Configure web server** - See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md#step-8-configure-your-web-server-nginx-or-apache)
+5. **Setup SSL in cPanel** - Go to SSL/TLS Status → Enable AutoSSL
 
-Done! 🎉
+Done! 🎉 Visit: https://amdakostrategies.com.ng
 
 ---
 
 ## 📋 For Complete Instructions
 
-**See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md)** for:
-- ✅ DNS setup
-- ✅ Server preparation
-- ✅ SSL/HTTPS setup
+**See [SMATWEB_DEPLOYMENT.md](SMATWEB_DEPLOYMENT.md)** for:
+- ✅ MongoDB Atlas setup
+- ✅ DNS configuration
+- ✅ Code upload methods
+- ✅ PM2 process management
 - ✅ Nginx/Apache configuration
+- ✅ SSL/HTTPS setup
 - ✅ Monitoring & maintenance
 - ✅ Troubleshooting
 
-**Use [DEPLOYMENT_CHECKLIST_CUSTOM_DOMAIN.md](DEPLOYMENT_CHECKLIST_CUSTOM_DOMAIN.md)** to verify each step
+**Use [SMATWEB_DEPLOYMENT_CHECKLIST.md](SMATWEB_DEPLOYMENT_CHECKLIST.md)** to verify each step
 
 ## 🔑 Environment Variables
 

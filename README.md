@@ -145,19 +145,22 @@ pm2 startup
 3. **Configure web server:**
 See [PRODUCTION.md](PRODUCTION.md) for Nginx/Apache configuration
 
-### Custom Domain Deployment
+### Smatweb Deployment (amdakostrategies.com.ng)
 
-**For deploying to your own domain on shared hosting:**
+Your production deployment is configured for **Smatweb hosting** with domain **amdakostrategies.com.ng**.
 
-See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md) for complete step-by-step guide including:
-- Pointing your domain to your hosting
-- Setting up Node.js on shared hosting
-- Configuring Nginx or Apache
-- Setting up SSL/HTTPS with Let's Encrypt
-- Managing with PM2
-- Monitoring and maintenance
+Complete deployment guide: [SMATWEB_DEPLOYMENT.md](SMATWEB_DEPLOYMENT.md)
 
-**See [PRODUCTION.md](PRODUCTION.md) for additional production configuration details**
+Quick start (5 steps): [QUICK_START_DEPLOYMENT.md](QUICK_START_DEPLOYMENT.md)
+
+Pre-launch checklist: [SMATWEB_DEPLOYMENT_CHECKLIST.md](SMATWEB_DEPLOYMENT_CHECKLIST.md)
+
+Key features:
+- MongoDB Atlas for database (cloud)
+- PM2 for process management
+- Nginx/Apache for web server
+- Let's Encrypt SSL (free, automatic)
+- cPanel-based hosting management
 
 ## 📋 Pre-Deployment Checklist
 
