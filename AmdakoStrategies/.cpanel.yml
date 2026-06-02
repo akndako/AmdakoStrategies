@@ -4,12 +4,11 @@ deployment:
     - deployment_target: "amdakostrategies.com.ng"
       repository_root: "/"
       working_directory: "/"
-      build_command: "/bin/bash deploy-frontend.sh"
-      test_command: "test -d public_html/amdako && test -f public_html/amdako/index.html"
-      restart_reload_command: "echo 'Frontend deployed successfully'"
+      build_command: "/bin/bash build.sh"
+      test_command: "test -f frontend/dist/index.html && test -f backend/server.js"
+      restart_reload_command: "/bin/bash restart.sh"
       environment_variables:
-        - NODE_ENV=production
+        - NODE_ENV: "production"
 hooks:
   post_deployment:
-    - echo "✅ Frontend deployment verified"
-    - echo "📍 Website: https://amdakostrategies.com.ng"
+    - echo "✅ Deployment verified on Dove Standard 11 (147.124.214.12)"
