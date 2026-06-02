@@ -5,24 +5,21 @@ set -e
 
 echo "🚀 Restarting application..."
 
-# Install PM2 globally if not exists
+# Install PM2
 if ! command -v pm2 &> /dev/null; then
     npm install -g pm2
 fi
 
-# Start or restart the app
+# Start or restart backend
 if pm2 list | grep -q "amdako-api"; then
-    echo "♻️  Restarting existing PM2 process..."
+    echo "♻️  Restarting PM2..."
     pm2 restart amdako-api
 else
-    echo "🟢 Starting new PM2 process..."
+    echo "🟢 Starting PM2..."
     pm2 start backend/server.js --name "amdako-api"
 fi
 
-# Save PM2 configuration
 pm2 save
-
-# Setup auto-restart on reboot
 pm2 startup > /dev/null 2>&1 || true
 
-echo "✅ Application restarted successfully!"
+echo "✅ Application restarted!"
