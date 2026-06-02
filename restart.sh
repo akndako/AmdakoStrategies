@@ -16,7 +16,7 @@ if pm2 list | grep -q "amdako-api"; then
     pm2 restart amdako-api
 else
     echo "🟢 Starting new PM2 process..."
-    pm2 start server.js --name "amdako-api"
+    pm2 start backend/server.js --name "amdako-api"
 fi
 
 # Save PM2 configuration
