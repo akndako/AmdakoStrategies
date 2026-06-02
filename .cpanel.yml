@@ -4,17 +4,12 @@ deployment:
     - deployment_target: "amdakostrategies.com.ng"
       repository_root: "/"
       working_directory: "/"
-      build_command: "/bin/bash build.sh"
-      test_command: "test -f frontend/dist/index.html && test -f backend/server.js"
-      restart_reload_command: "/bin/bash restart.sh"
-      environment_variables:
-        - NODE_ENV=production
+      build_command: "/bin/bash deploy-frontend.sh"
+      test_command: "test -f frontend/dist/index.html"
+      restart_reload_command: "echo 'Frontend deployed'"
 hooks:
   build:
     - export PATH=$PATH:/usr/local/bin
     - cd frontend && npm install --production && npm run build && cd ..
-    - cd backend && npm install --production && cd ..
   post_deployment:
-    - npm install -g pm2
-    - pm2 start backend/server.js --name "amdako-api" || pm2 restart amdako-api
-    - pm2 save
+    - echo "✅ Frontend deployed successfully"
