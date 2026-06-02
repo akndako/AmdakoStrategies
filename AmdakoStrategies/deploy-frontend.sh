@@ -30,6 +30,11 @@ cat > "$FRONTEND_DIR/.htaccess" << 'HTACCESS'
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
+
+    # Add Content Security Policy to allow 'eval' for libraries like jsPDF
+    <IfModule mod_headers.c>
+        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self' https://amdakostrategies.com.ng;"
+    </IfModule>
     
     # Ensure JavaScript files are served with the correct MIME type
     AddType application/javascript .js
