@@ -1,7 +1,6 @@
 ---
 deployment:
   tasks:
-    - export NODE_ENV=production
-    - /bin/bash build.sh
-    - /bin/bash restart.sh
-    - echo "✅ Deployment verified on Dove Standard 11 (147.124.214.12)"
+    - export DEPLOYPATH=/home/akndako/public_html/amdako/
+    - /bin/bash deploy-frontend.sh
+    - echo "✅ Deployment complete to $DEPLOYPATH"
