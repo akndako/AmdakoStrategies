@@ -1,14 +1,7 @@
 ---
 deployment:
-  targets:
-    - deployment_target: "amdakostrategies.com.ng"
-      repository_root: "/"
-      working_directory: "/"
-      build_command: "/bin/bash build.sh"
-      test_command: "test -f frontend/dist/index.html && test -f backend/server.js"
-      restart_reload_command: "/bin/bash restart.sh"
-      environment_variables:
-        - NODE_ENV: "production"
-hooks:
-  post_deployment:
+  tasks:
+    - export NODE_ENV=production
+    - /bin/bash build.sh
+    - /bin/bash restart.sh
     - echo "✅ Deployment verified on Dove Standard 11 (147.124.214.12)"
