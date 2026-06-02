@@ -31,9 +31,9 @@ cat > "$FRONTEND_DIR/.htaccess" << 'HTACCESS'
     RewriteEngine On
     RewriteBase /
 
-    # Add Content Security Policy to allow 'eval' for libraries like jsPDF
+    # Comprehensive CSP to allow 'eval' for jsPDF/html2canvas and blob/worker support
     <IfModule mod_headers.c>
-        Header set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data:; connect-src 'self' https://amdakostrategies.com.ng;"
+        Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
     </IfModule>
     
     # Ensure JavaScript files are served with the correct MIME type

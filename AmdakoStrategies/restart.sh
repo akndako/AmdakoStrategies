@@ -23,9 +23,12 @@ pm2 save
 pm2 startup > /dev/null 2>&1 || true
 
 # Force Apache to acknowledge configuration changes
-if [ -d "frontend/dist" ]; then
+CUSER=$(whoami)
+LIVE_HTACCESS="/home/$CUSER/public_html/amdako/.htaccess"
+
+if [ -f "$LIVE_HTACCESS" ]; then
     echo "📄 Refreshing Apache .htaccess settings..."
-    touch frontend/dist/.htaccess 2>/dev/null || true
+    touch "$LIVE_HTACCESS" 2>/dev/null || true
 fi
 
 echo "✅ Application restarted!"
