@@ -145,14 +145,19 @@ pm2 startup
 3. **Configure web server:**
 See [PRODUCTION.md](PRODUCTION.md) for Nginx/Apache configuration
 
-### Deployment Platforms
+### Custom Domain Deployment
 
-- **Vercel**: Frontend with auto-deploy from git
-- **Railway**: Full-stack deployment
-- **Heroku**: Traditional Node.js deployment
-- **DigitalOcean/Linode**: VPS with Docker
+**For deploying to your own domain on shared hosting:**
 
-**See [PRODUCTION.md](PRODUCTION.md) for detailed deployment guide**
+See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md) for complete step-by-step guide including:
+- Pointing your domain to your hosting
+- Setting up Node.js on shared hosting
+- Configuring Nginx or Apache
+- Setting up SSL/HTTPS with Let's Encrypt
+- Managing with PM2
+- Monitoring and maintenance
+
+**See [PRODUCTION.md](PRODUCTION.md) for additional production configuration details**
 
 ## 📋 Pre-Deployment Checklist
 

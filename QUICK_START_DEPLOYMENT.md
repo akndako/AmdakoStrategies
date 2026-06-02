@@ -1,52 +1,44 @@
-# 🚀 Quick Reference - Production Deployment
+# 🚀 Custom Domain Deployment - Quick Start
 
-## ⚡ 5-Minute Setup
+## ⚡ Quickest Path (5 Steps)
 
+1. **Point domain to hosting** - Update DNS with nameservers or A record (wait 24-48h)
+
+2. **Connect via SSH** - `ssh username@yourdomain.com`
+
+3. **Clone and setup:**
 ```bash
-# 1. Set environment variables
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT_SECRET
+cd ~/public_html  # or appropriate folder
+git clone https://github.com/yourusername/AmdakoStrategies.git
+cd AmdakoStrategies
+nano .env  # Create .env with MONGO_URI, JWT_SECRET, FRONTEND_URL
+```
 
-# 2. Install dependencies
-npm install
-
-# 3. Build frontend
+4. **Build and start:**
+```bash
+npm ci --only=production
 npm run build
-
-# 4. Start backend
-npm run server
+npm install -g pm2
+pm2 start server.js --name "amdako-api"
 ```
 
-Visit: `http://localhost:4000/health` ✅
-
----
-
-## 🐳 Docker Deployment (2 commands)
-
-```bash
-# 1. Start with MongoDB included
-docker-compose up -d
-
-# 2. Verify
-curl http://localhost:4000/health
-```
+5. **Configure web server** - See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md#step-8-configure-your-web-server-nginx-or-apache)
 
 Done! 🎉
 
 ---
 
-## 🗂️ Essential Files
+## 📋 For Complete Instructions
 
-| File | What It Does | Action |
-|:-----|:-------------|:-------|
-| `.env` | Configuration | **Create from .env.example** |
-| `server.js` | Backend API | ✅ Ready to deploy |
-| `vite.config.ts` | Frontend build | ✅ Optimized for production |
-| `Dockerfile` | Container setup | ✅ Production-ready |
-| `docker-compose.yml` | Full stack | ✅ Same as Docker |
-| `ErrorBoundary.tsx` | Error handling | ✅ Integrated |
+**See [CUSTOM_DOMAIN_DEPLOYMENT.md](CUSTOM_DOMAIN_DEPLOYMENT.md)** for:
+- ✅ DNS setup
+- ✅ Server preparation
+- ✅ SSL/HTTPS setup
+- ✅ Nginx/Apache configuration
+- ✅ Monitoring & maintenance
+- ✅ Troubleshooting
 
----
+**Use [DEPLOYMENT_CHECKLIST_CUSTOM_DOMAIN.md](DEPLOYMENT_CHECKLIST_CUSTOM_DOMAIN.md)** to verify each step
 
 ## 🔑 Environment Variables
 
