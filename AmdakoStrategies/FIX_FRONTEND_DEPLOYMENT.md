@@ -86,9 +86,12 @@ public_html/amdako/
 ```apache
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
+    AddType application/javascript .js
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.html [QSA,L]
+    RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf)$ [NC]
+    RewriteRule ^ index.html [L]
 </IfModule>
 ```
 

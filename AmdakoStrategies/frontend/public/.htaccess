@@ -1,11 +1,18 @@
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
-    RewriteRule ^index\.html$ - [L]
+
+    # Ensure JavaScript files are served with the correct MIME type
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    AddType text/css .css
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-l
-    RewriteRule . /index.html [L]
+    # Do NOT rewrite requests for static assets to index.html if they are missing
+    RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf)$ [NC]
+    RewriteRule ^ index.html [L]
 </IfModule>
 
 # Force HTTPS Redirection

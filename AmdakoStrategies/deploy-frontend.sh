@@ -29,10 +29,23 @@ echo "🔧 Setting up .htaccess for SPA routing..."
 cat > "$FRONTEND_DIR/.htaccess" << 'HTACCESS'
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    RewriteBase /
+    
+    # Ensure JavaScript files are served with the correct MIME type
+    AddType application/javascript .js
+    AddType application/javascript .mjs
+    AddType text/css .css
+
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
-    RewriteRule ^ index.html [QSA,L]
+    # Do NOT rewrite requests for static assets to index.html if they are missing
+    RewriteCond %{REQUEST_URI} !\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf|wasm)$ [NC]
+    RewriteRule ^ index.html [L]
 </IfModule>
+
+# Force HTTPS Redirection
+RewriteCond %{HTTPS} off
+RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 HTACCESS
 
 chmod 644 "$FRONTEND_DIR/.htaccess"

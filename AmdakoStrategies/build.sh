@@ -20,6 +20,17 @@ npm install --production
 npm run build
 cd ..
 
+# Deploy frontend files to web root
+CUSER=$(whoami)
+FRONTEND_DIR="/home/$CUSER/public_html/amdako"
+echo "📦 Deploying frontend assets to $FRONTEND_DIR..."
+mkdir -p "$FRONTEND_DIR"
+# Remove old assets to prevent clutter
+rm -rf "$FRONTEND_DIR/assets"
+cp -r frontend/dist/* "$FRONTEND_DIR/"
+# Ensure permissions are correct
+chmod -R 755 "$FRONTEND_DIR"
+
 # Install backend dependencies
 echo "📦 Installing backend dependencies..."
 cd backend
