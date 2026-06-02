@@ -132,7 +132,7 @@ Complete checklist for deploying to Smatweb hosting.
 
 ### DNS Resolution
 - [ ] DNS propagation complete (24-48 hours)
-- [ ] `nslookup amdakostrategies.com.ng` returns Smatweb IP
+- [ ] `nslookup amdakostrategies.com.ng` returns **147.124.214.12**
 - [ ] `dig amdakostrategies.com.ng` shows correct nameservers
 - [ ] A record points to Smatweb IP
 - [ ] MX records configured (if email needed)

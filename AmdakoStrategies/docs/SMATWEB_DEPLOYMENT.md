@@ -74,7 +74,7 @@ Your database will be hosted on MongoDB Atlas (free tier available).
 # Use cPanel credentials
 ssh username@amdakostrategies.com.ng
 # or use server IP
-ssh username@your-smatweb-ip
+ssh username@147.124.214.12
 ```
 
 ### 3.2 Verify Node.js
