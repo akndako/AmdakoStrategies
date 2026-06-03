@@ -9,7 +9,10 @@ FRONTEND_DIR="$PUBLIC_HTML/amdako"
 
 echo "🔨 Building frontend..."
 cd frontend
-npm install --production
+# We must install all dependencies (including devDeps) to run the build (Vite/TypeScript)
+npm install --include=dev
+# Ensure clean build
+rm -rf dist
 npm run build
 
 if [ ! -d "dist" ]; then
@@ -27,12 +30,14 @@ cp -r dist/* "$FRONTEND_DIR/"
 
 echo "🔧 Setting up .htaccess for SPA routing..."
 cat > "$FRONTEND_DIR/.htaccess" << 'HTACCESS'
+# Security and MIME Headers
 <IfModule mod_headers.c>
-    # Comprehensive CSP to allow 'eval' for jsPDF/html2canvas and blob/worker support
+    Header set X-Content-Type-Options "nosniff"
+    # Updated CSP to allow 'eval' for libraries like jsPDF/html2canvas
     Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
 </IfModule>
 
-# Ensure JavaScript files are served with the correct MIME type
+# Standard MIME Types
 AddType application/javascript .js
 AddType application/javascript .mjs
 AddType text/css .css
@@ -40,17 +45,18 @@ AddType text/css .css
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # 1. Force HTTPS Redirection (Should always be first)
+    # 1. Force HTTPS
     RewriteCond %{HTTPS} off
     RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
     RewriteBase /
 
-    # 2. Prevent SPA rewrite for static assets
-    # This ensures that if a JS/CSS file is missing, it returns 404 instead of index.html
-    RewriteRule ^assets/(.*) - [L]
+    # 2. Fix MIME issues: Do NOT rewrite requests for static assets that don't exist
+    # This prevents the server from sending index.html (text/html) when a .js file is missing
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteRule \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf)$ - [L,R=404]
 
-    # 3. SPA Routing
+    # 3. SPA Routing catch-all
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.html [L]

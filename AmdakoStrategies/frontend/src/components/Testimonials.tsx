@@ -260,7 +260,7 @@ export default function Testimonials() {
             transition={{ delay: idx * 0.2, duration: 0.6 }}
             viewport={{ once: true }}
           >
-            <Stars>★★★★★</Stars>
+            <Stars role="img" aria-label="5 star rating">★★★★★</Stars>
             <Quote>{testimonial.quote}</Quote>
             <Author>
               <Avatar>{testimonial.avatar}</Avatar>
