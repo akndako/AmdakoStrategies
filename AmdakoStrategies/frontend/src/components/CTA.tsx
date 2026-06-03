@@ -3,8 +3,8 @@ import { motion } from "framer-motion";
 
 const Section = styled.section`
   padding: 100px;
-  background: linear-gradient(135deg, rgba(124, 108, 246, 0.2), rgba(168, 85, 247, 0.2));
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: rgba(30, 35, 41, 0.7);
+  border: 1px solid rgba(243, 186, 47, 0.15);
   margin: 80px 100px;
   border-radius: 24px;
   text-align: center;
@@ -18,7 +18,7 @@ const Section = styled.section`
     right: -10%;
     width: 500px;
     height: 500px;
-    background: radial-gradient(circle, rgba(168, 85, 247, 0.15), transparent);
+    background: radial-gradient(circle, rgba(243, 186, 47, 0.15), transparent);
     border-radius: 50%;
     pointer-events: none;
   }
@@ -129,10 +129,10 @@ const ButtonGroup = styled.div`
 const Button = styled(motion.button)<{ primary?: boolean }>`
   padding: 16px 40px;
   border-radius: 12px;
-  border: ${({ primary }) => primary ? "none" : "2px solid rgba(168, 85, 247, 0.6)"};
-  background: ${({ primary }) => primary ? "linear-gradient(135deg, #7C6CF6, #A855F7)" : "transparent"};
+  border: ${({ primary }) => primary ? "none" : "2px solid rgba(243, 186, 47, 0.2)"};
+  background: ${({ primary }) => primary ? "linear-gradient(135deg, #F3BA2F 0%, #F7A600 100%)" : "transparent"};
   color: white;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -140,8 +140,8 @@ const Button = styled(motion.button)<{ primary?: boolean }>`
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: ${({ primary }) => primary ? "0 10px 30px rgba(168, 85, 247, 0.4)" : "none"};
-    ${({ primary }) => !primary && `border-color: rgba(168, 85, 247, 1);`}
+    box-shadow: ${({ primary }) => primary ? "0 16px 32px rgba(243, 186, 47, 0.4)" : "none"};
+    ${({ primary }) => !primary && `border-color: #F3BA2F;`}
   }
 
   @media (max-width: 768px) {

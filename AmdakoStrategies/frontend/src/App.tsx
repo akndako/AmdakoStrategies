@@ -1,4 +1,4 @@
-﻿import { useEffect, useState } from "react";
+﻿﻿import { useEffect, useState } from "react";
 import { ThemeProvider } from "styled-components";
 import { GlobalStyles } from "./globalStyles";
 import { theme } from "./theme";
@@ -18,7 +18,7 @@ import DashboardPage from "./pages/DashboardPage";
 import AboutUsPage from "./pages/AboutUsPage";
 import AgreementFormPage from "./pages/AgreementFormPage";
 
-type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
+export type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
 
 type AuthUser = {
   id: string;

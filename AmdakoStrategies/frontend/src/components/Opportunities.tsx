@@ -2,8 +2,8 @@ import styled from "styled-components";
 import { motion } from "framer-motion";
 
 const Section = styled.section`
-  padding: 120px 100px;
-  background: linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.05) 100%);
+  padding: 120px 100px; /* Consistent padding */
+  background: linear-gradient(180deg, transparent 0%, rgba(243, 186, 47, 0.05) 100%); /* Gold gradient */
 
   @media (max-width: 1200px) {
     padding: 100px 80px;
@@ -30,81 +30,82 @@ const Section = styled.section`
   }
 `;
 
-const Title = styled.h2`
-  font-size: 2.75rem;
-  margin-bottom: 24px;
-  text-align: center;
+// const Title = styled.h2`
+//   font-size: 2.75rem;
+//   margin-bottom: 24px;
+//   text-align: center;
 
-  @media (max-width: 1200px) {
-    font-size: 2.5rem;
-    margin-bottom: 22px;
-  }
+//   @media (max-width: 1200px) {
+//     font-size: 2.5rem;
+//     margin-bottom: 22px;
+//   }
 
-  @media (max-width: 1024px) {
-    font-size: 2.25rem;
-    margin-bottom: 20px;
-  }
+//   @media (max-width: 1024px) {
+//     font-size: 2.25rem;
+//     margin-bottom: 20px;
+//   }
 
-  @media (max-width: 768px) {
-    font-size: 2rem;
-    margin-bottom: 18px;
-  }
+//   @media (max-width: 768px) {
+//     font-size: 2rem;
+//     margin-bottom: 18px;
+//   }
 
-  @media (max-width: 600px) {
-    font-size: 1.75rem;
-    margin-bottom: 16px;
-  }
+//   @media (max-width: 600px) {
+//     font-size: 1.75rem;
+//     margin-bottom: 16px;
+//   }
 
-  @media (max-width: 480px) {
-    font-size: 1.625rem;
-    margin-bottom: 14px;
-  }
+//   @media (max-width: 480px) {
+//     font-size: 1.625rem;
+//     margin-bottom: 14px;
+//   }
 
-  @media (max-width: 360px) {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
-  }
-`;
+//   @media (max-width: 360px) {
+//     font-size: 1.5rem;
+//     margin-bottom: 12px;
+//   }
+// `;
 
-const Subtitle = styled.p`
-  font-size: 1.125rem;
-  opacity: 0.75;
-  text-align: center;
-  margin-bottom: 70px;
-  max-width: 650px;
-  margin-left: auto;
-  margin-right: auto;
+// const Subtitle = styled.p`
+//   font-size: 1.125rem;
+//   opacity: 0.75;
+//   text-align: center;
+//   margin-bottom: 70px;
+//   max-width: 650px;
+//   margin-left: auto;
+//   margin-right: auto;
+//   white-space: pre-line;
 
-  @media (max-width: 1200px) {
-    font-size: 1.0625rem;
-    margin-bottom: 65px;
-  }
+//   @media (max-width: 1200px) {
+//     font-size: 1.0625rem;
+//     margin-bottom: 65px;
+//   }
 
-  @media (max-width: 1024px) {
-    font-size: 1rem;
-    margin-bottom: 60px;
-  }
+//   @media (max-width: 1024px) {
+//     font-size: 1rem;
+//     margin-bottom: 60px;
+//   }
 
-  @media (max-width: 768px) {
-    font-size: 0.9375rem;
-    margin-bottom: 50px;
-  }
+//   @media (max-width: 768px) {
+//     font-size: 0.9375rem;
+//     margin-bottom: 50px;
+//   }
 
-  @media (max-width: 600px) {
-    font-size: 0.875rem;
-    margin-bottom: 45px;
-  }
+//   @media (max-width: 600px) {
+//     font-size: 0.875rem;
+//     margin-bottom: 45px;
+//   }
 
-  @media (max-width: 480px) {
-    font-size: 0.8125rem;
-    margin-bottom: 40px;
-  }
+//   @media (max-width: 480px) {
+//     font-size: 0.8125rem;
+//     margin-bottom: 40px;
+//   }
 
-  @media (max-width: 360px) {
-    font-size: 0.75rem;
-    margin-bottom: 35px;
-  }
-`;
+//   @media (max-width: 360px) {
+//     font-size: 0.75rem;
+//     margin-bottom: 35px;
+//   }
+// `;
 
 const Grid = styled.div`
   display: grid;
@@ -138,8 +139,8 @@ const Grid = styled.div`
 const Card = styled(motion.div)`
   padding: 45px;
   border-radius: 18px;
-  background: rgba(20,26,60,0.7);
-  border: 1px solid rgba(124, 108, 246, 0.3);
+  background: rgba(30, 35, 41, 0.7); /* Darker background to match Hero */
+  border: 1px solid rgba(243, 186, 47, 0.15); /* Gold border */
   backdrop-filter: blur(12px);
   cursor: pointer;
   transition: all 0.3s ease;
@@ -153,14 +154,14 @@ const Card = styled(motion.div)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.15), rgba(124, 108, 246, 0.1));
+    background: linear-gradient(135deg, rgba(243, 186, 47, 0.1), transparent); /* Gold gradient */
     opacity: 0;
     transition: opacity 0.3s ease;
   }
   
   &:hover {
-    border-color: rgba(168, 85, 247, 0.6);
-    background: rgba(124, 108, 246, 0.15);
+    border-color: #f3ba2f; /* Gold hover border */
+    background: rgba(30, 35, 41, 0.9); /* Darker background on hover */
     transform: translateY(-6px);
     box-shadow: 0 20px 50px rgba(168, 85, 247, 0.2);
     
@@ -252,8 +253,8 @@ const Card = styled(motion.div)`
   .roi {
     font-size: 1.125rem;
     font-weight: 600;
-    background: linear-gradient(90deg, #a78bfa, #f472b6);
-    -webkit-background-clip: text;
+    background: linear-gradient(90deg, #f3ba2f, #f7a600); /* Gold gradient */
+    -webkit-background-clip: text; /* Apply gradient to text */
     -webkit-text-fill-color: transparent;
     position: relative;
     z-index: 1;
@@ -280,8 +281,8 @@ const Button = styled(motion.button)`
   margin-top: 50px;
   padding: 18px 42px;
   border-radius: 16px;
-  border: 2px solid rgba(124, 108, 246, 0.6);
-  background: transparent;
+  border: 2px solid rgba(243, 186, 47, 0.3); /* Gold border */
+  background: transparent; /* Transparent background */
   color: white;
   font-weight: 600;
   font-size: 1.0625rem;
@@ -292,8 +293,8 @@ const Button = styled(motion.button)`
   margin-right: auto;
   
   &:hover {
-    background: linear-gradient(90deg,#7C6CF6,#A855F7);
-    border-color: transparent;
+    background: linear-gradient(90deg, #f3ba2f, #f7a600); /* Gold gradient on hover */
+    border-color: transparent; /* Transparent border on hover */
   }
   
   @media (max-width: 1024px) {
@@ -334,27 +335,32 @@ const Button = styled(motion.button)`
 export default function Opportunities() {
   const opportunities = [
     {
-      title: "🏦 DeFi Projects",
-      description: "Yield farming, lending protocols, and liquidity provision. Capture value from the fastest-growing DeFi ecosystem.",
-      roi: "Avg. 45-85% APY"
+      title: "📊 Crypto Trading",
+      description: "Advanced algorithmic models and real-time market analytics to identify profitable opportunities across Bitcoin, Ethereum, and emerging altcoins.",
+      roi: "Intelligent Systems"
     },
     {
-      title: "🎨 NFT Ventures",
-      description: "Strategic investments in blue-chip NFT collections and emerging digital assets with real utility.",
-      roi: "Avg. 120-200% annual"
+      title: "💼 Asset Management",
+      description: "Professional management combining human expertise with AI-driven insight to minimize risks and maximize returns.",
+      roi: "Expert Insight"
     },
     {
-      title: "🎮 Metaverse & Gaming",
-      description: "Early-stage gaming platforms and metaverse projects reshaping digital entertainment and social interaction.",
-      roi: "Avg. 150-320% potential"
+      title: "🔗 Blockchain Investment",
+      description: "Strategic entry into high-potential projects to bridge Africa’s financial potential with global digital markets.",
+      roi: "Global Perspective"
     }
   ];
 
   return (
     <Section>
-      <Title>Why Investors Are Choosing Amdako Strategy Nig. Ltd.</Title>
-      <Subtitle>In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd. stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency trading solutions from the heart of Nigeria.
-</Subtitle>
+      {/* <Title>Amdako Strategy Nig. Ltd.: Redefining the Future of Cryptocurrency Trading in Africa</Title> */}
+      {/* <Subtitle>
+        In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd. stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency trading solutions from the heart of Nigeria.
+        {"\n\n"}
+        Founded with a bold vision to bridge Africa’s financial potential with global digital markets, Amdako Strategy Nig. Ltd. is not just another trading company — it’s a strategic powerhouse built on intelligence, transparency, and cutting-edge technology.
+        {"\n\n"}
+        Funds are actively monitored and managed to optimize performance while minimizing unnecessary exposure, ensuring that every investment understands where their money goes and how it grows.
+      </Subtitle> */}
 
       <Grid>
         {opportunities.map((opp, idx) => (

@@ -9,6 +9,10 @@
     "start": "pm2 start backend/server.js --name amdako-api"
   },
   "devDependencies": {
+    "@types/node": "^25.9.1",
     "concurrently": "^8.2.0"
+  },
+  "dependencies": {
+    "react-signature-canvas": "^1.1.0-alpha.2"
   }
 }

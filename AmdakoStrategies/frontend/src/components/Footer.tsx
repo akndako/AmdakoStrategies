@@ -3,7 +3,7 @@ import styled from "styled-components";
 
 const Section = styled.section`
   padding: 100px 80px;
-  background: linear-gradient(180deg, transparent 0%, rgba(20, 26, 60, 0.8) 100%);
+  background: #0b0e11;
   border-top: 1px solid rgba(255, 255, 255, 0.1);
 
   @media (max-width: 1024px) {
@@ -149,7 +149,7 @@ const LinkColumn = styled.div`
     font-size: 14px;
     
     &:hover {
-      color: #a78bfa;
+      color: #f3ba2f;
     }
   }
 `;
@@ -271,7 +271,7 @@ const Social = styled.div`
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    background: rgba(124, 108, 246, 0.2);
+    background: rgba(243, 186, 47, 0.2);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -281,7 +281,7 @@ const Social = styled.div`
     font-size: 18px;
     
     &:hover {
-      background: linear-gradient(90deg, #7C6CF6, #A855F7);
+      background: linear-gradient(90deg, #F3BA2F, #F7A600);
       transform: translateY(-3px);
     }
   }

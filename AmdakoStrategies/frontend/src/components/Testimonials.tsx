@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const Section = styled.section`
   padding: 120px 100px;
-  background: linear-gradient(180deg, transparent 0%, rgba(168,85,247,0.08) 100%);
+  background: linear-gradient(180deg, #0b0e11 0%, #121212 100%);
   position: relative;
   overflow: hidden;
 
@@ -135,18 +135,18 @@ const Grid = styled.div`
 const Card = styled(motion.div)`
   padding: 40px;
   border-radius: 16px;
-  background: rgba(20, 26, 60, 0.8);
-  border: 1px solid rgba(168, 85, 247, 0.25);
-  backdrop-filter: blur(12px);
+  background: rgba(30, 35, 41, 0.7);
+  border: 1px solid rgba(243, 186, 47, 0.15);
+  backdrop-filter: blur(16px);
   transition: all 0.3s ease;
   display: flex;
   flex-direction: column;
   
   &:hover {
-    border-color: rgba(168, 85, 247, 0.6);
-    background: rgba(124, 108, 246, 0.1);
+    border-color: #f3ba2f; /* Gold hover border */
+    background: rgba(30, 35, 41, 0.9); /* Darker background on hover */
     transform: translateY(-8px);
-    box-shadow: 0 20px 50px rgba(168, 85, 247, 0.2);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
   }
 
   @media (max-width: 1024px) {
@@ -167,9 +167,10 @@ const Card = styled(motion.div)`
 `;
 
 const Stars = styled.div`
-  font-size: 1.25rem;
+  font-size: 1rem;
   margin-bottom: 18px;
   letter-spacing: 4px;
+  color: #f3ba2f;
 `;
 
 const Quote = styled.p`
@@ -200,8 +201,8 @@ const Avatar = styled.div`
   width: 48px;
   height: 48px;
   border-radius: 50%;
-  background: linear-gradient(135deg, rgba(168, 85, 247, 0.5), rgba(124, 108, 246, 0.5));
-  border: 2px solid rgba(168, 85, 247, 0.4);
+  background: linear-gradient(135deg, #f3ba2f, #f7a600);
+  border: 2px solid rgba(243, 186, 47, 0.4);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -227,22 +228,22 @@ const AuthorInfo = styled.div`
 export default function Testimonials() {
   const testimonials = [
     {
-      name: "Alex Turner",
+      name: "Usman Kolo",
       title: "Crypto Investor",
-      avatar: "AT",
-      quote: "Amdako Strategies transformed my investment approach. The returns have been consistently exceptional, and their transparent reporting gives me complete peace of mind."
+      avatar: "UK",
+      quote: "Amdako Strategies transformed my investment approach. The returns have been consistently exceptional, and the team’s expertise is evident in their strategic decisions. I highly recommend their services to anyone looking to grow their crypto portfolio."
     },
     {
-      name: "Sarah Chen",
-      title: "Portfolio Manager",
-      avatar: "SC",
-      quote: "Working with Amdako has been a game-changer. Their expert team and secure infrastructure make wealth management in crypto not just possible, but truly enjoyable."
+      name: "khalifa General",
+      title: "Institutional Investor",
+      avatar: "KG",
+      quote: "Thank you amdako ,I have received my monthly ROI. I am very satisfied with the service and the returns. The team is professional and responsive, making it a pleasure to work with them."
     },
     {
-      name: "Marcus Webb",
-      title: "Web3 Entrepreneur",
-      avatar: "MW",
-      quote: "Outstanding service. The combination of high returns, security, and professional management is unmatched in the industry. Highly recommended for serious investors."
+      name: "Sanda Gulu",
+      title: "Investor",
+      avatar: "SSA",
+      quote: "Outstanding service. Very reliable and trust worthy. The combination of high returns, security, and professional management is unmatched in the industry. Highly recommended for serious investors."
     }
   ];
 

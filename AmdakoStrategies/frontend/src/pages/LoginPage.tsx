@@ -23,7 +23,7 @@ const Page = styled.section`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(180deg, rgba(124,108,246,0.08) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(243, 186, 47, 0.08) 0%, transparent 100%);
 
   @media (max-width: 1024px) {
     padding: 80px 60px;
@@ -44,8 +44,8 @@ const Page = styled.section`
 
 const Card = styled.div`
   width: min(520px, 100%);
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
+  background: rgba(11, 14, 17, 0.95);
+  border: 1px solid rgba(243, 186, 47, 0.15);
   border-radius: 24px;
   padding: 48px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
@@ -110,16 +110,16 @@ const Field = styled.label`
 const Input = styled.input`
   width: 100%;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(71, 77, 87, 0.3);
+  background: rgba(30, 35, 41, 0.5);
   padding: 16px 18px;
   color: #fff;
   font-size: 16px;
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 108, 246, 0.8);
-    box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
+    border-color: #f3ba2f;
+    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
   }
 
   @media (max-width: 480px) {
@@ -147,14 +147,14 @@ const Button = styled.button`
   border: none;
   border-radius: 14px;
   padding: 16px 24px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #7c6cf6, #a855f7);
+  font-weight: 700;
+  background: linear-gradient(135deg, #f3ba2f, #f7a600);
   color: #fff;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(124, 108, 246, 0.25);
+    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.3);
   }
 
   @media (max-width: 480px) {

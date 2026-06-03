@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 const Section = styled.section`
   padding: 120px 100px;
-  background: linear-gradient(180deg, rgba(124,108,246,0.05) 0%, transparent 100%);
+  background: #0b0e11;
 
   @media (max-width: 1200px) {
     padding: 100px 80px;
@@ -108,7 +108,7 @@ const Subtitle = styled.p`
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 36px;
   
   @media (max-width: 1024px) {
@@ -133,8 +133,8 @@ const Grid = styled.div`
 const Card = styled(motion.div)`
   padding: 45px;
   border-radius: 18px;
-  background: rgba(20,26,60,0.6);
-  border: 1px solid rgba(124, 108, 246, 0.2);
+  background: rgba(30, 35, 41, 0.7);
+  border: 1px solid rgba(243, 186, 47, 0.15);
   backdrop-filter: blur(12px);
   transition: all 0.3s ease;
   position: relative;
@@ -147,16 +147,16 @@ const Card = styled(motion.div)`
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(168, 85, 247, 0.2), rgba(124, 108, 246, 0.1));
+    background: linear-gradient(135deg, rgba(247, 166, 0, 0.1), transparent);
     opacity: 0;
     transition: opacity 0.3s ease;
   }
   
   &:hover {
-    border-color: rgba(168, 85, 247, 0.5);
-    background: rgba(124, 108, 246, 0.15);
+    border-color: #f3ba2f;
+    background: rgba(30, 35, 41, 0.9);
     transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(168, 85, 247, 0.15);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
     
     &::before {
       opacity: 1;
@@ -240,7 +240,7 @@ const IconBox = styled.div`
   font-size: 56px;
   margin-bottom: 24px;
   display: inline-block;
-  background: rgba(168, 85, 247, 0.15);
+  background: rgba(243, 186, 47, 0.15);
   padding: 16px;
   border-radius: 12px;
   position: relative;
@@ -275,26 +275,31 @@ const IconBox = styled.div`
 export default function Features() {
   const features = [
     {
+      icon: "🚀",
+      title: "Data-Driven Edge",
+      description: "We leverage advanced algorithmic models to identify profitable trading opportunities across Bitcoin and emerging altcoins."
+    },
+    {
+      icon: "💎",
+      title: "Risk Management",
+      description: "Calculated growth through controlled exposure and capital preservation. We prioritize strategic analysis over emotional trading."
+    },
+    {
+      icon: "🎓",
+      title: "Our Mission",
+      description: "To empower individuals and businesses with the tools and opportunities to profit confidently in the digital asset world."
+    },
+    {
       icon: "📈",
-      title: "High Returns",
-      description: "Earn up to 320% annual returns through our diversified portfolio of top-performing Web3 projects."
-    },
-    {
-      icon: "🔒",
-      title: "Secure & Transparent",
-      description: "Smart contracts audited by leading firms. Real-time blockchain transparency. Your assets, your control."
-    },
-    {
-      icon: "👨‍💼",
-      title: "Expert Management",
-      description: "Managed by crypto veterans with 15+ years of experience in digital assets and blockchain technology."
+      title: "Our Vision",
+      description: "To become Africa’s most trusted cryptocurrency platform where innovation meets integrity and shared success."
     }
   ];
 
   return (
     <Section>
-      <Title>Why Choose Us?</Title>
-      <Subtitle>We provide the tools, expertise, and security you need to maximize your Web3 investments</Subtitle>
+      <Title>Why Investors Are Choosing Amdako Strategy Nig. Ltd.</Title>
+      <Subtitle>We combine human expertise with AI-driven insights to minimize risks and maximize returns, ensuring a stable and intelligent investment experience.</Subtitle>
 
       <Grid>
         {features.map((feature, idx) => (
@@ -314,4 +319,3 @@ export default function Features() {
     </Section>
   );
 }
-

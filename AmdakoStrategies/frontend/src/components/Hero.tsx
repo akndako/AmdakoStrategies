@@ -1,5 +1,6 @@
-﻿import styled from "styled-components";
-import { motion } from "framer-motion";
+﻿﻿import { useState, useEffect } from "react";
+import styled from "styled-components";
+import { motion, AnimatePresence } from "framer-motion";
 import eth from "../assets/eth.png";
 import btc from "../assets/btc.png";
 
@@ -7,9 +8,11 @@ const Section = styled.section`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 120px 100px;
+  padding: 140px 100px;
   min-height: 85vh;
   position: relative;
+  background: #0b0e11;
+  overflow: hidden;
 
   @media (max-width: 1200px) {
     padding: 100px 80px;
@@ -44,6 +47,18 @@ const Section = styled.section`
   }
 `;
 
+const BackgroundPattern = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0.4;
+  background-image: radial-gradient(circle at 2px 2px, rgba(243, 186, 47, 0.05) 1px, transparent 0);
+  background-size: 40px 40px;
+  pointer-events: none;
+`;
+
 const Left = styled.div`
   max-width: 650px;
   flex: 1;
@@ -67,7 +82,7 @@ const Title = styled(motion.h1)`
   margin-bottom: 35px;
 
   @media (max-width: 1200px) {
-    font-size: 3.125rem;
+    font-size: 3rem;
     margin-bottom: 32px;
   }
 
@@ -97,11 +112,49 @@ const Title = styled(motion.h1)`
   }
 `;
 
+const SlideContentCard = styled(motion.div)`
+  padding: 45px;
+  border-radius: 18px;
+  background: rgba(30, 35, 41, 0.7);
+  border: 1px solid rgba(243, 186, 47, 0.15);
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(243, 186, 47, 0.1), transparent);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  &:hover {
+    border-color: #f3ba2f;
+    background: rgba(30, 35, 41, 0.9);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+    
+    &::before {
+      opacity: 1;
+    }
+  }
+
+  @media (max-width: 1024px) { padding: 40px; }
+  @media (max-width: 768px) { padding: 35px; }
+  @media (max-width: 480px) { padding: 25px; }
+`;
+
 const Subtitle = styled(motion.p)`
   font-size: 1.25rem;
   line-height: 1.6;
   margin-bottom: 45px;
   opacity: 0.85;
+  color: rgba(255, 255, 255, 0.9);
 
   @media (max-width: 1200px) {
     font-size: 1.1875rem;
@@ -135,7 +188,7 @@ const Subtitle = styled(motion.p)`
 `;
 
 const Gradient = styled.span`
-  background: linear-gradient(90deg,#a78bfa,#f472b6);
+  background: linear-gradient(90deg, #f3ba2f, #f7a600);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;
@@ -159,18 +212,18 @@ const ButtonGroup = styled(motion.div)`
 const Button = styled(motion.button)`
   padding: 18px 40px;
   border-radius: 14px;
-  background: linear-gradient(90deg,#7C6CF6,#A855F7);
+  background: linear-gradient(135deg, #f3ba2f 0%, #f7a600 100%);
   border: none;
   color: white;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.0625rem;
   transition: 0.3s ease;
   white-space: nowrap;
 
   &:hover {
     transform: translateY(-3px);
-    box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.3);
   }
 
   @media (max-width: 1024px) {
@@ -207,17 +260,17 @@ const SecondaryButton = styled(motion.button)`
   padding: 18px 40px;
   border-radius: 14px;
   background: transparent;
-  border: 2px solid rgba(124, 108, 246, 0.6);
+  border: 2px solid rgba(243, 186, 47, 0.3);
   color: white;
   cursor: pointer;
-  font-weight: 600;
+  font-weight: 700;
   font-size: 1.0625rem;
   transition: 0.3s ease;
   white-space: nowrap;
 
   &:hover {
-    border-color: rgba(168, 85, 247, 1);
-    background: rgba(168, 85, 247, 0.1);
+    border-color: #f3ba2f;
+    background: rgba(243, 186, 47, 0.05);
   }
 
   @media (max-width: 1024px) {
@@ -258,10 +311,10 @@ const Right = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 60% 40%, rgba(168, 85, 247, 0.15), transparent);
+  background: radial-gradient(circle at 60% 40%, rgba(243, 186, 47, 0.08), transparent);
   border-radius: 20px;
-  border: 1px solid rgba(168, 85, 247, 0.2);
-  backdrop-filter: blur(8px);
+  border: 1px solid rgba(243, 186, 47, 0.15);
+  backdrop-filter: blur(16px);
 
   @media (max-width: 1200px) {
     max-width: 500px;
@@ -294,7 +347,7 @@ const Right = styled.div`
 const Coin = styled(motion.img)`
   width: 90px;
   position: absolute;
-  filter: drop-shadow(0 0 20px rgba(168, 85, 247, 0.4));
+  filter: drop-shadow(0 0 20px rgba(243, 186, 47, 0.3));
 
   @media (max-width: 1200px) {
     width: 85px;
@@ -321,57 +374,126 @@ const Coin = styled(motion.img)`
   }
 `;
 
+const CarouselDots = styled.div`
+  position: absolute;
+  bottom: 40px;
+  left: 100px;
+  display: flex;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    left: 50%;
+    transform: translateX(-50%);
+  }
+`;
+
+const Dot = styled.div<{ active: boolean }>`
+  width: ${props => props.active ? '32px' : '12px'};
+  height: 6px;
+  border-radius: 3px;
+  background: ${props => props.active ? '#f3ba2f' : 'rgba(255, 255, 255, 0.2)'};
+  transition: all 0.3s ease;
+  cursor: pointer;
+`;
+
+const slides = [
+  {
+    title: <>Redefining the Future of Cryptocurrency Trading in <br/><Gradient>Africa</Gradient></>,
+    subtitle: "Unlock unprecedented returns in decentralized finance and blockchain projects. Born from a vision to connect Africa's financial potential to the global digital economy.",
+    cta: "Start Investing Now"
+  },
+  {
+    title: <>Strategic Wealth Growth Powered by <br/><Gradient>Data Intelligence</Gradient></>,
+    subtitle: "We leverage advanced algorithmic models and real-time analytics to identify profitable opportunities. Calculated growth over reckless trading.",
+    cta: "View Strategies"
+  },
+  {
+    title: <>Built on Unmatched <br/><Gradient>Transparency & Trust</Gradient></>,
+    subtitle: "Every transaction, every result — open and accountable. Join thousands of investors who trust Amdako with their digital assets.",
+    cta: "Create Account"
+  }
+];
+
 export default function Hero() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentSlide((prev) => (prev + 1) % slides.length);
+    }, 6000);
+    return () => clearInterval(timer);
+  }, []);
+
   return (
     <Section>
+      <BackgroundPattern />
       <Left>
-        <Title
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8 }}
-        >
-          Redefining the Future of Cryptocurrency Trading in 
+        <AnimatePresence mode="wait">
+          <SlideContentCard
+            key={currentSlide}
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.5 }}
+            whileHover={{ scale: 1.01 }}
+          >
+            <Title>
+              {slides[currentSlide].title}
+            </Title>
 
-           <Gradient>Africa</Gradient> 
-        </Title>
+            <Subtitle>
+              {slides[currentSlide].subtitle}
+            </Subtitle>
 
-        <Subtitle
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-        >
-          Unlock unprecedented returns in decentralized finance, NFT ventures, and next-generation blockchain projects. Join thousands of investors already profiting.
-        </Subtitle>
-
-        <ButtonGroup
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.8, delay: 0.4 }}
-        >
-          <Button whileHover={{ scale: 1.05 }}>
-            Start Investing in Crypto Now
-          </Button>
-          <SecondaryButton whileHover={{ scale: 1.05 }}>
-            Learn More
-          </SecondaryButton>
-        </ButtonGroup>
+            <ButtonGroup>
+              <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                {slides[currentSlide].cta}
+              </Button>
+              <SecondaryButton whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                Learn More
+              </SecondaryButton>
+            </ButtonGroup>
+          </SlideContentCard>
+        </AnimatePresence>
       </Left>
 
       <Right>
         <Coin
           src={eth}
-          animate={{ y: [0, -20, 0] }}
-          transition={{ repeat: Infinity, duration: 4 }}
+          animate={{ 
+            y: [0, -20, 0],
+            rotate: [0, 5, 0]
+          }}
+          transition={{ 
+            y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
+            rotate: { repeat: Infinity, duration: 6, ease: "easeInOut" }
+          }}
           style={{ top: "20%", left: "20%" }}
         />
 
         <Coin
           src={btc}
-          animate={{ y: [0, 20, 0] }}
-          transition={{ repeat: Infinity, duration: 5 }}
+          animate={{ 
+            y: [0, 20, 0],
+            rotate: [0, -5, 0]
+          }}
+          transition={{ 
+            y: { repeat: Infinity, duration: 5, ease: "easeInOut" },
+            rotate: { repeat: Infinity, duration: 7, ease: "easeInOut" }
+          }}
           style={{ bottom: "20%", right: "20%" }}
         />
       </Right>
+
+      <CarouselDots>
+        {slides.map((_, idx) => (
+          <Dot 
+            key={idx} 
+            active={currentSlide === idx} 
+            onClick={() => setCurrentSlide(idx)}
+          />
+        ))}
+      </CarouselDots>
     </Section>
   );
 }

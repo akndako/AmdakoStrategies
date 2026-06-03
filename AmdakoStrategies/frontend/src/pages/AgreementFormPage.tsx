@@ -3,6 +3,10 @@ import styled from "styled-components";
 import SignatureCanvas from "react-signature-canvas";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import type { PageView } from "../App";
+
+// Fix for TypeScript error: 'SignatureCanvas' cannot be used as a JSX component.
+const SignatureCanvasComponent = SignatureCanvas as any;
 
 type AgreementFormPageProps = {
   user: {
@@ -13,13 +17,13 @@ type AgreementFormPageProps = {
     phone: string;
     email: string;
   };
-  onNavigate: (page: string) => void;
+  onNavigate: (page: PageView) => void;
 };
 
 const Page = styled.section`
   min-height: calc(100vh - 120px);
   padding: 100px 80px;
-  background: linear-gradient(180deg, rgba(124,108,246,0.08) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(243, 186, 47, 0.08) 0%, transparent 100%);
 
   @media (max-width: 1024px) {
     padding: 80px 60px;
@@ -42,8 +46,8 @@ const Card = styled.div`
   max-width: 800px;
   margin: 0 auto;
   padding: 40px;
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
+  background: rgba(11, 14, 17, 0.95);
+  border: 1px solid rgba(243, 186, 47, 0.15);
   border-radius: 24px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
 
@@ -85,6 +89,11 @@ const AgreementText = styled.div`
   max-height: 360px;
   overflow-y: auto;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+
+  &.expanded-for-print {
+    max-height: none;
+    overflow: visible;
+  }
 
   h3 {
     margin-top: 0;
@@ -138,8 +147,8 @@ const FormGroup = styled.div`
   input:focus,
   select:focus {
     outline: none;
-    border-color: rgba(124, 108, 246, 0.85);
-    box-shadow: 0 0 0 6px rgba(124, 108, 246, 0.12);
+    border-color: #f3ba2f;
+    box-shadow: 0 0 0 6px rgba(243, 186, 47, 0.12);
     background: rgba(255, 255, 255, 0.12);
   }
 
@@ -196,7 +205,7 @@ const Button = styled.button`
   border-radius: 16px;
   padding: 14px 24px;
   min-width: 150px;
-  background: linear-gradient(135deg, #7c6cf6, #a855f7);
+  background: linear-gradient(135deg, #f3ba2f, #f7a600);
   color: #fff;
   font-weight: 700;
   letter-spacing: 0.01em;
@@ -205,7 +214,7 @@ const Button = styled.button`
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 18px 35px rgba(124, 108, 246, 0.25);
+    box-shadow: 0 18px 35px rgba(243, 186, 47, 0.25);
   }
 
   @media (max-width: 600px) {
@@ -257,6 +266,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
   const [submitted, setSubmitted] = useState(false);
   const sigCanvas = useRef<SignatureCanvas>(null);
   const formRef = useRef<HTMLDivElement>(null);
+  const agreementTextRef = useRef<HTMLDivElement>(null);
 
   const toggleIdType = (type: keyof typeof idTypes) => {
     setIdTypes((current) => ({ ...current, [type]: !current[type] }));
@@ -276,11 +286,16 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
 
   const downloadAgreement = async () => {
     if (formRef.current) {
+      // Temporarily expand the scrollable text so it's fully captured in the PDF
+      if (agreementTextRef.current) {
+        agreementTextRef.current.classList.add('expanded-for-print');
+      }
+
       const canvas = await html2canvas(formRef.current);
       const imgData = canvas.toDataURL('image/png');
       const pdf = new jsPDF();
       const imgWidth = 210; // A4 width in mm
-      const pageHeight = 295; // A4 height in mm
+      const pageHeight = 297; // A4 standard height in mm
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
       let heightLeft = imgHeight;
 
@@ -294,6 +309,11 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
       }
 
       pdf.save('agreement.pdf');
+
+      // Revert the expansion
+      if (agreementTextRef.current) {
+        agreementTextRef.current.classList.remove('expanded-for-print');
+      }
     }
   };
 
@@ -302,7 +322,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
       <Card ref={formRef}>
         <Title>Agreement Form</Title>
         
-        <AgreementText>
+        <AgreementText ref={agreementTextRef}>
           <h3>AMDAKO STRATEGY NIG. LTD. INVESTMENT AGREEMENT FORM</h3>
           <p>
             This Investment Agreement is made on {date} between Amdako Strategy Nig. Ltd. and the investor named below.
@@ -321,10 +341,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
             4. The Investor agrees not to hold the Company liable for losses incurred due to market volatility.
           </p>
           <p>
-            5. The company will be liable for any losses incurred due to market volatility.
-          </p>
-          <p>
-            6. This agreement is governed by the laws of the Federal Republic of Nigeria.
+            5. This agreement is governed by the laws of the Federal Republic of Nigeria.
           </p>
           <p>
             By signing below, the Investor confirms that all information provided is true and correct and agrees to the terms and conditions of this investment.
@@ -544,11 +561,10 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
 
         <SignatureContainer>
           <label>Signature</label>
-          <SignatureCanvas
+          <SignatureCanvasComponent
             ref={sigCanvas}
             canvasProps={{
               className: 'sigCanvas',
-              width: 500,
               height: 200,
             }}
           />

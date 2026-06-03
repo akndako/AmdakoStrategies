@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Page = styled.section`
   min-height: calc(100vh - 120px);
   padding: 100px 80px;
-  background: linear-gradient(180deg, rgba(124,108,246,0.08) 0%, transparent 100%);
+  background: #0b0e11;
 
   @media (max-width: 1024px) {
     padding: 80px 60px;
@@ -46,9 +46,10 @@ const Wrapper = styled.div`
 const InfoCard = styled.div`
   padding: 40px;
   border-radius: 24px;
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  background: rgba(30, 35, 41, 0.9);
+r  border: 1px solid rgba(243, 186, 47, 0.15);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
 
   @media (max-width: 768px) {
     padding: 30px;
@@ -103,9 +104,10 @@ const FormCard = styled.form`
   gap: 20px;
   padding: 40px;
   border-radius: 24px;
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  background: rgba(30, 35, 41, 0.9); /* Dark background */
+  border: 1px solid rgba(243, 186, 47, 0.15); /* Gold border */
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
 
   @media (max-width: 768px) {
     padding: 30px;
@@ -132,16 +134,16 @@ const Field = styled.label`
 const Input = styled.input`
   width: 100%;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(71, 77, 87, 0.3);
+  background: rgba(11, 14, 17, 0.5);
   padding: 16px 18px;
   color: #fff;
   font-size: 16px;
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 108, 246, 0.8);
-    box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
+    border-color: #f3ba2f;
+    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
   }
 
   @media (max-width: 480px) {
@@ -154,8 +156,8 @@ const TextArea = styled.textarea`
   min-height: 170px;
   resize: vertical;
   border-radius: 14px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(71, 77, 87, 0.3);
+  background: rgba(11, 14, 17, 0.5);
   padding: 16px 18px;
   color: #fff;
   font-size: 16px;
@@ -163,8 +165,8 @@ const TextArea = styled.textarea`
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 108, 246, 0.8);
-    box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
+    border-color: #f3ba2f;
+    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
   }
 
   @media (max-width: 480px) {
@@ -179,14 +181,14 @@ const Button = styled.button`
   border: none;
   border-radius: 14px;
   padding: 16px 24px;
-  font-weight: 600;
-  background: linear-gradient(135deg, #7c6cf6, #a855f7);
+  font-weight: 800;
+  background: linear-gradient(135deg, #F3BA2F 0%, #F7A600 100%);
   color: #fff;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(124, 108, 246, 0.25);
+    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.4);
   }
 
   @media (max-width: 600px) {

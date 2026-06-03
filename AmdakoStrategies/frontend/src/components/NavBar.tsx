@@ -1,10 +1,10 @@
-﻿import { useState } from "react";
+﻿﻿import { useState } from "react";
 import styled from "styled-components";
 
 type NavbarProps = {
-  activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard";
+  activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
   auth: { token: string; user: { id: string; name: string; firstName: string; lastName: string; phone: string; email: string } } | null;
-  onNavigate: (page: "home" | "about" | "login" | "create" | "contact" | "dashboard") => void;
+  onNavigate: (page: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement") => void;
   onLogout: () => void;
 };
 
@@ -15,13 +15,13 @@ const Container = styled.div`
   align-items: center;
   padding: 20px 60px;
 
-  background: rgba(10, 10, 25, 0.6);
+  background: rgba(11, 14, 17, 0.95); /* Darker background to match Hero */
   backdrop-filter: blur(12px);
   border-bottom: 1px solid rgba(255,255,255,0.05);
   transition: all 0.3s ease;
 
   &:hover {
-    border-bottom-color: rgba(168, 85, 247, 0.15);
+    border-bottom-color: rgba(243, 186, 47, 0.15); /* Gold hover border */
   }
 
   @media (max-width: 1024px) {
@@ -52,8 +52,8 @@ const Brand = styled.h3`
   font-size: 18px;
   letter-spacing: 1px;
   text-transform: uppercase;
-  margin: 0;
-  background: linear-gradient(135deg, #a78bfa, #f472b6);
+  margin: 0; /* Remove margin */
+  background: linear-gradient(135deg, #f3ba2f, #f7a600); /* Gold gradient */
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   cursor: pointer;
@@ -91,21 +91,20 @@ const Button = styled.button<{ primary?: boolean }>`
   padding: 10px 18px;
   border-radius: 10px;
   border: ${({ primary }) =>
-    primary ? "none" : "1px solid rgba(168, 85, 247, 0.4)"};
+    primary ? "none" : "1px solid rgba(243, 186, 47, 0.3)"}; /* Gold border for secondary */
   background: ${({ primary }) =>
     primary
-      ? "linear-gradient(135deg, #7C6CF6, #A855F7)"
+      ? "linear-gradient(135deg, #f3ba2f, #f7a600)" /* Gold gradient for primary */
       : "transparent"};
   color: white;
   font-weight: 500;
   transition: all 0.3s ease;
   cursor: pointer;
-
+  
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${({ primary }) =>
-      primary ? "0 8px 24px rgba(168, 85, 247, 0.5)" : "0 8px 24px rgba(168, 85, 247, 0.2)"};
-    ${({ primary }) => !primary && "border-color: rgba(168, 85, 247, 0.8);"}
+    box-shadow: ${({ primary }) => primary ? "0 8px 24px rgba(243, 186, 47, 0.3)" : "0 8px 24px rgba(255, 255, 255, 0.05)"}; /* Gold shadow for primary */
+    ${({ primary }) => !primary && "border-color: #f3ba2f;"} /* Gold border on hover for secondary */
   }
 
   @media (max-width: 600px) {
@@ -127,17 +126,17 @@ const MenuToggle = styled.button`
   justify-content: center;
   width: 48px;
   height: 48px;
-  border-radius: 14px;
+  border-radius: 14px; /* Consistent border-radius */
   border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(20, 26, 60, 0.85);
+  background: rgba(30, 35, 41, 0.85); /* Darker background */
   color: white;
   cursor: pointer;
   font-size: 1.3rem;
   transition: transform 0.2s ease, background 0.2s ease;
 
   &:hover {
-    transform: scale(1.03);
-    background: rgba(124, 108, 246, 0.95);
+    transform: scale(1.03); /* Slight scale on hover */
+    background: rgba(243, 186, 47, 0.95); /* Gold background on hover */
   }
 
   @media (max-width: 760px) {
@@ -172,7 +171,7 @@ const MobileAction = styled(Button)`
 export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  const handleNavigate = (page: "home" | "about" | "login" | "create" | "contact" | "dashboard") => {
+  const handleNavigate = (page: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement") => {
     setMenuOpen(false);
     onNavigate(page);
   };

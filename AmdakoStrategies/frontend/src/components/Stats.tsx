@@ -3,8 +3,8 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tool
 import { motion } from "framer-motion";
 
 const Section = styled.section`
-  padding: 120px 100px;
-  background: linear-gradient(180deg, rgba(124,108,246,0.05) 0%, transparent 100%);
+  padding: 120px 100px; /* Consistent padding */
+  background: linear-gradient(180deg, rgba(243, 186, 47, 0.05) 0%, transparent 100%); /* Gold gradient */
 
   @media (max-width: 1200px) {
     padding: 100px 80px;
@@ -168,8 +168,8 @@ const Card = styled(motion.div)`
   flex: 1;
   padding: 36px;
   border-radius: 18px;
-  background: rgba(124, 108, 246, 0.15);
-  border: 1px solid rgba(168, 85, 247, 0.3);
+  background: rgba(30, 35, 41, 0.7); /* Darker background */
+  border: 1px solid rgba(243, 186, 47, 0.15); /* Gold border */
   backdrop-filter: blur(12px);
   text-align: left;
   
@@ -223,8 +223,8 @@ const Card = styled(motion.div)`
   .value {
     font-size: 2.75rem;
     font-weight: 700;
-    background: linear-gradient(90deg, #a78bfa, #f472b6);
-    -webkit-background-clip: text;
+    background: linear-gradient(90deg, #f3ba2f, #f7a600); /* Gold gradient */
+    -webkit-background-clip: text; /* Apply gradient to text */
     -webkit-text-fill-color: transparent;
     margin-bottom: 10px;
 
@@ -270,8 +270,8 @@ const Card = styled(motion.div)`
 const ChartBox = styled(motion.div)`
   padding: 40px;
   border-radius: 16px;
-  background: rgba(20, 26, 60, 0.8);
-  border: 1px solid rgba(124, 108, 246, 0.2);
+  background: rgba(30, 35, 41, 0.7); /* Darker background */
+  border: 1px solid rgba(243, 186, 47, 0.15); /* Gold border */
   backdrop-filter: blur(12px);
   
   @media (max-width: 1200px) {
@@ -334,16 +334,20 @@ const ChartBox = styled(motion.div)`
   }
 `;
 
-const data = [
-  { month: "Jan", value: 10 },
-  { month: "Feb", value: 25 },
-  { month: "Mar", value: 40 },
-  { month: "Apr", value: 60 },
-  { month: "May", value: 85 },
-  { month: "Jun", value: 120 }
-];
-
 export default function Stats() {
+  const monthsLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const currentMonth = new Date().getMonth();
+
+  // Dynamically generate the last 6 months of data
+  const dynamicData = Array.from({ length: 6 }, (_, i) => {
+    const date = new Date();
+    date.setMonth(currentMonth - (5 - i));
+    return {
+      month: monthsLabels[date.getMonth()],
+      value: Math.round(15 * Math.pow(1.5, i)) // Simulates an attractive growth trajectory
+    };
+  });
+
   return (
     <Section>
       <Title>Our Performance</Title>
@@ -358,8 +362,8 @@ export default function Stats() {
               transition={{ delay: 0 }}
             >
               <h4>Assets Under Management</h4>
-              <div className="value">$4.2M</div>
-              <p>Growing portfolio across Web3 projects</p>
+              <div className="value">$10,000</div>
+              <p>Equivalent to approximately ₦15,000,000</p>
             </Card>
             <Card
               initial={{ opacity: 0, scale: 0.9 }}
@@ -367,8 +371,8 @@ export default function Stats() {
               transition={{ delay: 0.1 }}
             >
               <h4>Average Annual Return</h4>
-              <div className="value">320%</div>
-              <p>Consistent outperformance exceeds expectations</p>
+              <div className="value">120%</div>
+              <p>Calculated at 10% monthly growth strategy</p>
             </Card>
           </StatRow>
           
@@ -379,8 +383,8 @@ export default function Stats() {
               transition={{ delay: 0.2 }}
             >
               <h4>Active Investors</h4>
-              <div className="value">8,500+</div>
-              <p>Trusted by thousands worldwide</p>
+              <div className="value">20</div>
+              <p>Exclusive group of verified active investors</p>
             </Card>
             <Card
               initial={{ opacity: 0, scale: 0.9 }}
@@ -401,23 +405,23 @@ export default function Stats() {
         >
           <h3>6-Month Growth Trajectory</h3>
           <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={data}>
+            <LineChart data={dynamicData}>
               <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.1)" />
               <XAxis dataKey="month" stroke="rgba(255,255,255,0.5)" />
               <YAxis stroke="rgba(255,255,255,0.5)" />
               <Tooltip 
                 contentStyle={{ 
-                  background: "rgba(20, 26, 60, 0.9)",
-                  border: "1px solid rgba(124, 108, 246, 0.5)",
+                  background: "rgba(30, 35, 41, 0.9)", /* Darker tooltip background */
+                  border: "1px solid rgba(243, 186, 47, 0.5)", /* Gold tooltip border */
                   borderRadius: "8px"
                 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="value" 
-                stroke="#7C6CF6" 
+                stroke="#f3ba2f" /* Gold line stroke */
                 strokeWidth={3}
-                dot={{ fill: "#A855F7", r: 5 }}
+                dot={{ fill: "#f7a600", r: 5 }} /* Gold dot fill */
                 activeDot={{ r: 7 }}
               />
             </LineChart>

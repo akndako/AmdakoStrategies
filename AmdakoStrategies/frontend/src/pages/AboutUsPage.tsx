@@ -3,7 +3,7 @@ import styled from "styled-components";
 const Page = styled.section`
   min-height: calc(100vh - 120px);
   padding: 100px 80px;
-  background: linear-gradient(180deg, rgba(130, 116, 235, 0.08) 0%, transparent 100%);
+  background: #0b0e11;
 
   @media (max-width: 1024px) {
     padding: 80px 60px;
@@ -46,9 +46,10 @@ const Wrapper = styled.div`
 const InfoCard = styled.div`
   padding: 40px;
   border-radius: 24px;
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+  background: rgba(30, 35, 41, 0.9);
+  border: 1px solid rgba(243, 186, 47, 0.15);
+  backdrop-filter: blur(20px);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
 
   @media (max-width: 768px) {
     padding: 30px;
@@ -89,7 +90,7 @@ const InfoCard = styled.div`
     display: block;
     margin-top: 18px;
     margin-bottom: 10px;
-    color: #fff;
+    color: #f3ba2f;
 
     @media (max-width: 480px) {
       margin-top: 16px;
@@ -205,14 +206,24 @@ export default function AboutUsPage() {
     <Page>
       <Wrapper>
         <InfoCard>
-          <h2>About Us</h2>
-          <p>Need assistance or want to learn more about our  investment strategies? Reach out and one of our advisors will respond within one business day.</p>
-          <strong>Email</strong>
-          <p>Amdakostrategy@gmail.com</p>
-          <strong>Phone</strong>
-          <p>08035817324</p>
-          <strong>Office</strong>
-          <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
+          <h2>About Amdako Strategy</h2>
+          <p>In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd. stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency trading solutions from the heart of Nigeria.</p>
+          
+          <strong>Our Mission</strong>
+          <p>To empower individuals, businesses, and investors with the knowledge, tools, and opportunities to profit confidently in the rapidly evolving world of digital assets.</p>
+          
+          <strong>Risk Management</strong>
+          <p>We focus strongly on controlled exposure, capital preservation, and diversification. Our emphasis is not reckless trading, but calculated growth through strategic analysis over emotional trading.</p>
+          
+          <strong>Profit Monitoring</strong>
+          <p>Funds are actively monitored and managed to optimize performance while minimizing unnecessary exposure. We ensure every investor understands how their money grows through data-driven insight and transparency.</p>
+
+          <strong>Contact Information</strong>
+          <p>
+            Email: Amdakostrategy@gmail.com<br/>
+            Phone: 08035817324<br/>
+            Office: Suite 8A First Floor Block A, City Plaza Area 11, Abuja.
+          </p>
         </InfoCard>
 
         {/* <FormCard onSubmit={(event) => event.preventDefault()}>

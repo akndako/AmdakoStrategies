@@ -7,7 +7,7 @@ const spin = keyframes`
 
 const Spinner = styled.div`
   border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #7c6cf6;
+  border-top: 3px solid #f3ba2f;
   border-radius: 50%;
   width: 20px;
   height: 20px;

@@ -1,4 +1,5 @@
-import React, { ReactNode, ReactElement } from "react";
+import React from "react";
+import type { ReactNode, ReactElement } from "react";
 
 interface Props {
   children: ReactNode;
@@ -53,7 +54,7 @@ export class ErrorBoundary extends React.Component<Props, State> {
             <p style={{ color: "#666", marginBottom: "24px" }}>
               We're sorry for the inconvenience. Please try refreshing the page.
             </p>
-            {process.env.NODE_ENV !== "production" && (
+            {import.meta.env.DEV && (
               <details
                 style={{
                   marginTop: "20px",

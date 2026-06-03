@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
+import type { PageView } from "../App"; // Import PageView
 
 type DashboardPageProps = {
   token: string;
@@ -12,13 +13,13 @@ type DashboardPageProps = {
     email: string;
   };
   onLogout: () => void;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: PageView) => void; // Use PageView type
 };
 
 const Page = styled.section`
   min-height: calc(100vh - 120px);
   padding: 100px 80px;
-  background: linear-gradient(180deg, rgba(124,108,246,0.08) 0%, transparent 100%);
+  background: linear-gradient(180deg, rgba(243, 186, 47, 0.08) 0%, transparent 100%);
 
   @media (max-width: 1024px) {
     padding: 80px 60px;
@@ -41,8 +42,8 @@ const Card = styled.div`
   max-width: 1000px;
   margin: 0 auto;
   padding: 40px;
-  background: rgba(12, 16, 34, 0.95);
-  border: 1px solid rgba(124, 108, 246, 0.15);
+  background: rgba(11, 14, 17, 0.95);
+  border: 1px solid rgba(243, 186, 47, 0.15);
   border-radius: 24px;
   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
 
@@ -159,9 +160,9 @@ const Button = styled.button`
   border: none;
   border-radius: 14px;
   padding: 14px 22px;
-  background: linear-gradient(135deg, #7c6cf6, #a855f7);
+  background: linear-gradient(135deg, #f3ba2f, #f7a600);
   color: #fff;
-  font-weight: 600;
+  font-weight: 700;
   cursor: pointer;
 
   @media (max-width: 600px) {
@@ -175,7 +176,7 @@ const Message = styled.div`
   color: rgba(255, 255, 255, 0.85);
 `;
 
-export default function DashboardPage({ token, user, onLogout, onNavigate }: DashboardPageProps) {
+export default function DashboardPage({ token, user, onNavigate }: DashboardPageProps) {
   const [dashboardData, setDashboardData] = useState<{ performance: string; balance: string; openPositions: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
