@@ -7,11 +7,17 @@ CUSER=$(whoami)
 PUBLIC_HTML="/home/$CUSER/public_html"
 FRONTEND_DIR="$PUBLIC_HTML/amdako"
 
+# Move to the script's directory to ensure relative paths work
+cd "$(dirname "$0")"
+
 echo "🔨 Building frontend..."
 cd frontend
+
 # We must install all dependencies (including devDeps) to run the build (Vite/TypeScript)
 npm install --include=dev
-# Ensure clean build
+
+# Ensure clean build and prevent "uncommitted changes" errors
+# by removing the build directory if it exists within the repo
 rm -rf dist
 npm run build
 
@@ -77,3 +83,10 @@ echo "   - Website: https://amdakostrategies.com.ng"
 echo ""
 echo "📁 Deployed files:"
 ls -lh "$FRONTEND_DIR" | head -20
+
+# 🛡️ PERMANENT FIX for "Uncommitted changes" error:
+# Remove the node_modules and dist folder from the repo path 
+# so the working tree stays clean for the next Git pull.
+cd ..
+rm -rf frontend/node_modules
+rm -rf frontend/dist
