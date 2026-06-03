@@ -13,10 +13,13 @@ cd "$(dirname "$0")"
 echo "🔨 Building frontend..."
 cd frontend
 
-# We must install all dependencies (including devDeps) to run the build (Vite/TypeScript)
-npm install --include=dev
+# Discard any previous local changes to package-lock to prevent "dirty" tree errors
+git checkout -- package-lock.json 2>/dev/null || true
 
-# Ensure clean build and prevent "uncommitted changes" errors
+# Install all dependencies (including devDeps) required for Vite build
+npm install
+
+# Ensure clean build and prevent untracked file conflicts
 # by removing the build directory if it exists within the repo
 rm -rf dist
 npm run build
@@ -58,11 +61,11 @@ AddType text/css .css
     RewriteBase /
 
     # 2. Fix MIME issues: Do NOT rewrite requests for static assets that don't exist
-    # This prevents the server from sending index.html (text/html) when a .js file is missing
+    # This prevents the server from sending index.html (text/html) when a .js/css file is missing
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf)$ - [L,R=404]
 
-    # 3. SPA Routing catch-all
+    # 3. SPA Routing: Handle deep-linking by sending all non-file requests to index.html
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteRule ^ index.html [L]
@@ -84,9 +87,10 @@ echo ""
 echo "📁 Deployed files:"
 ls -lh "$FRONTEND_DIR" | head -20
 
-# 🛡️ PERMANENT FIX for "Uncommitted changes" error:
-# Remove the node_modules and dist folder from the repo path 
-# so the working tree stays clean for the next Git pull.
+# 🛡️ DISCARD CHANGES TO PREVENT DEPLOYMENT BLOCKING:
+# Discard changes to package-lock.json and remove temp build artifacts
+# This ensures 'git status' is clean for the next 'git pull' on the server.
 cd ..
+git checkout -- frontend/package-lock.json 2>/dev/null || true
 rm -rf frontend/node_modules
 rm -rf frontend/dist

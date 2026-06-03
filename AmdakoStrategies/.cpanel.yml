@@ -1,5 +1,6 @@
 ---
 deployment:
   tasks:
-    - /bin/bash ./deploy-frontend.sh
-    - echo "Deployment successful"
+    - export DEPLOYPATH=/home/akndako/public_html/amdako/
+    - /bin/bash deploy-frontend.sh
+    - echo "✅ Deployment complete to $DEPLOYPATH"
