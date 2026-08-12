@@ -1,4 +1,5 @@
 import styled, { keyframes } from "styled-components";
+import { theme } from "../theme";
 
 const spin = keyframes`
   0% { transform: rotate(0deg); }
@@ -6,8 +7,8 @@ const spin = keyframes`
 `;
 
 const Spinner = styled.div`
-  border: 3px solid rgba(255, 255, 255, 0.1);
-  border-top: 3px solid #f3ba2f;
+  border: 3px solid ${theme.colors.border};
+  border-top: 3px solid ${theme.colors.primary};
   border-radius: 50%;
   width: 20px;
   height: 20px;
@@ -20,7 +21,7 @@ const LoadingContainer = styled.div`
   align-items: center;
   justify-content: center;
   gap: 12px;
-  color: rgba(255, 255, 255, 0.8);
+  color: ${theme.colors.textSecondary};
   font-size: 14px;
 `;
 

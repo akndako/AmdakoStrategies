@@ -1,55 +1,43 @@
 import styled from "styled-components";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { theme } from "../theme";
 
 const Page = styled.section`
-  min-height: calc(100vh - 120px);
-  padding: 100px 80px;
-  background: #0b0e11;
-
-  @media (max-width: 1024px) {
-    padding: 80px 60px;
-  }
+  min-height: calc(100vh - 68px);
+  padding: 60px 24px;
+  background: ${theme.colors.surfaceAlt};
 
   @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 50px 20px;
+    padding: 40px 20px;
   }
 
   @media (max-width: 480px) {
-    padding: 40px 16px;
+    padding: 30px 16px;
   }
 `;
 
-const Wrapper = styled.div`
+const Container = styled.div`
   max-width: 1080px;
   margin: 0 auto;
+`;
+
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 40px;
+  grid-template-columns: 1fr 1.1fr;
+  gap: 32px;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  @media (max-width: 600px) {
-    gap: 28px;
-  }
-
-  @media (max-width: 480px) {
     gap: 24px;
   }
 `;
 
 const InfoCard = styled.div`
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
   padding: 40px;
-  border-radius: 24px;
-  background: rgba(30, 35, 41, 0.9);
-r  border: 1px solid rgba(243, 186, 47, 0.15);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: ${theme.shadows.card};
 
   @media (max-width: 768px) {
     padding: 30px;
@@ -57,44 +45,68 @@ r  border: 1px solid rgba(243, 186, 47, 0.15);
 
   @media (max-width: 480px) {
     padding: 24px;
-    border-radius: 16px;
   }
 
   h2 {
-    font-size: 36px;
-    margin-bottom: 18px;
-
-    @media (max-width: 768px) {
-      font-size: 28px;
-      margin-bottom: 16px;
-    }
+    font-size: 28px;
+    margin-bottom: 14px;
 
     @media (max-width: 480px) {
       font-size: 24px;
     }
   }
 
-  p {
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.8;
-    margin-bottom: 24px;
+  > p {
+    color: ${theme.colors.textSecondary};
+    line-height: 1.7;
+    margin-bottom: 30px;
 
     @media (max-width: 480px) {
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 20px;
+      font-size: 0.9375rem;
     }
   }
+`;
 
-  strong {
+const ContactList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+`;
+
+const ContactItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+`;
+
+const ContactIcon = styled.div`
+  width: 40px;
+  height: 40px;
+  border-radius: ${theme.radii.medium};
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+`;
+
+const ContactContent = styled.div`
+  span {
     display: block;
-    margin-top: 18px;
-    margin-bottom: 10px;
-    color: #fff;
+    font-size: 13px;
+    color: ${theme.colors.textMuted};
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  p {
+    color: ${theme.colors.textSecondary};
+    font-size: 0.9375rem;
+    line-height: 1.6;
 
     @media (max-width: 480px) {
-      margin-top: 16px;
-      margin-bottom: 8px;
+      font-size: 0.875rem;
     }
   }
 `;
@@ -102,102 +114,133 @@ r  border: 1px solid rgba(243, 186, 47, 0.15);
 const FormCard = styled.form`
   display: grid;
   gap: 20px;
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
   padding: 40px;
-  border-radius: 24px;
-  background: rgba(30, 35, 41, 0.9); /* Dark background */
-  border: 1px solid rgba(243, 186, 47, 0.15); /* Gold border */
-  backdrop-filter: blur(20px);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
+  box-shadow: ${theme.shadows.card};
 
   @media (max-width: 768px) {
     padding: 30px;
   }
 
-  @media (max-width: 600px) {
-    padding: 28px;
-  }
-
   @media (max-width: 480px) {
     padding: 24px;
-    border-radius: 16px;
     gap: 16px;
+  }
+`;
+
+const FormHeader = styled.div`
+  margin-bottom: 4px;
+
+  h3 {
+    font-size: 22px;
+    margin-bottom: 8px;
+
+    @media (max-width: 480px) {
+      font-size: 20px;
+    }
+  }
+
+  p {
+    color: ${theme.colors.textSecondary};
+    font-size: 0.9375rem;
+
+    @media (max-width: 480px) {
+      font-size: 0.875rem;
+    }
   }
 `;
 
 const Field = styled.label`
   display: grid;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.85);
+  gap: 8px;
+  color: ${theme.colors.text};
   font-size: 14px;
+  font-weight: 500;
 `;
 
 const Input = styled.input`
   width: 100%;
-  border-radius: 14px;
-  border: 1px solid rgba(71, 77, 87, 0.3);
-  background: rgba(11, 14, 17, 0.5);
-  padding: 16px 18px;
-  color: #fff;
-  font-size: 16px;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  padding: 13px 16px;
+  color: ${theme.colors.text};
+  font-size: 15px;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: ${theme.colors.textMuted};
+  }
 
   &:focus {
     outline: none;
-    border-color: #f3ba2f;
-    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
+    border-color: ${theme.colors.primary};
+    box-shadow: 0 0 0 4px ${theme.colors.primaryLight};
   }
 
   @media (max-width: 480px) {
-    padding: 14px 16px;
-    font-size: 16px;
+    padding: 12px 14px;
+    font-size: 15px;
   }
 `;
 
 const TextArea = styled.textarea`
-  min-height: 170px;
+  min-height: 150px;
   resize: vertical;
-  border-radius: 14px;
-  border: 1px solid rgba(71, 77, 87, 0.3);
-  background: rgba(11, 14, 17, 0.5);
-  padding: 16px 18px;
-  color: #fff;
-  font-size: 16px;
+  width: 100%;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  padding: 13px 16px;
+  color: ${theme.colors.text};
+  font-size: 15px;
   line-height: 1.6;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: ${theme.colors.textMuted};
+  }
 
   &:focus {
     outline: none;
-    border-color: #f3ba2f;
-    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
+    border-color: ${theme.colors.primary};
+    box-shadow: 0 0 0 4px ${theme.colors.primaryLight};
   }
 
   @media (max-width: 480px) {
-    min-height: 140px;
-    padding: 14px 16px;
-    font-size: 16px;
+    min-height: 130px;
+    padding: 12px 14px;
+    font-size: 15px;
   }
 `;
 
 const Button = styled.button`
   appearance: none;
   border: none;
-  border-radius: 14px;
-  padding: 16px 24px;
-  font-weight: 800;
-  background: linear-gradient(135deg, #F3BA2F 0%, #F7A600 100%);
+  border-radius: ${theme.radii.medium};
+  padding: 14px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  background: ${theme.colors.primary};
   color: #fff;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: ${theme.shadows.button};
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.4);
-  }
-
-  @media (max-width: 600px) {
-    padding: 15px 22px;
+    background: ${theme.colors.primaryDark};
+    box-shadow: ${theme.shadows.buttonHover};
+    transform: translateY(-1px);
   }
 
   @media (max-width: 480px) {
-    padding: 14px 20px;
-    font-size: 16px;
+    padding: 13px 20px;
     width: 100%;
   }
 `;
@@ -205,37 +248,73 @@ const Button = styled.button`
 export default function ContactUsPage() {
   return (
     <Page>
-      <Wrapper>
-        <InfoCard>
-          <h2>Contact Us</h2>
-          <p>Need assistance or want to learn more about our  investment strategies? Reach out and one of our advisors will respond within one business day.</p>
-          <strong>Email</strong>
-          <p>Amdakostrategy@gmail.com</p>
-          <strong>Phone</strong>
-          <p>08035817324</p>
-          <strong>Office</strong>
-          <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
-        </InfoCard>
+      <Container>
+        <Grid>
+          <InfoCard>
+            <h2>Contact Us</h2>
+            <p>
+              Need assistance or want to learn more about our investment strategies? Reach out and one
+              of our advisors will respond within one business day.
+            </p>
+            <ContactList>
+              <ContactItem>
+                <ContactIcon>
+                  <Mail size={18} />
+                </ContactIcon>
+                <ContactContent>
+                  <span>Email</span>
+                  <p>Amdakostrategy@gmail.com</p>
+                </ContactContent>
+              </ContactItem>
+              <ContactItem>
+                <ContactIcon>
+                  <Phone size={18} />
+                </ContactIcon>
+                <ContactContent>
+                  <span>Phone</span>
+                  <p>08035817324</p>
+                </ContactContent>
+              </ContactItem>
+              <ContactItem>
+                <ContactIcon>
+                  <MapPin size={18} />
+                </ContactIcon>
+                <ContactContent>
+                  <span>Office</span>
+                  <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
+                </ContactContent>
+              </ContactItem>
+            </ContactList>
+          </InfoCard>
 
-        <FormCard onSubmit={(event) => event.preventDefault()}>
-          <Field>
-            Name
-            <Input type="text" placeholder="Your name" required />
-          </Field>
+          <FormCard onSubmit={(event) => event.preventDefault()}>
+            <FormHeader>
+              <h3>Send a Message</h3>
+              <p>Fill out the form and we'll get back to you as soon as possible.</p>
+            </FormHeader>
 
-          <Field>
-            Email
-            <Input type="email" placeholder="you@example.com" required />
-          </Field>
+            <Field>
+              Name
+              <Input type="text" placeholder="Your name" required />
+            </Field>
 
-          <Field>
-            Message
-            <TextArea placeholder="Tell us how we can help" required />
-          </Field>
+            <Field>
+              Email
+              <Input type="email" placeholder="you@example.com" required />
+            </Field>
 
-          <Button type="submit">Send Message</Button>
-        </FormCard>
-      </Wrapper>
+            <Field>
+              Message
+              <TextArea placeholder="Tell us how we can help" required />
+            </Field>
+
+            <Button type="submit">
+              Send Message
+              <Send size={16} />
+            </Button>
+          </FormCard>
+        </Grid>
+      </Container>
     </Page>
   );
 }

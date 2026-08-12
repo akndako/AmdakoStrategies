@@ -1,72 +1,41 @@
 import styled from "styled-components";
+import { Target, ShieldCheck, TrendingUp, Mail, Phone, MapPin, Building2 } from "lucide-react";
+import { theme } from "../theme";
 
 const Page = styled.section`
-  min-height: calc(100vh - 120px);
-  padding: 100px 80px;
-  background: #0b0e11;
-
-  @media (max-width: 1024px) {
-    padding: 80px 60px;
-  }
+  min-height: calc(100vh - 68px);
+  padding: 60px 24px;
+  background: ${theme.colors.surfaceAlt};
 
   @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 50px 20px;
+    padding: 40px 20px;
   }
 
   @media (max-width: 480px) {
-    padding: 40px 16px;
+    padding: 30px 16px;
   }
 `;
 
-const Wrapper = styled.div`
+const Container = styled.div`
   max-width: 1080px;
   margin: 0 auto;
-  display: grid;
-  grid-template-columns: 1.25fr 1fr;
-  gap: 40px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 30px;
-  }
-
-  @media (max-width: 600px) {
-    gap: 28px;
-  }
-
-  @media (max-width: 480px) {
-    gap: 24px;
-  }
 `;
 
-const InfoCard = styled.div`
-  padding: 40px;
-  border-radius: 24px;
-  background: rgba(30, 35, 41, 0.9);
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  backdrop-filter: blur(20px);
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.4);
-
-  @media (max-width: 768px) {
-    padding: 30px;
-  }
+const Header = styled.div`
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 50px;
 
   @media (max-width: 480px) {
-    padding: 24px;
-    border-radius: 16px;
+    margin-bottom: 35px;
   }
 
   h2 {
-    font-size: 36px;
-    margin-bottom: 18px;
+    font-size: 32px;
+    margin-bottom: 14px;
 
     @media (max-width: 768px) {
       font-size: 28px;
-      margin-bottom: 16px;
     }
 
     @media (max-width: 480px) {
@@ -75,176 +44,263 @@ const InfoCard = styled.div`
   }
 
   p {
-    color: rgba(255, 255, 255, 0.8);
-    line-height: 1.8;
-    margin-bottom: 24px;
+    color: ${theme.colors.textSecondary};
+    line-height: 1.7;
 
     @media (max-width: 480px) {
-      font-size: 15px;
-      line-height: 1.6;
-      margin-bottom: 20px;
-    }
-  }
-
-  strong {
-    display: block;
-    margin-top: 18px;
-    margin-bottom: 10px;
-    color: #f3ba2f;
-
-    @media (max-width: 480px) {
-      margin-top: 16px;
-      margin-bottom: 8px;
+      font-size: 0.9375rem;
     }
   }
 `;
 
-// const FormCard = styled.form`
-//   display: grid;
-//   gap: 20px;
-//   padding: 40px;
-//   border-radius: 24px;
-//   background: rgba(12, 16, 34, 0.95);
-//   border: 1px solid rgba(124, 108, 246, 0.15);
-//   box-shadow: 0 24px 80px rgba(0, 0, 0, 0.22);
+const IntroCard = styled.div`
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
+  padding: 36px 40px;
+  margin-bottom: 32px;
+  box-shadow: ${theme.shadows.card};
 
-//   @media (max-width: 768px) {
-//     padding: 30px;
-//   }
+  @media (max-width: 768px) {
+    padding: 28px 24px;
+  }
 
-//   @media (max-width: 600px) {
-//     padding: 28px;
-//   }
+  p {
+    color: ${theme.colors.textSecondary};
+    line-height: 1.8;
+    font-size: 0.975rem;
 
-//   @media (max-width: 480px) {
-//     padding: 24px;
-//     border-radius: 16px;
-//     gap: 16px;
-//   }
-// `;
+    @media (max-width: 480px) {
+      font-size: 0.9rem;
+    }
+  }
+`;
 
-// const Field = styled.label`
-//   display: grid;
-//   gap: 10px;
-//   color: rgba(255, 255, 255, 0.85);
-//   font-size: 14px;
-// `;
+const Grid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  margin-bottom: 32px;
 
-// const Input = styled.input`
-//   width: 100%;
-//   border-radius: 14px;
-//   border: 1px solid rgba(255, 255, 255, 0.12);
-//   background: rgba(255, 255, 255, 0.05);
-//   padding: 16px 18px;
-//   color: #fff;
-//   font-size: 16px;
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 18px;
+  }
+`;
 
-//   &:focus {
-//     outline: none;
-//     border-color: rgba(124, 108, 246, 0.8);
-//     box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
-//   }
+const SectionCard = styled.div`
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.large};
+  padding: 32px;
+  transition: all 0.2s ease;
 
-//   @media (max-width: 480px) {
-//     padding: 14px 16px;
-//     font-size: 16px;
-//   }
-// `;
+  &:hover {
+    border-color: ${theme.colors.primary};
+    box-shadow: ${theme.shadows.cardHover};
+  }
 
-// const TextArea = styled.textarea`
-//   min-height: 170px;
-//   resize: vertical;
-//   border-radius: 14px;
-//   border: 1px solid rgba(255, 255, 255, 0.12);
-//   background: rgba(255, 255, 255, 0.05);
-//   padding: 16px 18px;
-//   color: #fff;
-//   font-size: 16px;
-//   line-height: 1.6;
+  @media (max-width: 768px) {
+    padding: 26px 22px;
+  }
+`;
 
-//   &:focus {
-//     outline: none;
-//     border-color: rgba(124, 108, 246, 0.8);
-//     box-shadow: 0 0 0 4px rgba(124, 108, 246, 0.12);
-//   }
+const IconBox = styled.div`
+  width: 44px;
+  height: 44px;
+  border-radius: ${theme.radii.medium};
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 18px;
+`;
 
-//   @media (max-width: 480px) {
-//     min-height: 140px;
-//     padding: 14px 16px;
-//     font-size: 16px;
-//   }
-// `;
+const SectionTitle = styled.h3`
+  font-size: 1.25rem;
+  margin-bottom: 12px;
+  color: ${theme.colors.text};
 
-// const Button = styled.button`
-//   appearance: none;
-//   border: none;
-//   border-radius: 14px;
-//   padding: 16px 24px;
-//   font-weight: 600;
-//   background: linear-gradient(135deg, #7c6cf6, #a855f7);
-//   color: #fff;
-//   transition: transform 0.25s ease, box-shadow 0.25s ease;
+  @media (max-width: 480px) {
+    font-size: 1.125rem;
+  }
+`;
 
-//   &:hover {
-//     transform: translateY(-2px);
-//     box-shadow: 0 16px 32px rgba(124, 108, 246, 0.25);
-//   }
+const SectionText = styled.p`
+  color: ${theme.colors.textSecondary};
+  line-height: 1.75;
+  font-size: 0.9375rem;
 
-//   @media (max-width: 600px) {
-//     padding: 15px 22px;
-//   }
+  @media (max-width: 480px) {
+    font-size: 0.875rem;
+  }
+`;
 
-//   @media (max-width: 480px) {
-//     padding: 14px 20px;
-//     font-size: 16px;
-//     width: 100%;
-//   }
-// `;
+const ContactCard = styled.div`
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
+  padding: 36px 40px;
+  box-shadow: ${theme.shadows.card};
+
+  @media (max-width: 768px) {
+    padding: 28px 24px;
+  }
+
+  h3 {
+    font-size: 1.25rem;
+    margin-bottom: 20px;
+    color: ${theme.colors.text};
+
+    @media (max-width: 480px) {
+      font-size: 1.125rem;
+    }
+  }
+`;
+
+const ContactItems = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+`;
+
+const ContactItem = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  svg {
+    color: ${theme.colors.primary};
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    color: ${theme.colors.textSecondary};
+    font-size: 0.9375rem;
+    line-height: 1.6;
+
+    @media (max-width: 480px) {
+      font-size: 0.875rem;
+    }
+  }
+`;
+
+const ContactLabel = styled.span`
+  display: block;
+  font-size: 0.8125rem;
+  color: ${theme.colors.textMuted};
+  margin-bottom: 4px;
+  font-weight: 500;
+`;
 
 export default function AboutUsPage() {
   return (
     <Page>
-      <Wrapper>
-        <InfoCard>
+      <Container>
+        <Header>
           <h2>About Amdako Strategy</h2>
-          <p>In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd. stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency trading solutions from the heart of Nigeria.</p>
-          
-          <strong>Our Mission</strong>
-          <p>To empower individuals, businesses, and investors with the knowledge, tools, and opportunities to profit confidently in the rapidly evolving world of digital assets.</p>
-          
-          <strong>Risk Management</strong>
-          <p>We focus strongly on controlled exposure, capital preservation, and diversification. Our emphasis is not reckless trading, but calculated growth through strategic analysis over emotional trading.</p>
-          
-          <strong>Profit Monitoring</strong>
-          <p>Funds are actively monitored and managed to optimize performance while minimizing unnecessary exposure. We ensure every investor understands how their money grows through data-driven insight and transparency.</p>
-
-          <strong>Contact Information</strong>
           <p>
-            Email: Amdakostrategy@gmail.com<br/>
-            Phone: 08035817324<br/>
-            Office: Suite 8A First Floor Block A, City Plaza Area 11, Abuja.
+            In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd.
+            stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency
+            trading solutions from the heart of Nigeria.
           </p>
-        </InfoCard>
+        </Header>
 
-        {/* <FormCard onSubmit={(event) => event.preventDefault()}>
-          <Field>
-            Name
-            <Input type="text" placeholder="Your name" required />
-          </Field>
+        <IntroCard>
+          <p>
+            Founded with a bold vision to bridge Africa's financial potential with global digital markets,
+            Amdako Strategy Nig. Ltd. is not just another trading company — it's a strategic powerhouse
+            built on intelligence, transparency, and cutting-edge technology.
+          </p>
+        </IntroCard>
 
-          <Field>
-            Email
-            <Input type="email" placeholder="you@example.com" required />
-          </Field>
+        <Grid>
+          <SectionCard>
+            <IconBox>
+              <Target size={22} />
+            </IconBox>
+            <SectionTitle>Our Mission</SectionTitle>
+            <SectionText>
+              To empower individuals, businesses, and investors with the knowledge, tools, and opportunities
+              to profit confidently in the rapidly evolving world of digital assets.
+            </SectionText>
+          </SectionCard>
 
-          <Field>
-            Message
-            <TextArea placeholder="Tell us how we can help" required />
-          </Field>
+          <SectionCard>
+            <IconBox>
+              <ShieldCheck size={22} />
+            </IconBox>
+            <SectionTitle>Risk Management</SectionTitle>
+            <SectionText>
+              We focus strongly on controlled exposure, capital preservation, and diversification.
+              Our emphasis is not reckless trading, but calculated growth through strategic analysis
+              over emotional trading.
+            </SectionText>
+          </SectionCard>
 
-          <Button type="submit">Send Message</Button>
-        </FormCard> */}
-      </Wrapper>
+          <SectionCard>
+            <IconBox>
+              <TrendingUp size={22} />
+            </IconBox>
+            <SectionTitle>Profit Monitoring</SectionTitle>
+            <SectionText>
+              Funds are actively monitored and managed to optimize performance while minimizing unnecessary
+              exposure. We ensure every investor understands how their money grows through data-driven
+              insight and transparency.
+            </SectionText>
+          </SectionCard>
+
+          <SectionCard>
+            <IconBox>
+              <Building2 size={22} />
+            </IconBox>
+            <SectionTitle>Why Choose Us</SectionTitle>
+            <SectionText>
+              Our commitment to integrity, professional expertise, and a proven track record of delivering
+              consistent returns makes us the preferred choice for discerning investors across the continent.
+            </SectionText>
+          </SectionCard>
+        </Grid>
+
+        <ContactCard>
+          <h3>Contact Information</h3>
+          <ContactItems>
+            <ContactItem>
+              <Mail size={20} />
+              <div>
+                <ContactLabel>Email</ContactLabel>
+                <p>Amdakostrategy@gmail.com</p>
+              </div>
+            </ContactItem>
+            <ContactItem>
+              <Phone size={20} />
+              <div>
+                <ContactLabel>Phone</ContactLabel>
+                <p>08035817324</p>
+              </div>
+            </ContactItem>
+            <ContactItem>
+              <MapPin size={20} />
+              <div>
+                <ContactLabel>Office</ContactLabel>
+                <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
+              </div>
+            </ContactItem>
+          </ContactItems>
+        </ContactCard>
+      </Container>
     </Page>
   );
 }

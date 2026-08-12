@@ -13,11 +13,9 @@ export const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     min-height: 100vh;
-    font-family: 'Inter', system-ui, sans-serif;
-    background: radial-gradient(circle at top, rgba(124, 108, 246, 0.15), transparent 28%),
-      radial-gradient(circle at 20% 10%, rgba(255, 255, 255, 0.08), transparent 25%),
-      #05050f;
-    color: #f8f8ff;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: #ffffff;
+    color: #0A2540;
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -26,13 +24,14 @@ export const GlobalStyles = createGlobalStyle`
 
   h1, h2, h3, h4, h5, h6 {
     margin: 0;
-    font-weight: 600;
-    letter-spacing: 0.5px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    color: #0A2540;
   }
 
   h1 {
     font-size: 3.25rem;
-    line-height: 1.08;
+    line-height: 1.1;
 
     @media (max-width: 1200px) {
       font-size: 2.9rem;
@@ -53,7 +52,7 @@ export const GlobalStyles = createGlobalStyle`
 
   h2 {
     font-size: 2.5rem;
-    line-height: 1.18;
+    line-height: 1.2;
 
     @media (max-width: 1024px) {
       font-size: 2.1rem;
@@ -69,23 +68,23 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   h3 {
-    font-size: 1.85rem;
-    line-height: 1.25;
+    font-size: 1.5rem;
+    line-height: 1.3;
 
     @media (max-width: 768px) {
-      font-size: 1.5rem;
+      font-size: 1.35rem;
     }
 
     @media (max-width: 480px) {
-      font-size: 1.35rem;
+      font-size: 1.25rem;
     }
   }
 
   p {
     margin: 0;
     font-size: 1rem;
-    line-height: 1.75;
-    color: rgba(248, 248, 255, 0.85);
+    line-height: 1.7;
+    color: #425466;
 
     @media (max-width: 768px) {
       font-size: 0.97rem;
@@ -96,20 +95,38 @@ export const GlobalStyles = createGlobalStyle`
     }
   }
 
+  a {
+    color: #635BFF;
+    text-decoration: none;
+    transition: color 0.2s ease;
+
+    &:hover {
+      color: #4C45E8;
+    }
+  }
+
   button {
     cursor: pointer;
     border: none;
     outline: none;
+    font-family: inherit;
+  }
+
+  input, select, textarea {
+    font-family: inherit;
   }
 
   .container {
     width: min(1200px, 100%);
     margin: 0 auto;
-    padding: 0 20px;
+    padding: 0 24px;
 
     @media (max-width: 768px) {
+      padding: 0 20px;
+    }
+
+    @media (max-width: 480px) {
       padding: 0 16px;
     }
   }
 `;
-

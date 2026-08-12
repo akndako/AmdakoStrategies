@@ -1,50 +1,14 @@
 ﻿﻿import { useState, useEffect } from "react";
 import styled from "styled-components";
 import { motion, AnimatePresence } from "framer-motion";
-import eth from "../assets/eth.png";
-import btc from "../assets/btc.png";
+import { TrendingUp, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
+import { theme } from "../theme";
 
 const Section = styled.section`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 140px 100px;
-  min-height: 85vh;
   position: relative;
-  background: #0b0e11;
   overflow: hidden;
-
-  @media (max-width: 1200px) {
-    padding: 100px 80px;
-  }
-
-  @media (max-width: 1024px) {
-    padding: 90px 60px;
-  }
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    text-align: center;
-    padding: 70px 30px;
-    gap: 50px;
-    min-height: 75vh;
-  }
-
-  @media (max-width: 600px) {
-    padding: 60px 20px;
-    gap: 40px;
-    min-height: 70vh;
-  }
-
-  @media (max-width: 480px) {
-    padding: 50px 16px;
-    gap: 35px;
-  }
-
-  @media (max-width: 360px) {
-    padding: 40px 12px;
-    gap: 30px;
-  }
+  background: linear-gradient(180deg, #F8F9FF 0%, #FFFFFF 100%);
+  border-bottom: 1px solid ${theme.colors.borderLight};
 `;
 
 const BackgroundPattern = styled.div`
@@ -53,365 +17,369 @@ const BackgroundPattern = styled.div`
   left: 0;
   right: 0;
   bottom: 0;
-  opacity: 0.4;
-  background-image: radial-gradient(circle at 2px 2px, rgba(243, 186, 47, 0.05) 1px, transparent 0);
-  background-size: 40px 40px;
   pointer-events: none;
+  background-image: radial-gradient(circle at 1px 1px, rgba(99, 91, 255, 0.06) 1px, transparent 0);
+  background-size: 32px 32px;
+  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 120px 24px 100px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 60px;
+  align-items: center;
+  position: relative;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
+    gap: 50px;
+    padding: 90px 24px 80px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 70px 20px 60px;
+    gap: 40px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 60px 16px 50px;
+    gap: 35px;
+  }
 `;
 
 const Left = styled.div`
-  max-width: 650px;
-  flex: 1;
-
-  @media (max-width: 1200px) {
-    max-width: 600px;
-  }
+  max-width: 600px;
 
   @media (max-width: 1024px) {
-    max-width: 550px;
-  }
-
-  @media (max-width: 768px) {
     max-width: 100%;
+    text-align: center;
   }
+`;
+
+const Badge = styled.div`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 100px;
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 24px;
 `;
 
 const Title = styled(motion.h1)`
-  font-size: 3.5rem;
-  line-height: 1.15;
-  margin-bottom: 35px;
+  font-size: 3.25rem;
+  line-height: 1.1;
+  margin-bottom: 24px;
+  color: ${theme.colors.text};
 
   @media (max-width: 1200px) {
-    font-size: 3rem;
-    margin-bottom: 32px;
+    font-size: 2.9rem;
   }
 
   @media (max-width: 1024px) {
-    font-size: 2.875rem;
-    margin-bottom: 30px;
-  }
-
-  @media (max-width: 768px) {
     font-size: 2.5rem;
-    margin-bottom: 25px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 2.125rem;
-    margin-bottom: 20px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.875rem;
-    margin-bottom: 18px;
-  }
-
-  @media (max-width: 360px) {
-    font-size: 1.75rem;
-    margin-bottom: 16px;
-  }
-`;
-
-const SlideContentCard = styled(motion.div)`
-  padding: 45px;
-  border-radius: 18px;
-  background: rgba(30, 35, 41, 0.7);
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(243, 186, 47, 0.1), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
-  &:hover {
-    border-color: #f3ba2f;
-    background: rgba(30, 35, 41, 0.9);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    
-    &::before {
-      opacity: 1;
-    }
-  }
-
-  @media (max-width: 1024px) { padding: 40px; }
-  @media (max-width: 768px) { padding: 35px; }
-  @media (max-width: 480px) { padding: 25px; }
-`;
-
-const Subtitle = styled(motion.p)`
-  font-size: 1.25rem;
-  line-height: 1.6;
-  margin-bottom: 45px;
-  opacity: 0.85;
-  color: rgba(255, 255, 255, 0.9);
-
-  @media (max-width: 1200px) {
-    font-size: 1.1875rem;
-    margin-bottom: 42px;
-  }
-
-  @media (max-width: 1024px) {
-    font-size: 1.125rem;
-    margin-bottom: 40px;
   }
 
   @media (max-width: 768px) {
-    font-size: 1.0625rem;
-    margin-bottom: 35px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 1rem;
-    margin-bottom: 30px;
+    font-size: 2.1rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 0.9375rem;
-    margin-bottom: 25px;
-  }
-
-  @media (max-width: 360px) {
-    font-size: 0.875rem;
-    margin-bottom: 20px;
+    font-size: 1.85rem;
   }
 `;
 
 const Gradient = styled.span`
-  background: linear-gradient(90deg, #f3ba2f, #f7a600);
+  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark});
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 `;
 
+const Subtitle = styled(motion.p)`
+  font-size: 1.125rem;
+  line-height: 1.7;
+  color: ${theme.colors.textSecondary};
+  margin-bottom: 36px;
+
+  @media (max-width: 768px) {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+`;
+
 const ButtonGroup = styled(motion.div)`
   display: flex;
-  gap: 18px;
+  gap: 14px;
   flex-wrap: wrap;
+
+  @media (max-width: 1024px) {
+    justify-content: center;
+  }
 
   @media (max-width: 600px) {
     flex-direction: column;
     align-items: center;
-    gap: 14px;
-  }
-
-  @media (max-width: 480px) {
-    gap: 12px;
   }
 `;
 
 const Button = styled(motion.button)`
-  padding: 18px 40px;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #f3ba2f 0%, #f7a600 100%);
-  border: none;
-  color: white;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1.0625rem;
-  transition: 0.3s ease;
-  white-space: nowrap;
+  padding: 14px 28px;
+  border-radius: ${theme.radii.medium};
+  background: ${theme.colors.primary};
+  color: #fff;
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: ${theme.shadows.button};
 
   &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.3);
-  }
-
-  @media (max-width: 1024px) {
-    padding: 16px 36px;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 15px 32px;
-    font-size: 0.9375rem;
+    background: ${theme.colors.primaryDark};
+    box-shadow: ${theme.shadows.buttonHover};
+    transform: translateY(-1px);
   }
 
   @media (max-width: 600px) {
-    padding: 14px 28px;
     width: 100%;
     max-width: 300px;
-    font-size: 0.9375rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 13px 24px;
-    max-width: 280px;
-    font-size: 0.875rem;
-  }
-
-  @media (max-width: 360px) {
-    padding: 12px 20px;
-    max-width: 260px;
-    font-size: 0.8125rem;
+    justify-content: center;
   }
 `;
 
 const SecondaryButton = styled(motion.button)`
-  padding: 18px 40px;
-  border-radius: 14px;
+  padding: 14px 28px;
+  border-radius: ${theme.radii.medium};
   background: transparent;
-  border: 2px solid rgba(243, 186, 47, 0.3);
-  color: white;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1.0625rem;
-  transition: 0.3s ease;
-  white-space: nowrap;
+  border: 1px solid ${theme.colors.border};
+  color: ${theme.colors.text};
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
 
   &:hover {
-    border-color: #f3ba2f;
-    background: rgba(243, 186, 47, 0.05);
-  }
-
-  @media (max-width: 1024px) {
-    padding: 16px 36px;
-    font-size: 1rem;
-  }
-
-  @media (max-width: 768px) {
-    padding: 15px 32px;
-    font-size: 0.9375rem;
+    background: ${theme.colors.surfaceAlt};
+    border-color: ${theme.colors.primary};
+    color: ${theme.colors.primary};
   }
 
   @media (max-width: 600px) {
-    padding: 14px 28px;
     width: 100%;
     max-width: 300px;
-    font-size: 0.9375rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 13px 24px;
-    max-width: 280px;
-    font-size: 0.875rem;
-  }
-
-  @media (max-width: 360px) {
-    padding: 12px 20px;
-    max-width: 260px;
-    font-size: 0.8125rem;
+    justify-content: center;
   }
 `;
 
 const Right = styled.div`
-  flex: 1;
-  max-width: 550px;
-  height: 450px;
   position: relative;
   display: flex;
   align-items: center;
   justify-content: center;
-  background: radial-gradient(circle at 60% 40%, rgba(243, 186, 47, 0.08), transparent);
-  border-radius: 20px;
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  backdrop-filter: blur(16px);
-
-  @media (max-width: 1200px) {
-    max-width: 500px;
-    height: 420px;
-  }
 
   @media (max-width: 1024px) {
-    max-width: 450px;
-    height: 380px;
-  }
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-    height: 320px;
-  }
-
-  @media (max-width: 600px) {
-    height: 280px;
-  }
-
-  @media (max-width: 480px) {
-    height: 240px;
-  }
-
-  @media (max-width: 360px) {
-    height: 200px;
+    max-width: 500px;
+    margin: 0 auto;
   }
 `;
 
-const Coin = styled(motion.img)`
-  width: 90px;
-  position: absolute;
-  filter: drop-shadow(0 0 20px rgba(243, 186, 47, 0.3));
-
-  @media (max-width: 1200px) {
-    width: 85px;
-  }
-
-  @media (max-width: 1024px) {
-    width: 80px;
-  }
-
-  @media (max-width: 768px) {
-    width: 70px;
-  }
-
-  @media (max-width: 600px) {
-    width: 65px;
-  }
+const DashboardMock = styled(motion.div)`
+  width: 100%;
+  max-width: 480px;
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
+  box-shadow: ${theme.shadows.cardHover};
+  padding: 28px;
+  position: relative;
 
   @media (max-width: 480px) {
-    width: 60px;
+    padding: 20px;
+  }
+`;
+
+const MockHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+
+  h4 {
+    font-size: 14px;
+    font-weight: 600;
+    color: ${theme.colors.textSecondary};
   }
 
-  @media (max-width: 360px) {
-    width: 55px;
+  span {
+    font-size: 13px;
+    color: ${theme.colors.success};
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+`;
+
+const MockBalance = styled.div`
+  margin-bottom: 24px;
+
+  p {
+    font-size: 13px;
+    color: ${theme.colors.textMuted};
+    margin-bottom: 6px;
+  }
+
+  h3 {
+    font-size: 32px;
+    font-weight: 700;
+    color: ${theme.colors.text};
+  }
+`;
+
+const MockChart = styled.div`
+  height: 120px;
+  border-radius: ${theme.radii.medium};
+  background: linear-gradient(180deg, ${theme.colors.primaryLight} 0%, transparent 100%);
+  position: relative;
+  overflow: hidden;
+  margin-bottom: 24px;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: ${theme.colors.primary};
+    border-radius: 2px;
+  }
+`;
+
+const MockStats = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+`;
+
+const MockStat = styled.div`
+  padding: 14px;
+  border-radius: ${theme.radii.medium};
+  background: ${theme.colors.surfaceAlt};
+  border: 1px solid ${theme.colors.borderLight};
+
+  p {
+    font-size: 12px;
+    color: ${theme.colors.textMuted};
+    margin-bottom: 4px;
+  }
+
+  h5 {
+    font-size: 16px;
+    font-weight: 700;
+    color: ${theme.colors.text};
+  }
+`;
+
+const FloatingCard = styled(motion.div)`
+  position: absolute;
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.medium};
+  box-shadow: ${theme.shadows.cardHover};
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  @media (max-width: 480px) {
+    padding: 10px 12px;
+  }
+`;
+
+const FloatingIcon = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
+`;
+
+const FloatingText = styled.div`
+  p {
+    font-size: 12px;
+    color: ${theme.colors.textMuted};
+  }
+
+  h5 {
+    font-size: 14px;
+    font-weight: 700;
+    color: ${theme.colors.text};
   }
 `;
 
 const CarouselDots = styled.div`
-  position: absolute;
-  bottom: 40px;
-  left: 100px;
   display: flex;
-  gap: 12px;
+  gap: 8px;
+  margin-top: 40px;
 
-  @media (max-width: 768px) {
-    left: 50%;
-    transform: translateX(-50%);
+  @media (max-width: 1024px) {
+    justify-content: center;
   }
 `;
 
 const Dot = styled.div<{ active: boolean }>`
-  width: ${props => props.active ? '32px' : '12px'};
-  height: 6px;
-  border-radius: 3px;
-  background: ${props => props.active ? '#f3ba2f' : 'rgba(255, 255, 255, 0.2)'};
+  width: ${(props) => (props.active ? "28px" : "8px")};
+  height: 8px;
+  border-radius: 4px;
+  background: ${(props) => (props.active ? theme.colors.primary : theme.colors.border)};
   transition: all 0.3s ease;
   cursor: pointer;
 `;
 
 const slides = [
   {
-    title: <>Redefining the Future of Cryptocurrency Trading in <br/><Gradient>Africa</Gradient></>,
-    subtitle: "Unlock unprecedented returns in decentralized finance and blockchain projects. Born from a vision to connect Africa's financial potential to the global digital economy.",
-    cta: "Start Investing Now"
+    title: (
+      <>
+        Redefining the Future of Cryptocurrency Trading in <Gradient>Africa</Gradient>
+      </>
+    ),
+    subtitle:
+      "Unlock unprecedented returns in decentralized finance and blockchain projects. Born from a vision to connect Africa's financial potential to the global digital economy.",
+    cta: "Start Investing Now",
   },
   {
-    title: <>Strategic Wealth Growth Powered by <br/><Gradient>Data Intelligence</Gradient></>,
-    subtitle: "We leverage advanced algorithmic models and real-time analytics to identify profitable opportunities. Calculated growth over reckless trading.",
-    cta: "View Strategies"
+    title: (
+      <>
+        Strategic Wealth Growth Powered by <Gradient>Data Intelligence</Gradient>
+      </>
+    ),
+    subtitle:
+      "We leverage advanced algorithmic models and real-time analytics to identify profitable opportunities. Calculated growth over reckless trading.",
+    cta: "View Strategies",
   },
   {
-    title: <>Built on Unmatched <br/><Gradient>Transparency & Trust</Gradient></>,
-    subtitle: "Every transaction, every result — open and accountable. Join thousands of investors who trust Amdako with their digital assets.",
-    cta: "Create Account"
-  }
+    title: (
+      <>
+        Built on Unmatched <Gradient>Transparency & Trust</Gradient>
+      </>
+    ),
+    subtitle:
+      "Every transaction, every result — open and accountable. Join thousands of investors who trust Amdako with their digital assets.",
+    cta: "Create Account",
+  },
 ];
 
 export default function Hero() {
@@ -427,73 +395,105 @@ export default function Hero() {
   return (
     <Section>
       <BackgroundPattern />
-      <Left>
-        <AnimatePresence mode="wait">
-          <SlideContentCard
-            key={currentSlide}
+      <Container>
+        <Left>
+          <Badge>
+            <ShieldCheck size={14} />
+            Trusted Investment Platform
+          </Badge>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={currentSlide}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.4 }}
+            >
+              <Title>{slides[currentSlide].title}</Title>
+              <Subtitle>{slides[currentSlide].subtitle}</Subtitle>
+              <ButtonGroup>
+                <Button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  {slides[currentSlide].cta}
+                  <ArrowRight size={16} />
+                </Button>
+                <SecondaryButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                  Learn More
+                </SecondaryButton>
+              </ButtonGroup>
+            </motion.div>
+          </AnimatePresence>
+          <CarouselDots>
+            {slides.map((_, idx) => (
+              <Dot key={idx} active={currentSlide === idx} onClick={() => setCurrentSlide(idx)} />
+            ))}
+          </CarouselDots>
+        </Left>
+
+        <Right>
+          <DashboardMock
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            <MockHeader>
+              <h4>Portfolio Overview</h4>
+              <span>
+                <TrendingUp size={14} />
+                +12.4%
+              </span>
+            </MockHeader>
+            <MockBalance>
+              <p>Total Balance</p>
+              <h3>$10,000.00</h3>
+            </MockBalance>
+            <MockChart />
+            <MockStats>
+              <MockStat>
+                <p>ROI</p>
+                <h5>120%</h5>
+              </MockStat>
+              <MockStat>
+                <p>Investors</p>
+                <h5>20+</h5>
+              </MockStat>
+              <MockStat>
+                <p>Success</p>
+                <h5>98.7%</h5>
+              </MockStat>
+            </MockStats>
+          </DashboardMock>
+
+          <FloatingCard
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: 20 }}
-            transition={{ duration: 0.5 }}
-            whileHover={{ scale: 1.01 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            style={{ top: "10%", left: "-8%" }}
           >
-            <Title>
-              {slides[currentSlide].title}
-            </Title>
+            <FloatingIcon>
+              <BarChart3 size={18} />
+            </FloatingIcon>
+            <FloatingText>
+              <p>Monthly Growth</p>
+              <h5>+10% ROI</h5>
+            </FloatingText>
+          </FloatingCard>
 
-            <Subtitle>
-              {slides[currentSlide].subtitle}
-            </Subtitle>
-
-            <ButtonGroup>
-              <Button whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                {slides[currentSlide].cta}
-              </Button>
-              <SecondaryButton whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                Learn More
-              </SecondaryButton>
-            </ButtonGroup>
-          </SlideContentCard>
-        </AnimatePresence>
-      </Left>
-
-      <Right>
-        <Coin
-          src={eth}
-          animate={{ 
-            y: [0, -20, 0],
-            rotate: [0, 5, 0]
-          }}
-          transition={{ 
-            y: { repeat: Infinity, duration: 4, ease: "easeInOut" },
-            rotate: { repeat: Infinity, duration: 6, ease: "easeInOut" }
-          }}
-          style={{ top: "20%", left: "20%" }}
-        />
-
-        <Coin
-          src={btc}
-          animate={{ 
-            y: [0, 20, 0],
-            rotate: [0, -5, 0]
-          }}
-          transition={{ 
-            y: { repeat: Infinity, duration: 5, ease: "easeInOut" },
-            rotate: { repeat: Infinity, duration: 7, ease: "easeInOut" }
-          }}
-          style={{ bottom: "20%", right: "20%" }}
-        />
-      </Right>
-
-      <CarouselDots>
-        {slides.map((_, idx) => (
-          <Dot 
-            key={idx} 
-            active={currentSlide === idx} 
-            onClick={() => setCurrentSlide(idx)}
-          />
-        ))}
-      </CarouselDots>
+          <FloatingCard
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
+            style={{ bottom: "8%", right: "-6%" }}
+          >
+            <FloatingIcon>
+              <ShieldCheck size={18} />
+            </FloatingIcon>
+            <FloatingText>
+              <p>Security</p>
+              <h5>Fully Protected</h5>
+            </FloatingText>
+          </FloatingCard>
+        </Right>
+      </Container>
     </Section>
   );
 }

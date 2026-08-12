@@ -1,122 +1,98 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
+import { ArrowRight } from "lucide-react";
+import { theme } from "../theme";
 
 const Section = styled.section`
-  padding: 100px;
-  background: rgba(30, 35, 41, 0.7);
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  margin: 80px 100px;
-  border-radius: 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-
-  &::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -10%;
-    width: 500px;
-    height: 500px;
-    background: radial-gradient(circle, rgba(243, 186, 47, 0.15), transparent);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  @media (max-width: 1200px) {
-    padding: 80px;
-    margin: 70px 80px;
-  }
-
-  @media (max-width: 1024px) {
-    padding: 70px 60px;
-    margin: 60px 60px;
-  }
+  padding: 100px 24px;
+  background: #ffffff;
 
   @media (max-width: 768px) {
-    padding: 60px 40px;
-    margin: 50px 30px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 50px 30px;
-    margin: 40px 20px;
+    padding: 70px 20px;
   }
 
   @media (max-width: 480px) {
-    padding: 40px 24px;
-    margin: 30px 16px;
+    padding: 60px 16px;
   }
+`;
+
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
 `;
 
 const Content = styled.div`
   position: relative;
+  overflow: hidden;
+  text-align: center;
+  padding: 80px 60px;
+  border-radius: ${theme.radii.xl};
+  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
+
+  @media (max-width: 1024px) {
+    padding: 70px 50px;
+  }
+
+  @media (max-width: 768px) {
+    padding: 60px 35px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 50px 24px;
+  }
+`;
+
+const Glow = styled.div`
+  position: absolute;
+  top: -50%;
+  right: -10%;
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent);
+  border-radius: 50%;
+  pointer-events: none;
+`;
+
+const ContentInner = styled.div`
+  position: relative;
   z-index: 1;
-  max-width: 700px;
+  max-width: 650px;
   margin: 0 auto;
 `;
 
 const Title = styled(motion.h2)`
-  font-size: 2.5rem;
-  margin-bottom: 20px;
-  line-height: 1.2;
-
-  @media (max-width: 1200px) {
-    font-size: 2.25rem;
-    margin-bottom: 18px;
-  }
+  font-size: 2.25rem;
+  margin-bottom: 16px;
+  color: #fff;
 
   @media (max-width: 1024px) {
     font-size: 2rem;
-    margin-bottom: 16px;
   }
 
   @media (max-width: 768px) {
     font-size: 1.75rem;
-    margin-bottom: 14px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
   }
 
   @media (max-width: 480px) {
-    font-size: 1.375rem;
-    margin-bottom: 10px;
+    font-size: 1.5rem;
   }
 `;
 
 const Description = styled(motion.p)`
-  font-size: 1.125rem;
-  opacity: 0.85;
-  margin-bottom: 40px;
-  line-height: 1.6;
-
-  @media (max-width: 1024px) {
-    font-size: 1rem;
-    margin-bottom: 36px;
-  }
+  font-size: 1.0625rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.7;
+  margin-bottom: 36px;
 
   @media (max-width: 768px) {
-    font-size: 0.9375rem;
-    margin-bottom: 32px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 0.875rem;
-    margin-bottom: 28px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8125rem;
-    margin-bottom: 24px;
+    font-size: 0.95rem;
+    margin-bottom: 30px;
   }
 `;
 
 const ButtonGroup = styled.div`
   display: flex;
-  gap: 16px;
+  gap: 14px;
   justify-content: center;
   flex-wrap: wrap;
 
@@ -126,39 +102,45 @@ const ButtonGroup = styled.div`
   }
 `;
 
-const Button = styled(motion.button)<{ primary?: boolean }>`
-  padding: 16px 40px;
-  border-radius: 12px;
-  border: ${({ primary }) => primary ? "none" : "2px solid rgba(243, 186, 47, 0.2)"};
-  background: ${({ primary }) => primary ? "linear-gradient(135deg, #F3BA2F 0%, #F7A600 100%)" : "transparent"};
-  color: white;
-  font-weight: 700;
-  font-size: 1rem;
+const Button = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
+  padding: 14px 30px;
+  border-radius: ${theme.radii.medium};
+  font-weight: 600;
+  font-size: 15px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
   cursor: pointer;
-  transition: all 0.3s ease;
-  white-space: nowrap;
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: ${({ primary }) => primary ? "0 16px 32px rgba(243, 186, 47, 0.4)" : "none"};
-    ${({ primary }) => !primary && `border-color: #F3BA2F;`}
-  }
+  ${({ variant }) =>
+    variant === "secondary"
+      ? `
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    border: 1px solid rgba(255, 255, 255, 0.25);
 
-  @media (max-width: 768px) {
-    padding: 14px 32px;
-    font-size: 0.9375rem;
-  }
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+  `
+      : `
+    background: #fff;
+    color: ${theme.colors.primary};
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.95);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    }
+  `}
 
   @media (max-width: 600px) {
     width: 100%;
     max-width: 300px;
-    padding: 14px 28px;
-    font-size: 0.9375rem;
-  }
-
-  @media (max-width: 480px) {
-    padding: 13px 24px;
-    font-size: 0.875rem;
+    justify-content: center;
   }
 `;
 
@@ -169,45 +151,55 @@ interface CTAProps {
 export default function CTA({ onNavigate }: CTAProps) {
   return (
     <Section>
-      <Content>
-        <Title
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          Ready to Grow Your Wealth?
-        </Title>
-        <Description
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1, duration: 0.6 }}
-          viewport={{ once: true }}
-        >
-          Join our community of successful investors and start your journey to financial freedom with Amdako Strategies.
-        </Description>
-        <ButtonGroup>
-          <Button
-            primary
-            onClick={() => onNavigate("create")}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            Get Started
-          </Button>
-          <Button
-            onClick={() => onNavigate("login")}
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.6 }}
-            viewport={{ once: true }}
-          >
-            Sign In
-          </Button>
-        </ButtonGroup>
-      </Content>
+      <Container>
+        <Content>
+          <Glow />
+          <ContentInner>
+            <Title
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              Ready to Grow Your Wealth?
+            </Title>
+            <Description
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.5 }}
+              viewport={{ once: true }}
+            >
+              Join our community of successful investors and start your journey to financial freedom with Amdako Strategies.
+            </Description>
+            <ButtonGroup>
+              <Button
+                onClick={() => onNavigate("create")}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Get Started
+                <ArrowRight size={16} />
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => onNavigate("login")}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3, duration: 0.5 }}
+                viewport={{ once: true }}
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.97 }}
+              >
+                Sign In
+              </Button>
+            </ButtonGroup>
+          </ContentInner>
+        </Content>
+      </Container>
     </Section>
   );
 }

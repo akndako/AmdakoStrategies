@@ -21,7 +21,13 @@ const useLocalJSON = process.env.USE_LOCAL_JSON === "true" || (!process.env.MONG
 const app = express();
 
 // Middleware
-app.use(cors({ origin: "http://localhost:5173" }));
+const allowedOrigin = process.env.FRONTEND_URL || "http://localhost:5173";
+app.use(
+  cors({
+    origin: allowedOrigin,
+    credentials: true,
+  })
+);
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 

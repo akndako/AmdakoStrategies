@@ -1,5 +1,7 @@
 ﻿﻿import { useState } from "react";
 import styled from "styled-components";
+import { Menu, X, LogOut, LayoutDashboard, UserPlus, LogIn } from "lucide-react";
+import { theme } from "../theme";
 
 type NavbarProps = {
   activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
@@ -8,164 +10,171 @@ type NavbarProps = {
   onLogout: () => void;
 };
 
-const Container = styled.div`
-  position: relative;
+const Container = styled.header`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(16px);
+  border-bottom: 1px solid ${theme.colors.borderLight};
+`;
+
+const Nav = styled.nav`
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 24px;
+  height: 68px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px 60px;
-
-  background: rgba(11, 14, 17, 0.95); /* Darker background to match Hero */
-  backdrop-filter: blur(12px);
-  border-bottom: 1px solid rgba(255,255,255,0.05);
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-bottom-color: rgba(243, 186, 47, 0.15); /* Gold hover border */
-  }
-
-  @media (max-width: 1024px) {
-    padding: 20px 40px;
-  }
 
   @media (max-width: 768px) {
-    padding: 16px 20px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 14px 18px;
-  }
-
-  @media (max-width: 760px) {
-    flex-direction: column;
-    gap: 18px;
-    align-items: stretch;
-  }
-
-  @media (max-width: 480px) {
-    padding: 12px 16px;
-    gap: 12px;
+    padding: 0 20px;
+    height: 60px;
   }
 `;
 
-const Brand = styled.h3`
-  font-size: 18px;
-  letter-spacing: 1px;
-  text-transform: uppercase;
-  margin: 0; /* Remove margin */
-  background: linear-gradient(135deg, #f3ba2f, #f7a600); /* Gold gradient */
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
+const Brand = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
   cursor: pointer;
-  transition: transform 0.3s ease;
+  font-size: 17px;
+  font-weight: 700;
+  letter-spacing: 0.4px;
+  color: ${theme.colors.text};
+  text-transform: uppercase;
+
+  span {
+    color: ${theme.colors.primary};
+  }
+`;
+
+const BrandMark = styled.div`
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark});
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 800;
+`;
+
+const NavLinks = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 4px;
+
+  @media (max-width: 820px) {
+    display: none;
+  }
+`;
+
+const NavLink = styled.button<{ active?: boolean }>`
+  padding: 8px 14px;
+  border-radius: ${theme.radii.small};
+  background: transparent;
+  color: ${({ active }) => (active ? theme.colors.primary : theme.colors.textSecondary)};
+  font-weight: ${({ active }) => (active ? 600 : 500)};
+  font-size: 14px;
+  transition: all 0.2s ease;
 
   &:hover {
-    transform: scale(1.05);
-  }
-
-  @media (max-width: 480px) {
-    font-size: 16px;
+    background: ${theme.colors.surfaceAlt};
+    color: ${theme.colors.text};
   }
 `;
 
 const Actions = styled.div`
   display: flex;
-  gap: 14px;
   align-items: center;
+  gap: 10px;
 
-  @media (max-width: 760px) {
+  @media (max-width: 820px) {
     display: none;
   }
-
-  @media (max-width: 600px) {
-    gap: 12px;
-  }
-
-  @media (max-width: 480px) {
-    gap: 8px;
-    flex-wrap: wrap;
-  }
 `;
 
-const Button = styled.button<{ primary?: boolean }>`
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: ${({ primary }) =>
-    primary ? "none" : "1px solid rgba(243, 186, 47, 0.3)"}; /* Gold border for secondary */
-  background: ${({ primary }) =>
-    primary
-      ? "linear-gradient(135deg, #f3ba2f, #f7a600)" /* Gold gradient for primary */
-      : "transparent"};
-  color: white;
-  font-weight: 500;
-  transition: all 0.3s ease;
-  cursor: pointer;
-  
+const Button = styled.button<{ variant?: "primary" | "outline" }>`
+  padding: 9px 18px;
+  border-radius: ${theme.radii.small};
+  font-size: 14px;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  background: ${({ variant }) =>
+    variant === "primary" ? theme.colors.primary : "transparent"};
+  color: ${({ variant }) =>
+    variant === "primary" ? "#fff" : theme.colors.textSecondary};
+  border: ${({ variant }) =>
+    variant === "primary" ? "none" : `1px solid ${theme.colors.border}`};
+
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: ${({ primary }) => primary ? "0 8px 24px rgba(243, 186, 47, 0.3)" : "0 8px 24px rgba(255, 255, 255, 0.05)"}; /* Gold shadow for primary */
-    ${({ primary }) => !primary && "border-color: #f3ba2f;"} /* Gold border on hover for secondary */
-  }
-
-  @media (max-width: 600px) {
-    padding: 9px 15px;
-    font-size: 14px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 8px 14px;
-    font-size: 14px;
-    width: 100%;
-    max-width: 240px;
+    background: ${({ variant }) =>
+      variant === "primary" ? theme.colors.primaryDark : theme.colors.surfaceAlt};
+    color: ${({ variant }) =>
+      variant === "primary" ? "#fff" : theme.colors.text};
+    box-shadow: ${({ variant }) =>
+      variant === "primary" ? theme.shadows.buttonHover : "none"};
+    transform: ${({ variant }) => (variant === "primary" ? "translateY(-1px)" : "none")};
   }
 `;
 
-const MenuToggle = styled.button`
+const MobileToggle = styled.button`
   display: none;
+  width: 40px;
+  height: 40px;
+  border-radius: ${theme.radii.small};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  color: ${theme.colors.text};
   align-items: center;
   justify-content: center;
-  width: 48px;
-  height: 48px;
-  border-radius: 14px; /* Consistent border-radius */
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(30, 35, 41, 0.85); /* Darker background */
-  color: white;
-  cursor: pointer;
-  font-size: 1.3rem;
-  transition: transform 0.2s ease, background 0.2s ease;
 
-  &:hover {
-    transform: scale(1.03); /* Slight scale on hover */
-    background: rgba(243, 186, 47, 0.95); /* Gold background on hover */
-  }
-
-  @media (max-width: 760px) {
+  @media (max-width: 820px) {
     display: flex;
   }
 `;
 
 const MobileMenu = styled.div`
-  position: static;
-  width: 100%;
-  margin-top: 12px;
-  background: rgba(10, 10, 25, 0.99);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 16px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.35);
-  display: flex;
+  display: none;
   flex-direction: column;
-  gap: 10px;
-  z-index: 15;
+  padding: 12px 20px 20px;
+  gap: 6px;
+  background: #fff;
+  border-top: 1px solid ${theme.colors.borderLight};
 
-  @media (min-width: 761px) {
-    display: none;
+  @media (max-width: 820px) {
+    display: flex;
   }
 `;
 
-const MobileAction = styled(Button)`
-  width: 100%;
-  max-width: none;
+const MobileLink = styled.button<{ active?: boolean }>`
+  padding: 12px 16px;
+  border-radius: ${theme.radii.small};
+  background: ${({ active }) => (active ? theme.colors.primaryLight : "transparent")};
+  color: ${({ active }) => (active ? theme.colors.primary : theme.colors.text)};
+  font-weight: 500;
+  font-size: 15px;
+  text-align: left;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &:hover {
+    background: ${theme.colors.surfaceAlt};
+  }
+`;
+
+const MobileDivider = styled.div`
+  height: 1px;
+  background: ${theme.colors.borderLight};
+  margin: 8px 0;
 `;
 
 export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
@@ -178,96 +187,90 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
   return (
     <Container>
-      <Brand>AMDAKOSTRATEGIES</Brand>
+      <Nav>
+        <Brand onClick={() => handleNavigate("home")}>
+          <BrandMark>A</BrandMark>
+          Amdako<span>Strategies</span>
+        </Brand>
 
-      <Actions>
-        {!auth && (
-          <>
-            <Button
-              onClick={() => onNavigate("home")}
-              primary={activePage === "home"}
-            >
-              Home
-            </Button>
-            <Button
-              onClick={() => onNavigate("about")}
-              primary={activePage === "about"}
-            >
-              About Us
-            </Button>
-            <Button
-              onClick={() => onNavigate("contact")}
-              primary={activePage === "contact"}
-            >
-              Contact Us
-            </Button>
-          </>
-        )}
-        {auth ? (
-          <>
-           
-            <Button
-              onClick={() => handleNavigate("dashboard")}
-              primary={activePage === "dashboard"}
-            >
-              Dashboard
-            </Button>
-            <Button onClick={onLogout}>Logout</Button>
-          </>
-        ) : (
-          <>
-            <Button
-              onClick={() => handleNavigate("login")}
-              primary={activePage === "login"}
-            >
-              Login
-            </Button>
-            <Button
-              onClick={() => handleNavigate("create")}
-              primary={activePage === "create"}
-            >
-              Create Account
-            </Button>
-          </>
-        )}
-      </Actions>
+        <NavLinks>
+          <NavLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+            Home
+          </NavLink>
+          <NavLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+            About Us
+          </NavLink>
+          <NavLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+            Contact
+          </NavLink>
+        </NavLinks>
 
-      <MenuToggle onClick={() => setMenuOpen((current) => !current)} aria-label="Toggle navigation menu">
-        {menuOpen ? "✕" : "☰"}
-      </MenuToggle>
-
-      {menuOpen && (
-        <MobileMenu>
-          {!auth && (
-            <>
-              <MobileAction onClick={() => handleNavigate("home")} primary={activePage === "home"}>
-                Home
-              </MobileAction>
-              <MobileAction onClick={() => handleNavigate("contact")} primary={activePage === "contact"}>
-                Contact Us
-              </MobileAction>
-            </>
-          )}
+        <Actions>
           {auth ? (
             <>
-              <div style={{ color: 'rgba(255,255,255,0.8)', fontSize: '14px', textAlign: 'center', marginBottom: '8px' }}>
-                Welcome, {auth.user.name} 👋
-              </div>
-              <MobileAction onClick={() => handleNavigate("dashboard")} primary={activePage === "dashboard"}>
+              <Button variant="outline" onClick={() => handleNavigate("dashboard")}>
+                <LayoutDashboard size={16} />
                 Dashboard
-              </MobileAction>
-              <MobileAction onClick={() => { setMenuOpen(false); onLogout(); }}>
+              </Button>
+              <Button variant="primary" onClick={onLogout}>
+                <LogOut size={16} />
                 Logout
-              </MobileAction>
+              </Button>
             </>
           ) : (
             <>
-              <MobileAction onClick={() => handleNavigate("login")} primary={activePage === "login"}>
-                Login
-              </MobileAction>
-              <MobileAction onClick={() => handleNavigate("create")} primary={activePage === "create"}>
+              <Button variant="outline" onClick={() => handleNavigate("login")}>
+                <LogIn size={16} />
+                Sign In
+              </Button>
+              <Button variant="primary" onClick={() => handleNavigate("create")}>
+                <UserPlus size={16} />
                 Create Account
-              </MobileAction>
+              </Button>
+            </>
+          )}
+        </Actions>
+
+        <MobileToggle onClick={() => setMenuOpen((current) => !current)} aria-label="Toggle navigation menu">
+          {menuOpen ? <X size={20} /> : <Menu size={20} />}
+        </MobileToggle>
+      </Nav>
+
+      {menuOpen && (
+        <MobileMenu>
+          <MobileLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+            Home
+          </MobileLink>
+          <MobileLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+            About Us
+          </MobileLink>
+          <MobileLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+            Contact
+          </MobileLink>
+
+          <MobileDivider />
+
+          {auth ? (
+            <>
+              <MobileLink active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
+                <LayoutDashboard size={18} />
+                Dashboard
+              </MobileLink>
+              <MobileLink onClick={() => { setMenuOpen(false); onLogout(); }}>
+                <LogOut size={18} />
+                Logout
+              </MobileLink>
+            </>
+          ) : (
+            <>
+              <MobileLink active={activePage === "login"} onClick={() => handleNavigate("login")}>
+                <LogIn size={18} />
+                Sign In
+              </MobileLink>
+              <MobileLink active={activePage === "create"} onClick={() => handleNavigate("create")}>
+                <UserPlus size={18} />
+                Create Account
+              </MobileLink>
             </>
           )}
         </MobileMenu>

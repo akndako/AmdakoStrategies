@@ -1,321 +1,183 @@
 import styled from "styled-components";
-import { motion } from "framer-motion"; 
+import { motion } from "framer-motion";
+import { LineChart, ShieldCheck, Target, Eye } from "lucide-react";
+import { theme } from "../theme";
 
 const Section = styled.section`
-  padding: 120px 100px;
-  background: #0b0e11;
-
-  @media (max-width: 1200px) {
-    padding: 100px 80px;
-  }
-
-  @media (max-width: 1024px) {
-    padding: 90px 60px;
-  }
+  padding: 100px 24px;
+  background: #ffffff;
 
   @media (max-width: 768px) {
-    padding: 70px 30px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 60px 20px;
+    padding: 70px 20px;
   }
 
   @media (max-width: 480px) {
-    padding: 50px 16px;
+    padding: 60px 16px;
   }
+`;
 
-  @media (max-width: 360px) {
-    padding: 40px 12px;
+const Container = styled.div`
+  max-width: 1200px;
+  margin: 0 auto;
+`;
+
+const Header = styled.div`
+  text-align: center;
+  max-width: 650px;
+  margin: 0 auto 60px;
+
+  @media (max-width: 768px) {
+    margin-bottom: 45px;
   }
 `;
 
 const Title = styled.h2`
-  font-size: 2.75rem;
-  margin-bottom: 24px;
-  text-align: center;
-
-  @media (max-width: 1200px) {
-    font-size: 2.5rem;
-    margin-bottom: 22px;
-  }
-
-  @media (max-width: 1024px) {
-    font-size: 2.25rem;
-    margin-bottom: 20px;
-  }
+  font-size: 2.5rem;
+  margin-bottom: 16px;
 
   @media (max-width: 768px) {
     font-size: 2rem;
-    margin-bottom: 18px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 1.75rem;
-    margin-bottom: 16px;
   }
 
   @media (max-width: 480px) {
-    font-size: 1.625rem;
-    margin-bottom: 14px;
-  }
-
-  @media (max-width: 360px) {
-    font-size: 1.5rem;
-    margin-bottom: 12px;
+    font-size: 1.75rem;
   }
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.125rem;
-  opacity: 0.75;
-  text-align: center;
-  margin-bottom: 70px;
-  max-width: 650px;
-  margin-left: auto;
-  margin-right: auto;
-
-  @media (max-width: 1200px) {
-    font-size: 1.0625rem;
-    margin-bottom: 65px;
-  }
-
-  @media (max-width: 1024px) {
-    font-size: 1rem;
-    margin-bottom: 60px;
-  }
+  font-size: 1.0625rem;
+  color: ${theme.colors.textSecondary};
+  line-height: 1.7;
 
   @media (max-width: 768px) {
-    font-size: 0.9375rem;
-    margin-bottom: 50px;
-  }
-
-  @media (max-width: 600px) {
-    font-size: 0.875rem;
-    margin-bottom: 45px;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 0.8125rem;
-    margin-bottom: 40px;
-  }
-
-  @media (max-width: 360px) {
-    font-size: 0.75rem;
-    margin-bottom: 35px;
+    font-size: 0.95rem;
   }
 `;
 
 const Grid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 36px;
-  
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+
   @media (max-width: 1024px) {
     grid-template-columns: repeat(2, 1fr);
-    gap: 32px;
-  }
-  
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-    gap: 28px;
   }
 
   @media (max-width: 600px) {
-    gap: 24px;
-  }
-
-  @media (max-width: 480px) {
-    gap: 20px;
+    grid-template-columns: 1fr;
+    gap: 18px;
   }
 `;
 
 const Card = styled(motion.div)`
-  padding: 45px;
-  border-radius: 18px;
-  background: rgba(30, 35, 41, 0.7);
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  backdrop-filter: blur(12px);
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: linear-gradient(135deg, rgba(247, 166, 0, 0.1), transparent);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-  }
-  
+  padding: 32px 28px;
+  border-radius: ${theme.radii.large};
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  transition: all 0.25s ease;
+
   &:hover {
-    border-color: #f3ba2f;
-    background: rgba(30, 35, 41, 0.9);
-    transform: translateY(-5px);
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
-    
-    &::before {
-      opacity: 1;
-    }
-  }
-
-  @media (max-width: 1024px) {
-    padding: 40px;
-  }
-
-  @media (max-width: 768px) {
-    padding: 35px;
+    border-color: ${theme.colors.primary};
+    box-shadow: ${theme.shadows.cardHover};
+    transform: translateY(-3px);
   }
 
   @media (max-width: 600px) {
-    padding: 30px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 25px;
-  }
-
-  @media (max-width: 360px) {
-    padding: 20px;
-  }
-  
-  h3 {
-    font-size: 1.375rem;
-    margin-bottom: 18px;
-    position: relative;
-    z-index: 1;
-
-    @media (max-width: 1024px) {
-      font-size: 1.25rem;
-      margin-bottom: 16px;
-    }
-
-    @media (max-width: 768px) {
-      font-size: 1.1875rem;
-      margin-bottom: 14px;
-    }
-
-    @media (max-width: 600px) {
-      font-size: 1.125rem;
-      margin-bottom: 12px;
-    }
-
-    @media (max-width: 480px) {
-      font-size: 1.0625rem;
-      margin-bottom: 10px;
-    }
-
-    @media (max-width: 360px) {
-      font-size: 1rem;
-      margin-bottom: 8px;
-    }
-  }
-  
-  p {
-    opacity: 0.75;
-    line-height: 1.6;
-    font-size: 0.9375rem;
-    position: relative;
-    z-index: 1;
-
-    @media (max-width: 768px) {
-      font-size: 0.875rem;
-    }
-
-    @media (max-width: 480px) {
-      font-size: 0.8125rem;
-    }
-
-    @media (max-width: 360px) {
-      font-size: 0.75rem;
-    }
+    padding: 26px 22px;
   }
 `;
 
 const IconBox = styled.div`
-  font-size: 56px;
-  margin-bottom: 24px;
-  display: inline-block;
-  background: rgba(243, 186, 47, 0.15);
-  padding: 16px;
-  border-radius: 12px;
-  position: relative;
-  z-index: 1;
+  width: 48px;
+  height: 48px;
+  border-radius: ${theme.radii.medium};
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+`;
 
-  @media (max-width: 1024px) {
-    font-size: 52px;
-    margin-bottom: 22px;
-  }
-
-  @media (max-width: 768px) {
-    font-size: 48px;
-    margin-bottom: 20px;
-  }
+const CardTitle = styled.h3`
+  font-size: 1.125rem;
+  margin-bottom: 10px;
+  color: ${theme.colors.text};
 
   @media (max-width: 600px) {
-    font-size: 44px;
-    margin-bottom: 18px;
+    font-size: 1.0625rem;
   }
+`;
 
-  @media (max-width: 480px) {
-    font-size: 40px;
-    margin-bottom: 16px;
-  }
+const CardDescription = styled.p`
+  font-size: 0.9375rem;
+  color: ${theme.colors.textSecondary};
+  line-height: 1.65;
 
-  @media (max-width: 360px) {
-    font-size: 36px;
-    margin-bottom: 14px;
+  @media (max-width: 600px) {
+    font-size: 0.875rem;
   }
 `;
 
 export default function Features() {
   const features = [
     {
-      icon: "🚀",
+      icon: LineChart,
       title: "Data-Driven Edge",
-      description: "We leverage advanced algorithmic models to identify profitable trading opportunities across Bitcoin and emerging altcoins."
+      description:
+        "We leverage advanced algorithmic models to identify profitable trading opportunities across Bitcoin and emerging altcoins.",
     },
     {
-      icon: "💎",
+      icon: ShieldCheck,
       title: "Risk Management",
-      description: "Calculated growth through controlled exposure and capital preservation. We prioritize strategic analysis over emotional trading."
+      description:
+        "Calculated growth through controlled exposure and capital preservation. We prioritize strategic analysis over emotional trading.",
     },
     {
-      icon: "🎓",
+      icon: Target,
       title: "Our Mission",
-      description: "To empower individuals and businesses with the tools and opportunities to profit confidently in the digital asset world."
+      description:
+        "To empower individuals and businesses with the tools and opportunities to profit confidently in the digital asset world.",
     },
     {
-      icon: "📈",
+      icon: Eye,
       title: "Our Vision",
-      description: "To become Africa’s most trusted cryptocurrency platform where innovation meets integrity and shared success."
-    }
+      description:
+        "To become Africa's most trusted cryptocurrency platform where innovation meets integrity and shared success.",
+    },
   ];
 
   return (
     <Section>
-      <Title>Why Investors Are Choosing Amdako Strategy Nig. Ltd.</Title>
-      <Subtitle>We combine human expertise with AI-driven insights to minimize risks and maximize returns, ensuring a stable and intelligent investment experience.</Subtitle>
+      <Container>
+        <Header>
+          <Title>Why Investors Are Choosing Amdako Strategy Nig. Ltd.</Title>
+          <Subtitle>
+            We combine human expertise with AI-driven insights to minimize risks and maximize returns, ensuring a stable and intelligent investment experience.
+          </Subtitle>
+        </Header>
 
-      <Grid>
-        {features.map((feature, idx) => (
-          <Card 
-            key={idx}
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.2 }}
-            whileHover={{ scale: 1.05 }}
-          >
-            <IconBox>{feature.icon}</IconBox>
-            <h3>{feature.title}</h3>
-            <p>{feature.description}</p>
-          </Card>
-        ))}
-      </Grid>
+        <Grid>
+          {features.map((feature, idx) => {
+            const Icon = feature.icon;
+            return (
+              <Card
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+              >
+                <IconBox>
+                  <Icon size={22} />
+                </IconBox>
+                <CardTitle>{feature.title}</CardTitle>
+                <CardDescription>{feature.description}</CardDescription>
+              </Card>
+            );
+          })}
+        </Grid>
+      </Container>
     </Section>
   );
 }

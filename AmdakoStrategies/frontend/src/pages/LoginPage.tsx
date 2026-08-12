@@ -1,6 +1,8 @@
 import { type FormEvent, useState } from "react";
 import styled from "styled-components";
+import { Mail, Lock, ArrowRight } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { theme } from "../theme";
 
 type AuthUser = {
   id: string;
@@ -18,23 +20,15 @@ type LoginPageProps = {
 };
 
 const Page = styled.section`
-  min-height: calc(100vh - 120px);
-  padding: 100px 80px;
+  min-height: calc(100vh - 68px);
+  padding: 80px 24px;
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(180deg, rgba(243, 186, 47, 0.08) 0%, transparent 100%);
-
-  @media (max-width: 1024px) {
-    padding: 80px 60px;
-  }
+  background: ${theme.colors.surfaceAlt};
 
   @media (max-width: 768px) {
     padding: 60px 20px;
-  }
-
-  @media (max-width: 600px) {
-    padding: 50px 20px;
   }
 
   @media (max-width: 480px) {
@@ -43,24 +37,20 @@ const Page = styled.section`
 `;
 
 const Card = styled.div`
-  width: min(520px, 100%);
-  background: rgba(11, 14, 17, 0.95);
-  border: 1px solid rgba(243, 186, 47, 0.15);
-  border-radius: 24px;
+  width: min(480px, 100%);
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
   padding: 48px;
-  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.25);
+  box-shadow: ${theme.shadows.card};
 
   @media (max-width: 768px) {
     padding: 36px;
   }
 
-  @media (max-width: 600px) {
-    padding: 32px;
-  }
-
   @media (max-width: 480px) {
-    padding: 24px;
-    border-radius: 16px;
+    padding: 28px;
+    border-radius: ${theme.radii.large};
   }
 `;
 
@@ -72,13 +62,8 @@ const Header = styled.div`
   }
 
   h2 {
-    font-size: 36px;
-    margin-bottom: 12px;
-
-    @media (max-width: 768px) {
-      font-size: 28px;
-      margin-bottom: 10px;
-    }
+    font-size: 28px;
+    margin-bottom: 10px;
 
     @media (max-width: 480px) {
       font-size: 24px;
@@ -86,11 +71,12 @@ const Header = styled.div`
   }
 
   p {
-    color: rgba(255, 255, 255, 0.75);
+    color: ${theme.colors.textSecondary};
     line-height: 1.6;
+    font-size: 0.9375rem;
 
     @media (max-width: 480px) {
-      font-size: 15px;
+      font-size: 0.875rem;
     }
   }
 `;
@@ -102,29 +88,48 @@ const Form = styled.form`
 
 const Field = styled.label`
   display: grid;
-  gap: 10px;
-  color: rgba(255, 255, 255, 0.85);
+  gap: 8px;
+  color: ${theme.colors.text};
   font-size: 14px;
+  font-weight: 500;
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+
+  svg {
+    position: absolute;
+    left: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: ${theme.colors.textMuted};
+    pointer-events: none;
+  }
 `;
 
 const Input = styled.input`
   width: 100%;
-  border-radius: 14px;
-  border: 1px solid rgba(71, 77, 87, 0.3);
-  background: rgba(30, 35, 41, 0.5);
-  padding: 16px 18px;
-  color: #fff;
-  font-size: 16px;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  padding: 14px 16px 14px 44px;
+  color: ${theme.colors.text};
+  font-size: 15px;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: ${theme.colors.textMuted};
+  }
 
   &:focus {
     outline: none;
-    border-color: #f3ba2f;
-    box-shadow: 0 0 0 4px rgba(243, 186, 47, 0.1);
+    border-color: ${theme.colors.primary};
+    box-shadow: 0 0 0 4px ${theme.colors.primaryLight};
   }
 
   @media (max-width: 480px) {
-    padding: 14px 16px;
-    font-size: 16px;
+    padding: 13px 14px 13px 40px;
+    font-size: 15px;
   }
 `;
 
@@ -145,35 +150,52 @@ const Actions = styled.div`
 const Button = styled.button`
   appearance: none;
   border: none;
-  border-radius: 14px;
-  padding: 16px 24px;
-  font-weight: 700;
-  background: linear-gradient(135deg, #f3ba2f, #f7a600);
+  border-radius: ${theme.radii.medium};
+  padding: 14px 24px;
+  font-weight: 600;
+  font-size: 15px;
+  background: ${theme.colors.primary};
   color: #fff;
-  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.2s ease;
+  box-shadow: ${theme.shadows.button};
 
   &:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 16px 32px rgba(243, 186, 47, 0.3);
+    background: ${theme.colors.primaryDark};
+    box-shadow: ${theme.shadows.buttonHover};
+    transform: translateY(-1px);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
   }
 
   @media (max-width: 480px) {
-    padding: 14px 20px;
-    font-size: 16px;
+    padding: 13px 20px;
+    font-size: 15px;
+    width: 100%;
+    justify-content: center;
   }
 `;
 
 const Secondary = styled.span`
-  color: rgba(255, 255, 255, 0.72);
+  color: ${theme.colors.textSecondary};
+  font-size: 14px;
 `;
 
 const ErrorMessage = styled.div`
-  color: #ffbaba;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 186, 186, 0.4);
+  color: ${theme.colors.danger};
+  background: rgba(214, 69, 69, 0.08);
+  border: 1px solid rgba(214, 69, 69, 0.2);
   padding: 12px 16px;
-  border-radius: 14px;
+  border-radius: ${theme.radii.medium};
   margin-top: 8px;
+  font-size: 14px;
 `;
 
 export default function LoginPage({ onAuthSuccess }: LoginPageProps) {
@@ -222,17 +244,26 @@ export default function LoginPage({ onAuthSuccess }: LoginPageProps) {
         <Form onSubmit={handleSubmit}>
           <Field>
             Email address
-            <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required disabled={loading} />
+            <InputWrapper>
+              <Mail size={18} />
+              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required disabled={loading} />
+            </InputWrapper>
           </Field>
 
           <Field>
             Password
-            <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required disabled={loading} />
+            <InputWrapper>
+              <Lock size={18} />
+              <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required disabled={loading} />
+            </InputWrapper>
           </Field>
 
           <Actions>
             <Secondary>Remember me</Secondary>
-            <Button type="submit" disabled={loading}>{loading ? "Signing in..." : "Sign In"}</Button>
+            <Button type="submit" disabled={loading}>
+              {loading ? "Signing in..." : "Sign In"}
+              {!loading && <ArrowRight size={16} />}
+            </Button>
           </Actions>
           {loading && <LoadingSpinner message="Signing you in..." />}
           {error && <ErrorMessage>{error}</ErrorMessage>}
