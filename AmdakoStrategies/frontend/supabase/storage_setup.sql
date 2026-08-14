@@ -1,0 +1,97 @@
+-- Supabase Storage Bucket Configuration for Agreements
+-- Phase 8: File Uploads
+
+-- Create the agreements storage bucket
+-- This bucket will store signed agreement PDFs and signature images
+
+-- Note: Bucket creation is typically done via the Supabase Dashboard or CLI
+-- The SQL below sets up RLS policies for the bucket metadata
+
+-- 1. Create bucket via Supabase CLI or Dashboard:
+--   supabase storage create agreements --public=false
+--
+-- Or via the Supabase Dashboard:
+--   Storage -> Buckets -> New Bucket
+--   Name: agreements
+--   Public: Disabled (private bucket)
+--   File size limit: 10MB
+--   Allowed file types: pdf, png, jpg, jpeg, svg, doc, docx
+
+-- 2. Storage RLS Policies (these are stored in the database, not via SQL directly)
+-- The policies are typically set via the Supabase Dashboard or API,
+-- but here's the equivalent SQL for reference:
+
+-- Enable storage RLS (this is usually enabled by default)
+-- alter table storage.buckets enable row level security;
+-- alter table storage.objects enable row level security;
+
+-- 3. Storage policies for the agreements bucket:
+
+-- Policy: Users can upload their own agreement files
+-- Only the user who created the agreement can upload files
+-- This is typically enforced at the application level by checking
+-- that the user_id in the agreements table matches auth.uid()
+
+-- Policy: Users can read their own agreement files
+-- CREATE POLICY "Users can read own agreement files"
+--   ON storage.objects for select
+--   USING ( bucket_id = 'agreements' );
+--
+-- Policy: Admins can read all agreement files
+-- CREATE POLICY "Admins can read all agreement files"
+--   ON storage.objects for select
+--   USING ( bucket_id = 'agreements' );
+--
+-- Policy: Users can delete their own agreement files
+-- CREATE POLICY "Users can delete own agreement files"
+--   ON storage.objects for delete
+--   USING ( bucket_id = 'agreements' );
+--
+-- Policy: Admins can delete all agreement files
+-- CREATE POLICY "Admins can delete all agreement files"
+--   ON storage.objects for delete
+--   USING ( bucket_id = 'agreements' );
+
+-- 4. File upload guidelines for the application:
+--
+-- - Maximum file size: 10MB
+-- - Allowed types: application/pdf, image/png, image/jpeg, image/svg+xml
+-- - Rename files to include user ID and timestamp to avoid conflicts
+-- - Store files with path: agreements/{user_id}/{filename}
+--
+-- 5. Example Supabase Storage usage in the services:
+--
+-- import { supabase } from "../lib/supabase";
+--
+-- export async function uploadAgreementFile(
+--   userId: string,
+--   file: File
+-- ): Promise<{ data: { path: string } | null; error: any }> {
+--   const { data, error } = await supabase.storage
+--     .from("agreements")
+--     .upload(`${userId}/agreement-${Date.now()}.pdf`, file, {
+--       cacheControl: "3600",
+--       contentType: file.type,
+--    });
+--   return { data, error };
+-- }
+--
+-- export async function getAgreementFilePath(
+--   userId: string,
+--   fileName: string
+-- ): Promise<string | null> {
+--   const { data } = supabase.storage
+--     .from("agreements")
+--     .getPublicUrl(`${userId}/agreement-${fileName}.pdf`);
+--   return data?.publicUrl ?? null;
+-- }
+--
+-- export async function deleteAgreementFile(
+--   userId: string,
+--   fileName: string
+-- ): Promise<{ data: any; error: any }> {
+--   const { error } = await supabase.storage
+--     .from("agreements")
+--     .remove([`${userId}/agreement-${fileName}.pdf`]);
+--   return { error };
+-- }

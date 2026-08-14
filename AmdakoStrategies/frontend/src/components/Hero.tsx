@@ -1,115 +1,134 @@
-﻿﻿import { useState, useEffect } from "react";
-import styled from "styled-components";
-import { motion, AnimatePresence } from "framer-motion";
-import { TrendingUp, ShieldCheck, BarChart3, ArrowRight } from "lucide-react";
+﻿﻿import styled from "styled-components";
+import { motion } from "framer-motion";
+import { ShieldCheck, ArrowRight, TrendingUp, Lock } from "lucide-react";
 import { theme } from "../theme";
 
 const Section = styled.section`
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, #F8F9FF 0%, #FFFFFF 100%);
+  background: ${theme.colors.ivory};
   border-bottom: 1px solid ${theme.colors.borderLight};
 `;
 
-const BackgroundPattern = styled.div`
+const GoldLine = styled.div`
   position: absolute;
   top: 0;
   left: 0;
   right: 0;
-  bottom: 0;
-  pointer-events: none;
-  background-image: radial-gradient(circle at 1px 1px, rgba(99, 91, 255, 0.06) 1px, transparent 0);
-  background-size: 32px 32px;
-  mask-image: radial-gradient(ellipse at center, black 30%, transparent 70%);
+  height: 3px;
+  background: linear-gradient(90deg, ${theme.colors.gold}, ${theme.colors.primary});
 `;
 
 const Container = styled.div`
   max-width: 1200px;
   margin: 0 auto;
-  padding: 120px 24px 100px;
+  padding: 100px 24px 90px;
   display: grid;
-  grid-template-columns: 1.1fr 0.9fr;
-  gap: 60px;
+  grid-template-columns: 1.15fr 0.85fr;
+  gap: 64px;
   align-items: center;
   position: relative;
 
   @media (max-width: 1024px) {
     grid-template-columns: 1fr;
-    gap: 50px;
-    padding: 90px 24px 80px;
+    gap: 48px;
+    padding: 80px 24px 70px;
   }
 
   @media (max-width: 768px) {
-    padding: 70px 20px 60px;
+    padding: 60px 20px 55px;
     gap: 40px;
   }
 
   @media (max-width: 480px) {
-    padding: 60px 16px 50px;
-    gap: 35px;
+    padding: 50px 16px 45px;
+    gap: 36px;
   }
 `;
 
 const Left = styled.div`
-  max-width: 600px;
+  max-width: 640px;
 
   @media (max-width: 1024px) {
     max-width: 100%;
     text-align: center;
+    margin: 0 auto;
   }
 `;
 
 const Badge = styled.div`
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  padding: 6px 14px;
+  gap: 10px;
+  padding: 8px 16px;
   border-radius: 100px;
-  background: ${theme.colors.primaryLight};
+  background: ${theme.colors.goldLight};
+  border: 1px solid rgba(201, 162, 39, 0.35);
   color: ${theme.colors.primary};
   font-size: 13px;
   font-weight: 600;
-  margin-bottom: 24px;
+  letter-spacing: 0.2px;
+  margin-bottom: 28px;
 `;
 
 const Title = styled(motion.h1)`
-  font-size: 3.25rem;
+  font-size: 3.2rem;
   line-height: 1.1;
   margin-bottom: 24px;
   color: ${theme.colors.text};
+  font-weight: 600;
+
+  .gold {
+    color: ${theme.colors.gold};
+  }
 
   @media (max-width: 1200px) {
-    font-size: 2.9rem;
+    font-size: 2.8rem;
   }
 
   @media (max-width: 1024px) {
-    font-size: 2.5rem;
+    font-size: 2.4rem;
   }
 
   @media (max-width: 768px) {
-    font-size: 2.1rem;
+    font-size: 2.05rem;
   }
 
   @media (max-width: 480px) {
-    font-size: 1.85rem;
+    font-size: 1.75rem;
   }
-`;
-
-const Gradient = styled.span`
-  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark});
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
 `;
 
 const Subtitle = styled(motion.p)`
   font-size: 1.125rem;
-  line-height: 1.7;
+  line-height: 1.75;
   color: ${theme.colors.textSecondary};
-  margin-bottom: 36px;
+  margin-bottom: 24px;
+  max-width: 560px;
+
+  @media (max-width: 1024px) {
+    margin: 0 auto 24px;
+  }
 
   @media (max-width: 768px) {
     font-size: 1rem;
-    margin-bottom: 30px;
+  }
+`;
+
+const RegulatoryNote = styled(motion.p)`
+  font-size: 0.8125rem;
+  color: ${theme.colors.textMuted};
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  margin-bottom: 32px;
+
+  @media (max-width: 1024px) {
+    margin-bottom: 28px;
+  }
+
+  strong {
+    color: ${theme.colors.primary};
+    font-weight: 600;
   }
 `;
 
@@ -128,8 +147,8 @@ const ButtonGroup = styled(motion.div)`
   }
 `;
 
-const Button = styled(motion.button)`
-  padding: 14px 28px;
+const Button = styled(motion.a)`
+  padding: 15px 30px;
   border-radius: ${theme.radii.medium};
   background: ${theme.colors.primary};
   color: #fff;
@@ -138,6 +157,7 @@ const Button = styled(motion.button)`
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: ${theme.shadows.button};
 
@@ -145,17 +165,18 @@ const Button = styled(motion.button)`
     background: ${theme.colors.primaryDark};
     box-shadow: ${theme.shadows.buttonHover};
     transform: translateY(-1px);
+    color: #fff;
   }
 
   @media (max-width: 600px) {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
     justify-content: center;
   }
 `;
 
-const SecondaryButton = styled(motion.button)`
-  padding: 14px 28px;
+const SecondaryButton = styled.button`
+  padding: 14px 30px;
   border-radius: ${theme.radii.medium};
   background: transparent;
   border: 1px solid ${theme.colors.border};
@@ -168,55 +189,64 @@ const SecondaryButton = styled(motion.button)`
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${theme.colors.surfaceAlt};
+    background: #fff;
     border-color: ${theme.colors.primary};
     color: ${theme.colors.primary};
   }
 
   @media (max-width: 600px) {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
     justify-content: center;
   }
 `;
 
 const Right = styled.div`
   position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
 
   @media (max-width: 1024px) {
-    max-width: 500px;
+    max-width: 560px;
     margin: 0 auto;
+    width: 100%;
   }
 `;
 
-const DashboardMock = styled(motion.div)`
-  width: 100%;
-  max-width: 480px;
+const FrameCard = styled(motion.div)`
   background: #fff;
   border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
+  border-top: 3px solid ${theme.colors.gold};
+  border-radius: ${theme.radii.large};
   box-shadow: ${theme.shadows.cardHover};
-  padding: 28px;
+  padding: 32px;
   position: relative;
 
   @media (max-width: 480px) {
-    padding: 20px;
+    padding: 24px;
+  }
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: 24px;
+    width: 80px;
+    height: 3px;
+    background: ${theme.colors.gold};
+    border-radius: 0 0 4px 4px;
   }
 `;
 
-const MockHeader = styled.div`
+const FrameHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 
   h4 {
-    font-size: 14px;
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 18px;
     font-weight: 600;
-    color: ${theme.colors.textSecondary};
+    color: ${theme.colors.text};
   }
 
   span {
@@ -225,273 +255,165 @@ const MockHeader = styled.div`
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 5px;
   }
 `;
 
-const MockBalance = styled.div`
-  margin-bottom: 24px;
-
-  p {
-    font-size: 13px;
-    color: ${theme.colors.textMuted};
-    margin-bottom: 6px;
-  }
-
-  h3 {
-    font-size: 32px;
-    font-weight: 700;
-    color: ${theme.colors.text};
-  }
-`;
-
-const MockChart = styled.div`
-  height: 120px;
-  border-radius: ${theme.radii.medium};
-  background: linear-gradient(180deg, ${theme.colors.primaryLight} 0%, transparent 100%);
-  position: relative;
-  overflow: hidden;
-  margin-bottom: 24px;
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 2px;
-    background: ${theme.colors.primary};
-    border-radius: 2px;
-  }
-`;
-
-const MockStats = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-`;
-
-const MockStat = styled.div`
-  padding: 14px;
-  border-radius: ${theme.radii.medium};
-  background: ${theme.colors.surfaceAlt};
-  border: 1px solid ${theme.colors.borderLight};
-
-  p {
-    font-size: 12px;
-    color: ${theme.colors.textMuted};
-    margin-bottom: 4px;
-  }
-
-  h5 {
-    font-size: 16px;
-    font-weight: 700;
-    color: ${theme.colors.text};
-  }
-`;
-
-const FloatingCard = styled(motion.div)`
-  position: absolute;
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.medium};
-  box-shadow: ${theme.shadows.cardHover};
-  padding: 12px 16px;
+const TermList = styled.div`
   display: flex;
-  align-items: center;
-  gap: 10px;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 24px;
+`;
 
-  @media (max-width: 480px) {
-    padding: 10px 12px;
+const Term = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid ${theme.colors.borderLight};
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
   }
 `;
 
-const FloatingIcon = styled.div`
+const TermIcon = styled.div`
   width: 36px;
   height: 36px;
-  border-radius: 10px;
+  border-radius: ${theme.radii.small};
+  background: ${theme.colors.primaryLight};
+  color: ${theme.colors.primary};
   display: flex;
   align-items: center;
   justify-content: center;
-  background: ${theme.colors.primaryLight};
-  color: ${theme.colors.primary};
+  flex-shrink: 0;
 `;
 
-const FloatingText = styled.div`
+const TermContent = styled.div`
   p {
-    font-size: 12px;
+    font-size: 12.5px;
     color: ${theme.colors.textMuted};
+    margin-bottom: 2px;
+    line-height: 1.4;
   }
 
   h5 {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: 15px;
+    font-weight: 600;
     color: ${theme.colors.text};
+    line-height: 1.4;
   }
 `;
 
-const CarouselDots = styled.div`
-  display: flex;
-  gap: 8px;
-  margin-top: 40px;
+const FrameFooter = styled.div`
+  background: ${theme.colors.surfaceAlt};
+  border: 1px solid ${theme.colors.borderLight};
+  border-radius: ${theme.radii.medium};
+  padding: 14px 16px;
 
-  @media (max-width: 1024px) {
-    justify-content: center;
+  p {
+    font-size: 12.5px;
+    color: ${theme.colors.textSecondary};
+    line-height: 1.6;
   }
 `;
-
-const Dot = styled.div<{ active: boolean }>`
-  width: ${(props) => (props.active ? "28px" : "8px")};
-  height: 8px;
-  border-radius: 4px;
-  background: ${(props) => (props.active ? theme.colors.primary : theme.colors.border)};
-  transition: all 0.3s ease;
-  cursor: pointer;
-`;
-
-const slides = [
-  {
-    title: (
-      <>
-        Redefining the Future of Cryptocurrency Trading in <Gradient>Africa</Gradient>
-      </>
-    ),
-    subtitle:
-      "Unlock unprecedented returns in decentralized finance and blockchain projects. Born from a vision to connect Africa's financial potential to the global digital economy.",
-    cta: "Start Investing Now",
-  },
-  {
-    title: (
-      <>
-        Strategic Wealth Growth Powered by <Gradient>Data Intelligence</Gradient>
-      </>
-    ),
-    subtitle:
-      "We leverage advanced algorithmic models and real-time analytics to identify profitable opportunities. Calculated growth over reckless trading.",
-    cta: "View Strategies",
-  },
-  {
-    title: (
-      <>
-        Built on Unmatched <Gradient>Transparency & Trust</Gradient>
-      </>
-    ),
-    subtitle:
-      "Every transaction, every result — open and accountable. Join thousands of investors who trust Amdako with their digital assets.",
-    cta: "Create Account",
-  },
-];
 
 export default function Hero() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % slides.length);
-    }, 6000);
-    return () => clearInterval(timer);
-  }, []);
-
   return (
     <Section>
-      <BackgroundPattern />
+      <GoldLine />
       <Container>
         <Left>
           <Badge>
-            <ShieldCheck size={14} />
-            Trusted Investment Platform
+            <ShieldCheck size={15} />
+            Registered & Regulated in Nigeria
           </Badge>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={currentSlide}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <Title>{slides[currentSlide].title}</Title>
-              <Subtitle>{slides[currentSlide].subtitle}</Subtitle>
-              <ButtonGroup>
-                <Button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  {slides[currentSlide].cta}
-                  <ArrowRight size={16} />
-                </Button>
-                <SecondaryButton whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                  Learn More
-                </SecondaryButton>
-              </ButtonGroup>
-            </motion.div>
-          </AnimatePresence>
-          <CarouselDots>
-            {slides.map((_, idx) => (
-              <Dot key={idx} active={currentSlide === idx} onClick={() => setCurrentSlide(idx)} />
-            ))}
-          </CarouselDots>
+          <Title
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.55 }}
+          >
+            Strategic Wealth Creation, Digital Finance & Institutional Partnership
+          </Title>
+          <Subtitle
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1, duration: 0.55 }}
+          >
+            Amdako Strategy Nig. Ltd. empowers individuals, institutions, governments, and organizations
+            through strategic wealth creation, digital finance education, and innovative investment
+            opportunities in the digital asset economy.
+          </Subtitle>
+          <RegulatoryNote
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.55 }}
+          >
+            <strong>AMDAKO STRATEGY NIG. LTD.</strong> — RC. 9560518
+          </RegulatoryNote>
+          <ButtonGroup
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2, duration: 0.55 }}
+          >
+            <Button href="#investment-plan">
+              View Investment Plan
+              <ArrowRight size={16} />
+            </Button>
+            <SecondaryButton onClick={() => window.scrollTo({ top: document.body.scrollHeight, behavior: "smooth" })}>
+              Speak with an Advisor
+            </SecondaryButton>
+          </ButtonGroup>
         </Left>
 
         <Right>
-          <DashboardMock
+          <FrameCard
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
           >
-            <MockHeader>
-              <h4>Portfolio Overview</h4>
+            <FrameHeader>
+              <h4>Official Investment Terms</h4>
               <span>
                 <TrendingUp size={14} />
-                +12.4%
+                10% Monthly ROI
               </span>
-            </MockHeader>
-            <MockBalance>
-              <p>Total Balance</p>
-              <h3>$10,000.00</h3>
-            </MockBalance>
-            <MockChart />
-            <MockStats>
-              <MockStat>
-                <p>ROI</p>
-                <h5>120%</h5>
-              </MockStat>
-              <MockStat>
-                <p>Investors</p>
-                <h5>20+</h5>
-              </MockStat>
-              <MockStat>
-                <p>Success</p>
-                <h5>98.7%</h5>
-              </MockStat>
-            </MockStats>
-          </DashboardMock>
-
-          <FloatingCard
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
-            style={{ top: "10%", left: "-8%" }}
-          >
-            <FloatingIcon>
-              <BarChart3 size={18} />
-            </FloatingIcon>
-            <FloatingText>
-              <p>Monthly Growth</p>
-              <h5>+10% ROI</h5>
-            </FloatingText>
-          </FloatingCard>
-
-          <FloatingCard
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.8 }}
-            style={{ bottom: "8%", right: "-6%" }}
-          >
-            <FloatingIcon>
-              <ShieldCheck size={18} />
-            </FloatingIcon>
-            <FloatingText>
-              <p>Security</p>
-              <h5>Fully Protected</h5>
-            </FloatingText>
-          </FloatingCard>
+            </FrameHeader>
+            <TermList>
+              <Term>
+                <TermIcon>
+                  <TrendingUp size={17} />
+                </TermIcon>
+                <TermContent>
+                  <p>Monthly Return</p>
+                  <h5>10% of invested capital, paid on the 30th of every month</h5>
+                </TermContent>
+              </Term>
+              <Term>
+                <TermIcon>
+                  <Lock size={17} />
+                </TermIcon>
+                <TermContent>
+                  <p>Capital Lock Period</p>
+                  <h5>Minimum 3 months — flexible, open-ended thereafter</h5>
+                </TermContent>
+              </Term>
+              <Term>
+                <TermIcon>
+                  <ShieldCheck size={17} />
+                </TermIcon>
+                <TermContent>
+                  <p>Capital Protection</p>
+                  <h5>100% protection through verified, risk-controlled trading systems</h5>
+                </TermContent>
+              </Term>
+            </TermList>
+            <FrameFooter>
+              <p>Minimum investment: ₦750,000 · Referral commission: $30 per successful referral</p>
+            </FrameFooter>
+          </FrameCard>
         </Right>
       </Container>
     </Section>

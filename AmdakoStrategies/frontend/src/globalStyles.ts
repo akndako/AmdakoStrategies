@@ -14,8 +14,8 @@ export const GlobalStyles = createGlobalStyle`
     margin: 0;
     min-height: 100vh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #ffffff;
-    color: #0A2540;
+    background: #F8F6F1;
+    color: #1A1A18;
     font-size: 16px;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
@@ -24,14 +24,15 @@ export const GlobalStyles = createGlobalStyle`
 
   h1, h2, h3, h4, h5, h6 {
     margin: 0;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    color: #0A2540;
+    font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: #1A1A18;
   }
 
   h1 {
     font-size: 3.25rem;
-    line-height: 1.1;
+    line-height: 1.08;
 
     @media (max-width: 1200px) {
       font-size: 2.9rem;
@@ -52,7 +53,7 @@ export const GlobalStyles = createGlobalStyle`
 
   h2 {
     font-size: 2.5rem;
-    line-height: 1.2;
+    line-height: 1.15;
 
     @media (max-width: 1024px) {
       font-size: 2.1rem;
@@ -63,7 +64,7 @@ export const GlobalStyles = createGlobalStyle`
     }
 
     @media (max-width: 480px) {
-      font-size: 1.75rem;
+      font-size: 1.7rem;
     }
   }
 
@@ -83,8 +84,8 @@ export const GlobalStyles = createGlobalStyle`
   p {
     margin: 0;
     font-size: 1rem;
-    line-height: 1.7;
-    color: #425466;
+    line-height: 1.75;
+    color: #5C5A52;
 
     @media (max-width: 768px) {
       font-size: 0.97rem;
@@ -96,12 +97,12 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   a {
-    color: #635BFF;
+    color: #0B3D2E;
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #4C45E8;
+      color: #07291F;
     }
   }
 
@@ -114,6 +115,11 @@ export const GlobalStyles = createGlobalStyle`
 
   input, select, textarea {
     font-family: inherit;
+  }
+
+  ::selection {
+    background: #C9A227;
+    color: #FFFFFF;
   }
 
   .container {

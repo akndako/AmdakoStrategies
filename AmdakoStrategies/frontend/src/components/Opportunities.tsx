@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { BarChart3, Briefcase, Link2, ArrowRight } from "lucide-react";
+import { Handshake, Award, CalendarCheck, Users, Headset, ShieldCheck, Trophy } from "lucide-react";
 import { theme } from "../theme";
 
 const Section = styled.section`
   padding: 100px 24px;
-  background: #ffffff;
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 70px 20px;
@@ -23,12 +23,21 @@ const Container = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  max-width: 650px;
+  max-width: 680px;
   margin: 0 auto 60px;
 
   @media (max-width: 768px) {
     margin-bottom: 45px;
   }
+`;
+
+const Eyebrow = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${theme.colors.gold};
+  margin-bottom: 14px;
 `;
 
 const Title = styled.h2`
@@ -78,10 +87,9 @@ const Card = styled(motion.div)`
   background: #fff;
   border: 1px solid ${theme.colors.border};
   transition: all 0.25s ease;
-  cursor: pointer;
 
   &:hover {
-    border-color: ${theme.colors.primary};
+    border-color: ${theme.colors.gold};
     box-shadow: ${theme.shadows.cardHover};
     transform: translateY(-4px);
   }
@@ -101,6 +109,7 @@ const IconBox = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 20px;
+  border: 1px solid rgba(11, 61, 46, 0.1);
 `;
 
 const CardTitle = styled.h3`
@@ -116,8 +125,8 @@ const CardTitle = styled.h3`
 const CardDescription = styled.p`
   font-size: 0.9375rem;
   color: ${theme.colors.textSecondary};
-  line-height: 1.65;
-  margin-bottom: 20px;
+  line-height: 1.7;
+  margin-bottom: 18px;
 
   @media (max-width: 600px) {
     font-size: 0.875rem;
@@ -128,7 +137,7 @@ const Tag = styled.div`
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  font-size: 0.875rem;
+  font-size: 0.84375rem;
   font-weight: 600;
   color: ${theme.colors.primary};
   background: ${theme.colors.primaryLight};
@@ -136,59 +145,140 @@ const Tag = styled.div`
   border-radius: 100px;
 `;
 
-const Button = styled(motion.button)`
-  margin-top: 50px;
-  padding: 14px 32px;
-  border-radius: ${theme.radii.medium};
-  border: 1px solid ${theme.colors.border};
-  background: transparent;
-  color: ${theme.colors.text};
-  font-weight: 600;
-  font-size: 15px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  display: flex;
+const Banner = styled(motion.div)`
+  margin-top: 48px;
+  display: grid;
+  grid-template-columns: 1fr 1.2fr;
+  gap: 32px;
   align-items: center;
-  gap: 8px;
-  margin-left: auto;
-  margin-right: auto;
+  background: ${theme.colors.primary};
+  border-radius: ${theme.radii.xl};
+  padding: 44px;
+  position: relative;
+  overflow: hidden;
 
-  &:hover {
-    border-color: ${theme.colors.primary};
-    color: ${theme.colors.primary};
-    background: ${theme.colors.primaryLight};
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
+    gap: 20px;
+    padding: 34px 28px;
   }
 
-  @media (max-width: 600px) {
-    width: 100%;
-    max-width: 320px;
-    justify-content: center;
-    margin-top: 40px;
+  @media (max-width: 480px) {
+    padding: 28px 22px;
+    margin-top: 38px;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -10%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.15), transparent);
+    border-radius: 50%;
+    pointer-events: none;
+  }
+`;
+
+const CTALeft = styled.div`
+  position: relative;
+  z-index: 1;
+
+  h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 12px;
+
+    @media (max-width: 480px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9375rem;
+    line-height: 1.7;
+
+    @media (max-width: 480px) {
+      font-size: 0.875rem;
+    }
+  }
+`;
+
+const CTARight = styled.div`
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+`;
+
+const CTARow = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+
+  svg {
+    color: ${theme.colors.gold};
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    line-height: 1.6;
+
+    @media (max-width: 480px) {
+      font-size: 0.84375rem;
+    }
   }
 `;
 
 export default function Opportunities() {
-  const opportunities = [
+  const partnershipBenefits = [
     {
-      icon: BarChart3,
-      title: "Crypto Trading",
+      icon: Handshake,
+      title: "Investor & Partner Program",
       description:
-        "Advanced algorithmic models and real-time market analytics to identify profitable opportunities across Bitcoin, Ethereum, and emerging altcoins.",
-      tag: "Intelligent Systems",
+        "Investors who wish to grow with the company can become Amdako Strategy Partners and enjoy a range of exclusive benefits.",
+      tag: "Grow With Us",
     },
     {
-      icon: Briefcase,
-      title: "Asset Management",
+      icon: Award,
+      title: "Referral & Commission Earnings",
       description:
-        "Professional management combining human expertise with AI-driven insight to minimize risks and maximize returns.",
-      tag: "Expert Insight",
+        "Earn generous referral commissions on every successful referral — $30 (Thirty US Dollars) paid instantly once the referred investor's capital is confirmed.",
+      tag: "Earn Instantly",
     },
     {
-      icon: Link2,
-      title: "Blockchain Investment",
+      icon: CalendarCheck,
+      title: "Exclusive Events & Reports",
       description:
-        "Strategic entry into high-potential projects to bridge Africa's financial potential with global digital markets.",
-      tag: "Global Perspective",
+        "Exclusive access to company events and detailed performance reports, keeping partners fully informed of company trading performance.",
+      tag: "Exclusive Access",
+    },
+    {
+      icon: Users,
+      title: "Regional Leadership Roles",
+      description:
+        "Take leadership roles in regional investor networks and play a key part in growing the Amdako community across Africa.",
+      tag: "Leadership",
+    },
+    {
+      icon: Headset,
+      title: "Priority Support",
+      description:
+        "Priority support and timely updates on company trading performance, ensuring partners and investors stay ahead.",
+      tag: "Priority",
+    },
+    {
+      icon: ShieldCheck,
+      title: "100% Capital Protection",
+      description:
+        "Every partnership is backed by our verified risk-controlled trading systems and our steadfast 100% capital protection policy.",
+      tag: "Protected",
     },
   ];
 
@@ -196,38 +286,64 @@ export default function Opportunities() {
     <Section>
       <Container>
         <Header>
-          <Title>Investment Opportunities</Title>
+          <Eyebrow>Growth & Partnership</Eyebrow>
+          <Title>Partnership Opportunities</Title>
           <Subtitle>
-            Explore our range of professionally managed investment strategies designed for sustainable growth.
+            Investors who wish to grow with the company can become Amdako Strategy Partners, enjoying exclusive
+            benefits designed for long-term success.
           </Subtitle>
         </Header>
 
         <Grid>
-          {opportunities.map((opp, idx) => {
-            const Icon = opp.icon;
+          {partnershipBenefits.map((benefit, idx) => {
+            const Icon = benefit.icon;
             return (
               <Card
                 key={idx}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1, duration: 0.5 }}
+                transition={{ delay: idx * 0.08, duration: 0.5 }}
                 viewport={{ once: true }}
               >
                 <IconBox>
                   <Icon size={24} />
                 </IconBox>
-                <CardTitle>{opp.title}</CardTitle>
-                <CardDescription>{opp.description}</CardDescription>
-                <Tag>{opp.tag}</Tag>
+                <CardTitle>{benefit.title}</CardTitle>
+                <CardDescription>{benefit.description}</CardDescription>
+                <Tag>{benefit.tag}</Tag>
               </Card>
             );
           })}
         </Grid>
 
-        <Button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-          Explore All Investment Opportunities
-          <ArrowRight size={16} />
-        </Button>
+        <Banner
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+          viewport={{ once: true }}
+        >
+          <CTALeft>
+            <h3>Become an Amdako Strategy Partner</h3>
+            <p>
+              Join a growing network of investors and partners building sustainable wealth across Africa.
+              Contact our investment team today to start your partnership journey.
+            </p>
+          </CTALeft>
+          <CTARight>
+            <CTARow>
+              <Trophy size={17} />
+              <p>Guaranteed 10% monthly returns on capital</p>
+            </CTARow>
+            <CTARow>
+              <ShieldCheck size={17} />
+              <p>100% capital protection policy</p>
+            </CTARow>
+            <CTARow>
+              <Award size={17} />
+              <p>Referral income opportunities — $30 per referral</p>
+            </CTARow>
+          </CTARight>
+        </Banner>
       </Container>
     </Section>
   );

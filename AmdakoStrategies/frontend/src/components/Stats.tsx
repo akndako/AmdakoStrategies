@@ -5,7 +5,7 @@ import { theme } from "../theme";
 
 const Section = styled.section`
   padding: 100px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.surface};
 
   @media (max-width: 768px) {
     padding: 70px 20px;
@@ -23,12 +23,21 @@ const Container = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  max-width: 650px;
+  max-width: 680px;
   margin: 0 auto 60px;
 
   @media (max-width: 768px) {
     margin-bottom: 45px;
   }
+`;
+
+const Eyebrow = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${theme.colors.gold};
+  margin-bottom: 14px;
 `;
 
 const Title = styled.h2`
@@ -84,7 +93,7 @@ const StatCard = styled(motion.div)`
   transition: all 0.25s ease;
 
   &:hover {
-    border-color: ${theme.colors.primary};
+    border-color: ${theme.colors.gold};
     box-shadow: ${theme.shadows.cardHover};
   }
 
@@ -93,16 +102,20 @@ const StatCard = styled(motion.div)`
   }
 
   h4 {
-    font-size: 0.875rem;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
     color: ${theme.colors.textMuted};
     margin-bottom: 10px;
-    font-weight: 500;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
   }
 
   .value {
     font-size: 2rem;
+    font-family: 'Playfair Display', Georgia, serif;
     font-weight: 700;
-    color: ${theme.colors.text};
+    color: ${theme.colors.primary};
     margin-bottom: 8px;
 
     @media (max-width: 480px) {
@@ -130,8 +143,14 @@ const ChartBox = styled(motion.div)`
 
   h3 {
     font-size: 1.125rem;
-    margin-bottom: 24px;
+    margin-bottom: 4px;
     color: ${theme.colors.text};
+  }
+
+  p {
+    font-size: 0.84375rem;
+    color: ${theme.colors.textMuted};
+    margin-bottom: 24px;
   }
 `;
 
@@ -139,13 +158,15 @@ export default function Stats() {
   const monthsLabels = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   const currentMonth = new Date().getMonth();
 
-  // Dynamically generate the last 6 months of data
+  // Dynamically generate the last 6 months — illustrating 10% monthly compounding on a ₦1,000,000 base
   const dynamicData = Array.from({ length: 6 }, (_, i) => {
     const date = new Date();
     date.setMonth(currentMonth - (5 - i));
+    const start = 1000000;
+    const value = Math.round(start * Math.pow(1.1, i + 1) / 100000) * 100000;
     return {
       month: monthsLabels[date.getMonth()],
-      value: Math.round(15 * Math.pow(1.5, i)),
+      value,
     };
   });
 
@@ -153,8 +174,12 @@ export default function Stats() {
     <Section>
       <Container>
         <Header>
-          <Title>Our Performance</Title>
-          <Subtitle>Proven track record of consistent growth and investor returns</Subtitle>
+          <Eyebrow>Portfolio Performance</Eyebrow>
+          <Title>Consistent, Predictable Returns</Title>
+          <Subtitle>
+            Our structured investment approach delivers steady growth through disciplined
+            market strategies and professional risk management.
+          </Subtitle>
         </Header>
 
         <Content>
@@ -165,9 +190,9 @@ export default function Stats() {
               transition={{ duration: 0.4 }}
               viewport={{ once: true }}
             >
-              <h4>Assets Under Management</h4>
-              <div className="value">$10,000</div>
-              <p>Equivalent to approximately ₦15,000,000</p>
+              <h4>Monthly ROI</h4>
+              <div className="value">10%</div>
+              <p>Guaranteed monthly return on your invested capital</p>
             </StatCard>
             <StatCard
               initial={{ opacity: 0, scale: 0.95 }}
@@ -175,7 +200,7 @@ export default function Stats() {
               transition={{ delay: 0.1, duration: 0.4 }}
               viewport={{ once: true }}
             >
-              <h4>Average Annual Return</h4>
+              <h4>Annual ROI</h4>
               <div className="value">120%</div>
               <p>Calculated at 10% monthly growth strategy</p>
             </StatCard>
@@ -185,9 +210,9 @@ export default function Stats() {
               transition={{ delay: 0.2, duration: 0.4 }}
               viewport={{ once: true }}
             >
-              <h4>Active Investors</h4>
-              <div className="value">20</div>
-              <p>Exclusive group of verified active investors</p>
+              <h4>Capital Lock</h4>
+              <div className="value">3 mo</div>
+              <p>Minimum lock period to ensure sustainable growth</p>
             </StatCard>
             <StatCard
               initial={{ opacity: 0, scale: 0.95 }}
@@ -195,9 +220,9 @@ export default function Stats() {
               transition={{ delay: 0.3, duration: 0.4 }}
               viewport={{ once: true }}
             >
-              <h4>Success Rate</h4>
-              <div className="value">98.7%</div>
-              <p>Successful investment outcomes</p>
+              <h4>Capital Protection</h4>
+              <div className="value">100%</div>
+              <p>Protected under our verified risk-controlled systems</p>
             </StatCard>
           </StatsGrid>
 
@@ -207,7 +232,8 @@ export default function Stats() {
             transition={{ delay: 0.2, duration: 0.5 }}
             viewport={{ once: true }}
           >
-            <h3>6-Month Growth Trajectory</h3>
+            <h3>6-Month Growth Projection</h3>
+            <p>Compound growth on a ₦1,000,000 investment at 10% monthly ROI</p>
             <ResponsiveContainer width="100%" height={280}>
               <LineChart data={dynamicData}>
                 <CartesianGrid strokeDasharray="3 3" stroke={theme.colors.borderLight} vertical={false} />
@@ -223,9 +249,11 @@ export default function Stats() {
                   fontSize={12}
                   tickLine={false}
                   axisLine={false}
-                  width={40}
+                  width={70}
+                  tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`}
                 />
                 <Tooltip
+                  formatter={(value: number) => [`₦${value.toLocaleString()}`, "Portfolio Value"]}
                   contentStyle={{
                     background: "#fff",
                     border: `1px solid ${theme.colors.border}`,
@@ -238,7 +266,7 @@ export default function Stats() {
                 <Line
                   type="monotone"
                   dataKey="value"
-                  stroke={theme.colors.primary}
+                  stroke={theme.colors.gold}
                   strokeWidth={2.5}
                   dot={{ fill: theme.colors.primary, r: 4, strokeWidth: 0 }}
                   activeDot={{ r: 6 }}

@@ -1,6 +1,7 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+// https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
   build: {
@@ -28,6 +29,14 @@ export default defineConfig({
   },
   server: {
     port: 5173,
+    host: 'localhost',
+    strictPort: true,
+    hmr: {
+      protocol: 'ws',
+      host: 'localhost',
+      port: 5173,
+      overlay: false,
+    },
     proxy: {
       '/api': {
         target: 'http://localhost:4000',
@@ -37,6 +46,13 @@ export default defineConfig({
     },
   },
   define: {
-    __APP_VERSION__: JSON.stringify(process.env.npm_package_version),
+    __APP_VERSION__: JSON.stringify(process.env.npm_package_version || '0.0.0'),
+    // Polyfill process.env for browser dependencies (e.g. @supabase/* packages)
+    'process.env': JSON.stringify({
+      NODE_ENV: process.env.NODE_ENV || 'development',
+      VITE_SUPABASE_URL: process.env.VITE_SUPABASE_URL || '',
+      VITE_SUPABASE_ANON_KEY: process.env.VITE_SUPABASE_ANON_KEY || '',
+      VITE_SUPABASE_PUBLISHABLE_KEY: process.env.VITE_SUPABASE_PUBLISHABLE_KEY || '',
+    }),
   },
 })

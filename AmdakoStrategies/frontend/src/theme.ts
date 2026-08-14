@@ -1,39 +1,44 @@
 export const theme = {
   colors: {
-    primary: "#635BFF",
-    primaryDark: "#4C45E8",
-    primaryLight: "#EEEDFF",
-    secondary: "#0A2540",
+    // Institutional wealth-management palette
+    primary: "#0B3D2E", // deep forest green
+    primaryDark: "#07291F", // darker green for hover
+    primaryLight: "#E8F0EC", // soft green tint
+    secondary: "#1A1A18", // charcoal
+    gold: "#C9A227", // refined gold accent
+    goldLight: "#F5EDD8", // soft gold tint
+    ivory: "#F8F6F1", // page background
     surface: "#FFFFFF",
-    surfaceAlt: "#F6F8FA",
-    border: "#E6E8EB",
-    borderLight: "#F0F2F5",
-    text: "#0A2540",
-    textSecondary: "#425466",
-    textMuted: "#7A8BA0",
-    success: "#0BA17C",
-    danger: "#D64545",
-    warning: "#F5A623",
-    shadow: "rgba(10, 37, 64, 0.08)",
-    shadowHover: "rgba(10, 37, 64, 0.14)",
+    surfaceAlt: "#F3F1EA", // subtle warm alt surface
+    border: "#E3DFD4", // hairline warm border
+    borderLight: "#ECE9E0",
+    text: "#1A1A18", // charcoal
+    textSecondary: "#5C5A52", // warm gray
+    textMuted: "#8A877B", // muted warm gray
+    success: "#0B7A55",
+    danger: "#B3403A",
+    warning: "#C9A227",
+    shadow: "rgba(26, 26, 24, 0.07)",
+    shadowHover: "rgba(26, 26, 24, 0.12)",
   },
   typography: {
     fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif",
-    headingWeight: 700,
+    serif: "'Playfair Display', Georgia, 'Times New Roman', serif",
+    headingWeight: 600,
     bodyWeight: 400,
     lineHeight: 1.6,
   },
   radii: {
-    small: "8px",
-    medium: "12px",
-    large: "16px",
-    xl: "24px",
+    small: "6px",
+    medium: "10px",
+    large: "14px",
+    xl: "20px",
   },
   shadows: {
-    card: "0 1px 3px rgba(10, 37, 64, 0.06), 0 4px 12px rgba(10, 37, 64, 0.06)",
-    cardHover: "0 2px 6px rgba(10, 37, 64, 0.08), 0 12px 32px rgba(10, 37, 64, 0.1)",
-    button: "0 2px 8px rgba(99, 91, 255, 0.35)",
-    buttonHover: "0 4px 16px rgba(99, 91, 255, 0.45)",
+    card: "0 1px 2px rgba(26, 26, 24, 0.04), 0 4px 12px rgba(26, 26, 24, 0.04)",
+    cardHover: "0 2px 4px rgba(26, 26, 24, 0.06), 0 12px 28px rgba(26, 26, 24, 0.08)",
+    button: "0 2px 6px rgba(11, 61, 46, 0.25)",
+    buttonHover: "0 4px 14px rgba(11, 61, 46, 0.35)",
   },
   breakpoints: {
     sm: "480px",

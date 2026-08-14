@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { Target, ShieldCheck, TrendingUp, Mail, Phone, MapPin, Building2 } from "lucide-react";
+import { Target, Eye, ShieldCheck, TrendingUp, Mail, Phone, MapPin, Building2, Globe } from "lucide-react";
 import { theme } from "../theme";
 
 const Page = styled.section`
   min-height: calc(100vh - 68px);
   padding: 60px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 40px 20px;
@@ -23,11 +23,20 @@ const Container = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  max-width: 680px;
+  max-width: 720px;
   margin: 0 auto 50px;
 
   @media (max-width: 480px) {
     margin-bottom: 35px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: ${theme.colors.gold};
+    margin-bottom: 14px;
   }
 
   h2 {
@@ -56,6 +65,7 @@ const Header = styled.div`
 const IntroCard = styled.div`
   background: #fff;
   border: 1px solid ${theme.colors.border};
+  border-left: 3px solid ${theme.colors.gold};
   border-radius: ${theme.radii.xl};
   padding: 36px 40px;
   margin-bottom: 32px;
@@ -65,14 +75,34 @@ const IntroCard = styled.div`
     padding: 28px 24px;
   }
 
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 20px;
+    color: ${theme.colors.primary};
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
   p {
     color: ${theme.colors.textSecondary};
     line-height: 1.8;
     font-size: 0.975rem;
+    margin-bottom: 12px;
+
+    &:last-child {
+      margin-bottom: 0;
+    }
 
     @media (max-width: 480px) {
       font-size: 0.9rem;
     }
+  }
+
+  strong {
+    color: ${theme.colors.primary};
+    font-weight: 600;
   }
 `;
 
@@ -96,7 +126,7 @@ const SectionCard = styled.div`
   transition: all 0.2s ease;
 
   &:hover {
-    border-color: ${theme.colors.primary};
+    border-color: ${theme.colors.gold};
     box-shadow: ${theme.shadows.cardHover};
   }
 
@@ -115,6 +145,7 @@ const IconBox = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
+  border: 1px solid rgba(11, 61, 46, 0.1);
 `;
 
 const SectionTitle = styled.h3`
@@ -161,7 +192,7 @@ const ContactCard = styled.div`
 
 const ContactItems = styled.div`
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
   gap: 20px;
 
   @media (max-width: 768px) {
@@ -181,7 +212,7 @@ const ContactItem = styled.div`
   }
 
   svg {
-    color: ${theme.colors.primary};
+    color: ${theme.colors.gold};
     flex-shrink: 0;
     margin-top: 2px;
   }
@@ -210,19 +241,28 @@ export default function AboutUsPage() {
     <Page>
       <Container>
         <Header>
-          <h2>About Amdako Strategy</h2>
+          <div className="eyebrow">About Us</div>
+          <h2>About Amdako Strategy Nig. Ltd.</h2>
           <p>
-            In a world where digital finance is shaping the global economy, Amdako Strategy Nig. Ltd.
-            stands at the forefront of innovation — driving smart, secure, and sustainable cryptocurrency
-            trading solutions from the heart of Nigeria.
+            A Strategic Wealth Creation, Digital Finance and Institutional Partnership Company —
+            empowering individuals, institutions, governments, and organizations through strategic
+            wealth creation, digital finance education, and innovative investment opportunities.
           </p>
         </Header>
 
         <IntroCard>
+          <h3>
+            <Building2 size={20} />
+            Company Overview
+          </h3>
           <p>
-            Founded with a bold vision to bridge Africa's financial potential with global digital markets,
-            Amdako Strategy Nig. Ltd. is not just another trading company — it's a strategic powerhouse
-            built on intelligence, transparency, and cutting-edge technology.
+            <strong>Amdako Strategy Nig. Ltd. (RC. 9560518)</strong> is a forward-thinking cryptocurrency
+            trading and investment company dedicated to generating consistent profits through advanced crypto
+            market analysis, spot trading, and disciplined risk management.
+          </p>
+          <p>
+            Our team of experienced traders and analysts ensures investors enjoy steady returns while maintaining
+            the safety and integrity of their invested capital.
           </p>
         </IntroCard>
 
@@ -233,8 +273,19 @@ export default function AboutUsPage() {
             </IconBox>
             <SectionTitle>Our Mission</SectionTitle>
             <SectionText>
-              To empower individuals, businesses, and investors with the knowledge, tools, and opportunities
-              to profit confidently in the rapidly evolving world of digital assets.
+              To empower individuals, institutions, governments, and organizations through strategic wealth
+              creation, digital finance education, and innovative investment opportunities.
+            </SectionText>
+          </SectionCard>
+
+          <SectionCard>
+            <IconBox>
+              <Eye size={22} />
+            </IconBox>
+            <SectionTitle>Our Vision</SectionTitle>
+            <SectionText>
+              To become Africa's most trusted strategic financial ecosystem connecting governments, institutions,
+              businesses, and communities to sustainable economic growth.
             </SectionText>
           </SectionCard>
 
@@ -261,17 +312,6 @@ export default function AboutUsPage() {
               insight and transparency.
             </SectionText>
           </SectionCard>
-
-          <SectionCard>
-            <IconBox>
-              <Building2 size={22} />
-            </IconBox>
-            <SectionTitle>Why Choose Us</SectionTitle>
-            <SectionText>
-              Our commitment to integrity, professional expertise, and a proven track record of delivering
-              consistent returns makes us the preferred choice for discerning investors across the continent.
-            </SectionText>
-          </SectionCard>
         </Grid>
 
         <ContactCard>
@@ -281,21 +321,28 @@ export default function AboutUsPage() {
               <Mail size={20} />
               <div>
                 <ContactLabel>Email</ContactLabel>
-                <p>Amdakostrategy@gmail.com</p>
+                <p>amdakoStrategy@gmail.com</p>
               </div>
             </ContactItem>
             <ContactItem>
               <Phone size={20} />
               <div>
                 <ContactLabel>Phone</ContactLabel>
-                <p>08035817324</p>
+                <p>0803 581 7324</p>
               </div>
             </ContactItem>
             <ContactItem>
               <MapPin size={20} />
               <div>
                 <ContactLabel>Office</ContactLabel>
-                <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
+                <p>Suite 1, First Floor, Novare Central, 502 Dalaba Street, Wuse Zone 5, Abuja.</p>
+              </div>
+            </ContactItem>
+            <ContactItem>
+              <Globe size={20} />
+              <div>
+                <ContactLabel>Website</ContactLabel>
+                <p>www.amdakostrategies.com.ng</p>
               </div>
             </ContactItem>
           </ContactItems>

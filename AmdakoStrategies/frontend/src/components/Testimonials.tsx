@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { Star, Quote } from "lucide-react";
+import { BadgeCheck } from "lucide-react";
 import { theme } from "../theme";
 
 const Section = styled.section`
   padding: 100px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.surface};
 
   @media (max-width: 768px) {
     padding: 70px 20px;
@@ -23,12 +23,21 @@ const Container = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  max-width: 650px;
+  max-width: 680px;
   margin: 0 auto 60px;
 
   @media (max-width: 768px) {
     margin-bottom: 45px;
   }
+`;
+
+const Eyebrow = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${theme.colors.gold};
+  margin-bottom: 14px;
 `;
 
 const Title = styled.h2`
@@ -54,125 +63,174 @@ const Subtitle = styled.p`
   }
 `;
 
-const Grid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 24px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
-
-  @media (max-width: 600px) {
-    gap: 18px;
-  }
-`;
-
 const Card = styled(motion.div)`
-  padding: 32px 28px;
-  border-radius: ${theme.radii.large};
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
   background: #fff;
   border: 1px solid ${theme.colors.border};
-  display: flex;
-  flex-direction: column;
-  transition: all 0.25s ease;
+  border-radius: ${theme.radii.xl};
+  box-shadow: ${theme.shadows.card};
+  overflow: hidden;
 
-  &:hover {
-    border-color: ${theme.colors.primary};
-    box-shadow: ${theme.shadows.cardHover};
-    transform: translateY(-3px);
-  }
-
-  @media (max-width: 600px) {
-    padding: 26px 22px;
+  @media (max-width: 900px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const Stars = styled.div`
-  display: flex;
-  gap: 3px;
-  margin-bottom: 16px;
-  color: #F5A623;
-`;
+const LeftPanel = styled.div`
+  background: ${theme.colors.primary};
+  padding: 48px 42px;
+  position: relative;
+  overflow: hidden;
 
-const QuoteIcon = styled.div`
-  color: ${theme.colors.primary};
-  opacity: 0.2;
-  margin-bottom: 12px;
-`;
-
-const QuoteText = styled.p`
-  font-size: 0.9375rem;
-  line-height: 1.7;
-  color: ${theme.colors.textSecondary};
-  margin-bottom: 24px;
-  flex-grow: 1;
-
-  @media (max-width: 600px) {
-    font-size: 0.875rem;
+  @media (max-width: 900px) {
+    padding: 38px 30px;
   }
-`;
 
-const Author = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-`;
+  @media (max-width: 480px) {
+    padding: 30px 24px;
+  }
 
-const Avatar = styled.div`
-  width: 44px;
-  height: 44px;
-  border-radius: 50%;
-  background: ${theme.colors.primaryLight};
-  color: ${theme.colors.primary};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 700;
-  font-size: 14px;
-`;
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -40%;
+    left: -20%;
+    width: 300px;
+    height: 300px;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.2), transparent);
+    border-radius: 50%;
+    pointer-events: none;
+  }
 
-const AuthorInfo = styled.div`
-  h4 {
-    font-size: 0.9375rem;
-    margin: 0 0 2px;
-    color: ${theme.colors.text};
-    font-weight: 600;
+  h3 {
+    font-size: 1.5rem;
+    color: #fff;
+    margin-bottom: 14px;
+
+    @media (max-width: 480px) {
+      font-size: 1.3rem;
+    }
   }
 
   p {
-    font-size: 0.8125rem;
-    color: ${theme.colors.textMuted};
-    margin: 0;
+    color: rgba(255, 255, 255, 0.85);
+    font-size: 0.9375rem;
+    line-height: 1.75;
+
+    @media (max-width: 480px) {
+      font-size: 0.875rem;
+    }
+  }
+`;
+
+const LeftStat = styled.div`
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+
+  @media (max-width: 480px) {
+    gap: 14px;
+  }
+
+  h4 {
+    font-size: 28px;
+    font-weight: 700;
+    color: ${theme.colors.gold};
+    margin-bottom: 4px;
+    font-family: 'Playfair Display', Georgia, serif;
+
+    @media (max-width: 480px) {
+      font-size: 24px;
+    }
+  }
+
+  p {
+    font-size: 12.5px;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1.4;
+
+    @media (max-width: 480px) {
+      font-size: 11.5px;
+    }
+  }
+`;
+
+const RightPanel = styled.div`
+  padding: 48px 42px;
+
+  @media (max-width: 900px) {
+    padding: 38px 30px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 30px 24px;
+  }
+`;
+
+const CheckList = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+`;
+
+const CheckItem = styled.li`
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+
+  svg {
+    color: ${theme.colors.gold};
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  p {
+    font-size: 0.9375rem;
+    color: ${theme.colors.textSecondary};
+    line-height: 1.6;
+
+    @media (max-width: 480px) {
+      font-size: 0.875rem;
+    }
+  }
+
+  strong {
+    color: ${theme.colors.text};
+    font-weight: 600;
   }
 `;
 
 export default function Testimonials() {
-  const testimonials = [
+  const benefits = [
     {
-      name: "Usman Kolo",
-      title: "Crypto Investor",
-      avatar: "UK",
-      quote:
-        "Amdako Strategies transformed my investment approach. The returns have been consistently exceptional, and the team's expertise is evident in their strategic decisions. I highly recommend their services to anyone looking to grow their crypto portfolio.",
+      title: "Guaranteed 10% monthly returns on capital",
+      detail: "Paid directly to your bank account on the 30th of every month.",
     },
     {
-      name: "khalifa General",
-      title: "Institutional Investor",
-      avatar: "KG",
-      quote:
-        "Thank you amdako, I have received my monthly ROI. I am very satisfied with the service and the returns. The team is professional and responsive, making it a pleasure to work with them.",
+      title: "100% capital protection policy",
+      detail: "Your principal is safeguarded under verified, risk-controlled trading systems.",
     },
     {
-      name: "Sanda Gulu",
-      title: "Investor",
-      avatar: "SA",
-      quote:
-        "Outstanding service. Very reliable and trustworthy. The combination of high returns, security, and professional management is unmatched in the industry. Highly recommended for serious investors.",
+      title: "Transparent and reliable management system",
+      detail: "Periodic performance updates and transparent reporting for all investors.",
+    },
+    {
+      title: "Referral income opportunities",
+      detail: "Earn $30 (Thirty US Dollars) per successful referral, paid instantly.",
+    },
+    {
+      title: "Secure three-month capital lock system",
+      detail: "Ensures sustainable growth through optimal trading cycles and steady accumulation.",
+    },
+    {
+      title: "Professional team with proven trading experience",
+      detail: "All trading conducted exclusively by certified and professional crypto experts.",
     },
   ];
 
@@ -180,40 +238,58 @@ export default function Testimonials() {
     <Section>
       <Container>
         <Header>
-          <Title>What Our Investors Say</Title>
+          <Eyebrow>Why Amdako</Eyebrow>
+          <Title>Why Invest with Amdako Strategy Nig. Ltd.?</Title>
           <Subtitle>
-            Join thousands of satisfied investors who trust Amdako with their digital assets
+            A track record built on discipline, transparency, and proven trading expertise.
           </Subtitle>
         </Header>
 
-        <Grid>
-          {testimonials.map((testimonial, idx) => (
-            <Card
-              key={idx}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.1, duration: 0.5 }}
-              viewport={{ once: true }}
-            >
-              <QuoteIcon>
-                <Quote size={28} />
-              </QuoteIcon>
-              <Stars aria-label="5 star rating">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} size={16} fill="currentColor" strokeWidth={0} />
-                ))}
-              </Stars>
-              <QuoteText>{testimonial.quote}</QuoteText>
-              <Author>
-                <Avatar>{testimonial.avatar}</Avatar>
-                <AuthorInfo>
-                  <h4>{testimonial.name}</h4>
-                  <p>{testimonial.title}</p>
-                </AuthorInfo>
-              </Author>
-            </Card>
-          ))}
-        </Grid>
+        <Card
+          initial={{ opacity: 0, y: 24 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55 }}
+          viewport={{ once: true }}
+        >
+          <LeftPanel>
+            <h3>Guaranteed Returns, Protected Capital</h3>
+            <p>
+              Amdako Strategy Nig. Ltd. combines professional market expertise with disciplined risk
+              management to deliver consistent, predictable returns for investors.
+            </p>
+            <LeftStat>
+              <div>
+                <h4>10%</h4>
+                <p>Monthly ROI on invested capital</p>
+              </div>
+              <div>
+                <h4>120%</h4>
+                <p>Annualised ROI potential</p>
+              </div>
+              <div>
+                <h4>100%</h4>
+                <p>Capital protection policy</p>
+              </div>
+              <div>
+                <h4>$30</h4>
+                <p>Per successful referral commission</p>
+              </div>
+            </LeftStat>
+          </LeftPanel>
+
+          <RightPanel>
+            <CheckList>
+              {benefits.map((benefit, idx) => (
+                <CheckItem key={idx}>
+                  <BadgeCheck size={20} />
+                  <p>
+                    <strong>{benefit.title}</strong> — {benefit.detail}
+                  </p>
+                </CheckItem>
+              ))}
+            </CheckList>
+          </RightPanel>
+        </Card>
       </Container>
     </Section>
   );

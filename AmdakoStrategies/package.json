@@ -3,16 +3,18 @@
   "version": "1.0.0",
   "description": "Amdako Strategies - Investment Platform",
   "scripts": {
-    "install-all": "cd frontend && npm install && cd ../backend && npm install && cd ..",
-    "build": "cd frontend && npm run build && cd ..",
-    "dev": "concurrently \"cd frontend && npm run dev\" \"cd backend && npm start\"",
-    "start": "pm2 start backend/server.js --name amdako-api"
+    "install-all": "cd frontend && npm install",
+    "build": "cd frontend && npm run build",
+    "dev": "cd frontend && npm run dev",
+    "start": "cd frontend && npm run preview"
   },
   "devDependencies": {
-    "@types/node": "^25.9.1",
+    "@types/node": "^25.9.5",
     "concurrently": "^8.2.0"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.112.3",
+    "jsonwebtoken": "^9.0.3",
     "react-signature-canvas": "^1.1.0-alpha.2"
   }
 }

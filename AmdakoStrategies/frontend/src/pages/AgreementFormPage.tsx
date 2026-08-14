@@ -25,7 +25,7 @@ type AgreementFormPageProps = {
 const Page = styled.section`
   min-height: calc(100vh - 68px);
   padding: 60px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 40px 20px;
@@ -70,6 +70,15 @@ const Title = styled.h2`
   @media (max-width: 480px) {
     font-size: 20px;
   }
+`;
+
+const Eyebrow = styled.div`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${theme.colors.gold};
+  margin-bottom: 10px;
 `;
 
 const AgreementText = styled.div`
@@ -368,6 +377,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
     <Page>
       <Container>
         <Card ref={formRef}>
+          <Eyebrow>Official Investment Contract</Eyebrow>
           <Title>Agreement Form</Title>
 
           <AgreementText ref={agreementTextRef}>

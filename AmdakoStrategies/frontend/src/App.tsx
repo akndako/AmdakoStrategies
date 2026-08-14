@@ -2,12 +2,16 @@
 import { ThemeProvider } from "styled-components";
 import { GlobalStyles } from "./globalStyles";
 import { theme } from "./theme";
+import { logOut } from "./lib/auth";
 
 import Navbar from "./components/NavBar";
 import Hero from "./components/Hero";
 import Features from "./components/Features";
-import Testimonials from "./components/Testimonials";
+import InvestmentPlan from "./components/InvestmentPlan";
+import ProjectionTable from "./components/ProjectionTable";
 import Opportunities from "./components/Opportunities";
+import HowToInvest from "./components/HowToInvest";
+import Testimonials from "./components/Testimonials";
 import Stats from "./components/Stats";
 import CTA from "./components/CTA";
 import Footer from "./components/Footer";
@@ -45,6 +49,13 @@ export default function App() {
   useEffect(() => {
     if (auth) {
       localStorage.setItem("amdako-auth", JSON.stringify(auth));
+      // Keep authenticated users in the portal — land them on dashboard
+      setPage((current) => {
+        if (current === "home" || current === "about" || current === "contact") {
+          return "dashboard";
+        }
+        return current;
+      });
     } else {
       localStorage.removeItem("amdako-auth");
     }
@@ -55,9 +66,23 @@ export default function App() {
     setPage("dashboard");
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
+    try {
+      await logOut();
+    } catch {
+      // Ignore logout errors and clear local state anyway
+    }
     setAuth(null);
     setPage("home");
+  };
+
+  const handleNavigate = (nextPage: PageView) => {
+    // Authenticated users should stay in the investor portal — redirect marketing pages to dashboard
+    if (auth && (nextPage === "home" || nextPage === "about" || nextPage === "contact")) {
+      setPage("dashboard");
+      return;
+    }
+    setPage(nextPage);
   };
 
   const renderPage = () => {
@@ -75,12 +100,17 @@ export default function App() {
       case "dashboard":
         return auth ? <DashboardPage token={auth.token} user={auth.user} onLogout={handleLogout} onNavigate={setPage} /> : <LoginPage onAuthSuccess={handleAuthSuccess} />;
       default:
-        return (
+        return auth ? (
+          <DashboardPage token={auth.token} user={auth.user} onLogout={handleLogout} onNavigate={setPage} />
+        ) : (
           <>
             <Hero />
             <Features />
-            <Testimonials />
+            <InvestmentPlan />
+            <ProjectionTable />
             <Opportunities />
+            <HowToInvest />
+            <Testimonials />
             <Stats />
             <CTA onNavigate={setPage} />
           </>
@@ -88,17 +118,19 @@ export default function App() {
     }
   };
 
+  const isAuthPage = page === "dashboard" || page === "agreement";
+
   return (
     <ThemeProvider theme={theme}>
       <GlobalStyles />
       <Navbar
-        onNavigate={(nextPage) => setPage(nextPage)}
+        onNavigate={handleNavigate}
         activePage={page}
         auth={auth}
         onLogout={handleLogout}
       />
       {renderPage()}
-      <Footer />
+      {!isAuthPage && auth ? null : <Footer />}
     </ThemeProvider>
   );
 }

@@ -14,61 +14,93 @@ const Container = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(255, 255, 255, 0.9);
+  background: rgba(248, 246, 241, 0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid ${theme.colors.borderLight};
+`;
+
+const TopBar = styled.div`
+  background: ${theme.colors.primary};
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 12px;
+  letter-spacing: 0.4px;
+  text-align: center;
+  padding: 7px 16px;
+
+  strong {
+    color: #fff;
+    font-weight: 600;
+  }
 `;
 
 const Nav = styled.nav`
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 24px;
-  height: 68px;
+  height: 70px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   @media (max-width: 768px) {
     padding: 0 20px;
-    height: 60px;
+    height: 62px;
   }
 `;
 
 const Brand = styled.div`
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
   cursor: pointer;
-  font-size: 17px;
-  font-weight: 700;
-  letter-spacing: 0.4px;
-  color: ${theme.colors.text};
-  text-transform: uppercase;
-
-  span {
-    color: ${theme.colors.primary};
-  }
 `;
 
 const BrandMark = styled.div`
-  width: 32px;
-  height: 32px;
-  border-radius: 8px;
+  width: 40px;
+  height: 40px;
+  border-radius: ${theme.radii.small};
   background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark});
+  border: 1px solid ${theme.colors.gold};
   display: flex;
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 14px;
+  font-size: 15px;
   font-weight: 800;
+  letter-spacing: 0.5px;
+`;
+
+const BrandText = styled.div`
+  h3 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 16px;
+    font-weight: 600;
+    letter-spacing: 0.2px;
+    color: ${theme.colors.text};
+    margin: 0 0 2px;
+    line-height: 1.2;
+
+    span {
+      color: ${theme.colors.primary};
+    }
+  }
+
+  p {
+    font-size: 10.5px;
+    color: ${theme.colors.textMuted};
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin: 0;
+    line-height: 1.3;
+  }
 `;
 
 const NavLinks = styled.div`
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
     display: none;
   }
 `;
@@ -83,8 +115,8 @@ const NavLink = styled.button<{ active?: boolean }>`
   transition: all 0.2s ease;
 
   &:hover {
-    background: ${theme.colors.surfaceAlt};
-    color: ${theme.colors.text};
+    background: ${theme.colors.primaryLight};
+    color: ${theme.colors.primary};
   }
 `;
 
@@ -93,7 +125,7 @@ const Actions = styled.div`
   align-items: center;
   gap: 10px;
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
     display: none;
   }
 `;
@@ -116,9 +148,9 @@ const Button = styled.button<{ variant?: "primary" | "outline" }>`
 
   &:hover {
     background: ${({ variant }) =>
-      variant === "primary" ? theme.colors.primaryDark : theme.colors.surfaceAlt};
+      variant === "primary" ? theme.colors.primaryDark : theme.colors.primaryLight};
     color: ${({ variant }) =>
-      variant === "primary" ? "#fff" : theme.colors.text};
+      variant === "primary" ? "#fff" : theme.colors.primary};
     box-shadow: ${({ variant }) =>
       variant === "primary" ? theme.shadows.buttonHover : "none"};
     transform: ${({ variant }) => (variant === "primary" ? "translateY(-1px)" : "none")};
@@ -136,7 +168,7 @@ const MobileToggle = styled.button`
   align-items: center;
   justify-content: center;
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
     display: flex;
   }
 `;
@@ -149,7 +181,7 @@ const MobileMenu = styled.div`
   background: #fff;
   border-top: 1px solid ${theme.colors.borderLight};
 
-  @media (max-width: 820px) {
+  @media (max-width: 860px) {
     display: flex;
   }
 `;
@@ -187,22 +219,33 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
   return (
     <Container>
+      <TopBar>
+        <strong>AMDAKO STRATEGY NIG. LTD.</strong> — RC. 9560518 &nbsp;·&nbsp; Registered Investment & Digital Finance Company
+      </TopBar>
+
       <Nav>
         <Brand onClick={() => handleNavigate("home")}>
           <BrandMark>A</BrandMark>
-          Amdako<span>Strategies</span>
+          <BrandText>
+            <h3>Amdako <span>Strategies</span></h3>
+            <p>Strategic Wealth & Digital Finance</p>
+          </BrandText>
         </Brand>
 
         <NavLinks>
-          <NavLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
-            Home
-          </NavLink>
-          <NavLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
-            About Us
-          </NavLink>
-          <NavLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-            Contact
-          </NavLink>
+          {!auth && (
+            <>
+              <NavLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+                Home
+              </NavLink>
+              <NavLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+                About Us
+              </NavLink>
+              <NavLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+                Contact
+              </NavLink>
+            </>
+          )}
         </NavLinks>
 
         <Actions>
@@ -238,17 +281,20 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       {menuOpen && (
         <MobileMenu>
-          <MobileLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
-            Home
-          </MobileLink>
-          <MobileLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
-            About Us
-          </MobileLink>
-          <MobileLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-            Contact
-          </MobileLink>
-
-          <MobileDivider />
+          {!auth && (
+            <>
+              <MobileLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+                Home
+              </MobileLink>
+              <MobileLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+                About Us
+              </MobileLink>
+              <MobileLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+                Contact
+              </MobileLink>
+              <MobileDivider />
+            </>
+          )}
 
           {auth ? (
             <>

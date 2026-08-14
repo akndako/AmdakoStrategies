@@ -1,11 +1,11 @@
 import styled from "styled-components";
-import { Mail, Phone, MapPin, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
 import { theme } from "../theme";
 
 const Page = styled.section`
   min-height: calc(100vh - 68px);
   padding: 60px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 40px 20px;
@@ -45,6 +45,15 @@ const InfoCard = styled.div`
 
   @media (max-width: 480px) {
     padding: 24px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: ${theme.colors.gold};
+    margin-bottom: 12px;
   }
 
   h2 {
@@ -89,6 +98,7 @@ const ContactIcon = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border: 1px solid rgba(11, 61, 46, 0.1);
 `;
 
 const ContactContent = styled.div`
@@ -251,7 +261,8 @@ export default function ContactUsPage() {
       <Container>
         <Grid>
           <InfoCard>
-            <h2>Contact Us</h2>
+            <div className="eyebrow">Contact Us</div>
+            <h2>Get in Touch</h2>
             <p>
               Need assistance or want to learn more about our investment strategies? Reach out and one
               of our advisors will respond within one business day.
@@ -263,7 +274,7 @@ export default function ContactUsPage() {
                 </ContactIcon>
                 <ContactContent>
                   <span>Email</span>
-                  <p>Amdakostrategy@gmail.com</p>
+                  <p>amdakoStrategy@gmail.com</p>
                 </ContactContent>
               </ContactItem>
               <ContactItem>
@@ -272,7 +283,7 @@ export default function ContactUsPage() {
                 </ContactIcon>
                 <ContactContent>
                   <span>Phone</span>
-                  <p>08035817324</p>
+                  <p>0803 581 7324</p>
                 </ContactContent>
               </ContactItem>
               <ContactItem>
@@ -281,7 +292,16 @@ export default function ContactUsPage() {
                 </ContactIcon>
                 <ContactContent>
                   <span>Office</span>
-                  <p>Suite 8A First Floor Block A, City Plaza Area 11, Abuja.</p>
+                  <p>Suite 1, First Floor, Novare Central, 502 Dalaba Street, Wuse Zone 5, Abuja.</p>
+                </ContactContent>
+              </ContactItem>
+              <ContactItem>
+                <ContactIcon>
+                  <Globe size={18} />
+                </ContactIcon>
+                <ContactContent>
+                  <span>Website</span>
+                  <p>www.amdakostrategies.com.ng</p>
                 </ContactContent>
               </ContactItem>
             </ContactList>

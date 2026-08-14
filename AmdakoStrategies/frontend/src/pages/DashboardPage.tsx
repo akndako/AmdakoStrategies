@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
 import styled from "styled-components";
-import { FileText, TrendingUp, Wallet, Briefcase, LogOut, RefreshCw } from "lucide-react";
+import { FileText, TrendingUp, Wallet, Briefcase, LogOut, Mail, Phone } from "lucide-react";
 import type { PageView } from "../App";
 import { theme } from "../theme";
 
@@ -21,7 +20,7 @@ type DashboardPageProps = {
 const Page = styled.section`
   min-height: calc(100vh - 68px);
   padding: 60px 24px;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 40px 20px;
@@ -49,6 +48,15 @@ const Header = styled.div`
     align-items: flex-start;
     gap: 16px;
     margin-bottom: 24px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: ${theme.colors.gold};
+    margin-bottom: 8px;
   }
 
   h2 {
@@ -158,6 +166,108 @@ const Card = styled.div`
   }
 `;
 
+const ProfileCard = styled.div`
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 32px;
+  align-items: center;
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-left: 3px solid ${theme.colors.gold};
+  border-radius: ${theme.radii.xl};
+  padding: 36px 40px;
+  box-shadow: ${theme.shadows.card};
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 24px;
+    padding: 28px 24px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 24px 20px;
+  }
+`;
+
+const Avatar = styled.div`
+  width: 88px;
+  height: 88px;
+  border-radius: 50%;
+  background: ${theme.colors.primary};
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  border: 3px solid ${theme.colors.gold};
+  margin: 0 auto;
+
+  @media (max-width: 480px) {
+    width: 72px;
+    height: 72px;
+    font-size: 26px;
+  }
+`;
+
+const ProfileInfo = styled.div`
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 6px;
+    color: ${theme.colors.text};
+
+    @media (max-width: 480px) {
+      font-size: 1.3rem;
+    }
+  }
+
+  .role {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: ${theme.colors.gold};
+    margin-bottom: 16px;
+  }
+`;
+
+const ProfileDetails = styled.div`
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const ProfileItem = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: ${theme.colors.surfaceAlt};
+  border: 1px solid ${theme.colors.borderLight};
+  border-radius: ${theme.radii.medium};
+
+  svg {
+    color: ${theme.colors.primary};
+    flex-shrink: 0;
+  }
+
+  p {
+    font-size: 0.875rem;
+    color: ${theme.colors.textSecondary};
+    line-height: 1.4;
+
+    @media (max-width: 480px) {
+      font-size: 0.8125rem;
+    }
+  }
+`;
+
 const StatsGrid = styled.div`
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -221,71 +331,28 @@ const StatCard = styled.div`
   }
 `;
 
-const Message = styled.div`
-  margin-top: 24px;
-  color: ${theme.colors.textSecondary};
-  font-size: 15px;
-  text-align: center;
-  padding: 40px;
-  background: ${theme.colors.surfaceAlt};
-  border-radius: ${theme.radii.large};
-  border: 1px dashed ${theme.colors.border};
-`;
-
-const LoadingState = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding: 60px 0;
-  color: ${theme.colors.textMuted};
-
-  svg {
-    animation: spin 1s linear infinite;
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-`;
-
 export default function DashboardPage({ token, user, onLogout, onNavigate }: DashboardPageProps) {
-  const [dashboardData, setDashboardData] = useState<{ performance: string; balance: string; openPositions: number } | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
+  const dashboardData = {
+    performance: "+10%",
+    balance: "₦1,000,000",
+    openPositions: 3,
+  };
 
-  useEffect(() => {
-    async function loadDashboard() {
-      try {
-        const response = await fetch("http://localhost:4000/api/dashboard", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        const data = await response.json();
-        if (!response.ok) {
-          setError(data.message || "Unable to load dashboard.");
-          return;
-        }
-        setDashboardData(data);
-      } catch {
-        setError("Unable to reach the backend server.");
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    loadDashboard();
-  }, [token]);
+  const initials = user.name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <Page>
       <Container>
         <Header>
           <div>
+            <div className="eyebrow">Investor Dashboard</div>
             <h2>Welcome, {user.name}</h2>
-            <p>Your dashboard is ready. Review your portfolio, manage your account, and keep track of market performance.</p>
+            <p>Your investor portal is ready. Review your profile, manage your account, and track your investment performance.</p>
           </div>
           <HeaderActions>
             <Button onClick={() => onNavigate("agreement")}>
@@ -299,41 +366,48 @@ export default function DashboardPage({ token, user, onLogout, onNavigate }: Das
           </HeaderActions>
         </Header>
 
+        <ProfileCard>
+          <Avatar>{initials}</Avatar>
+          <ProfileInfo>
+            <h3>{user.name}</h3>
+            <div className="role">Verified Investor</div>
+            <ProfileDetails>
+              <ProfileItem>
+                <Mail size={16} />
+                <p>{user.email}</p>
+              </ProfileItem>
+              <ProfileItem>
+                <Phone size={16} />
+                <p>{user.phone || "Not provided"}</p>
+              </ProfileItem>
+            </ProfileDetails>
+          </ProfileInfo>
+        </ProfileCard>
+
         <Card>
-          {loading ? (
-            <LoadingState>
-              <RefreshCw size={24} />
-              <span>Loading dashboard...</span>
-            </LoadingState>
-          ) : error ? (
-            <Message>{error}</Message>
-          ) : dashboardData ? (
-            <StatsGrid>
-              <StatCard>
-                <div className="stat-icon">
-                  <Wallet size={20} />
-                </div>
-                <h3>Account Balance</h3>
-                <p>{dashboardData.balance}</p>
-              </StatCard>
-              <StatCard>
-                <div className="stat-icon">
-                  <TrendingUp size={20} />
-                </div>
-                <h3>Performance</h3>
-                <p>{dashboardData.performance}</p>
-              </StatCard>
-              <StatCard>
-                <div className="stat-icon">
-                  <Briefcase size={20} />
-                </div>
-                <h3>Open Positions</h3>
-                <p>{dashboardData.openPositions}</p>
-              </StatCard>
-            </StatsGrid>
-          ) : (
-            <Message>No dashboard data available.</Message>
-          )}
+          <StatsGrid>
+            <StatCard>
+              <div className="stat-icon">
+                <Wallet size={20} />
+              </div>
+              <h3>Account Balance</h3>
+              <p>{dashboardData.balance}</p>
+            </StatCard>
+            <StatCard>
+              <div className="stat-icon">
+                <TrendingUp size={20} />
+              </div>
+              <h3>Performance</h3>
+              <p>{dashboardData.performance}</p>
+            </StatCard>
+            <StatCard>
+              <div className="stat-icon">
+                <Briefcase size={20} />
+              </div>
+              <h3>Open Positions</h3>
+              <p>{dashboardData.openPositions}</p>
+            </StatCard>
+          </StatsGrid>
         </Card>
       </Container>
     </Page>

@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { User, Mail, Phone, Lock, ArrowRight } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { theme } from "../theme";
+import { signUp } from "../lib/auth";
 
 type AuthUser = {
   id: string;
@@ -25,7 +26,7 @@ const Page = styled.section`
   display: flex;
   justify-content: center;
   align-items: center;
-  background: ${theme.colors.surfaceAlt};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 60px 20px;
@@ -59,6 +60,15 @@ const Header = styled.div`
 
   @media (max-width: 480px) {
     margin-bottom: 24px;
+  }
+
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: ${theme.colors.gold};
+    margin-bottom: 10px;
   }
 
   h2 {
@@ -219,24 +229,26 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
     setLoading(true);
 
     try {
-      const response = await fetch("http://localhost:4000/api/auth/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ firstName, lastName, phone, email, password }),
-      });
+      const { authState, error, requiresEmailConfirmation } = await signUp(firstName, lastName, email, password, phone);
 
-      const data = await response.json();
-      if (!response.ok) {
-        setError(data?.message || "Unable to create account.");
-        setLoading(false);
+      if (error) {
+        setError(error.message || "Unable to create account.");
         return;
       }
 
-      onAuthSuccess({ token: data.token, user: { id: data._id, name: data.name, firstName: data.firstName, lastName: data.lastName, phone: data.phone, email: data.email } });
+      if (requiresEmailConfirmation) {
+        setError("Account created. Check your email to confirm before logging in.");
+        return;
+      }
+
+      if (!authState) {
+        setError("Unable to create account.");
+        return;
+      }
+
+      onAuthSuccess(authState);
     } catch (err) {
-      setError("Unable to connect to the server.");
+      setError((err as Error)?.message || "Unable to create account.");
     } finally {
       setLoading(false);
     }
@@ -246,8 +258,9 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
     <Page>
       <Card>
         <Header>
+          <div className="eyebrow">Investor Registration</div>
           <h2>Create Your Account</h2>
-          <p>Join today to start investing in premium Web3 strategies with trusted security and expert guidance.</p>
+          <p>Join today to start investing in premium digital finance strategies with trusted security and expert guidance.</p>
         </Header>
 
         <Form onSubmit={handleSubmit}>

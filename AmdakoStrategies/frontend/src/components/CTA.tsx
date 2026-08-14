@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, PhoneCall } from "lucide-react";
 import { theme } from "../theme";
 
 const Section = styled.section`
   padding: 100px 24px;
-  background: #ffffff;
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 70px 20px;
@@ -27,7 +27,8 @@ const Content = styled.div`
   text-align: center;
   padding: 80px 60px;
   border-radius: ${theme.radii.xl};
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
+  background: ${theme.colors.primary};
+  border: 1px solid ${theme.colors.primaryDark};
 
   @media (max-width: 1024px) {
     padding: 70px 50px;
@@ -42,15 +43,24 @@ const Content = styled.div`
   }
 `;
 
-const Glow = styled.div`
+const GoldOverlay = styled.div`
   position: absolute;
   top: -50%;
   right: -10%;
   width: 400px;
   height: 400px;
-  background: radial-gradient(circle, rgba(255, 255, 255, 0.12), transparent);
+  background: radial-gradient(circle, rgba(201, 162, 39, 0.15), transparent);
   border-radius: 50%;
   pointer-events: none;
+`;
+
+const GoldLine = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, ${theme.colors.gold}, transparent);
 `;
 
 const ContentInner = styled.div`
@@ -58,6 +68,15 @@ const ContentInner = styled.div`
   z-index: 1;
   max-width: 650px;
   margin: 0 auto;
+`;
+
+const Eyebrow = styled.p`
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: ${theme.colors.gold};
+  margin-bottom: 14px;
 `;
 
 const Title = styled(motion.h2)`
@@ -116,22 +135,22 @@ const Button = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
   ${({ variant }) =>
     variant === "secondary"
       ? `
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(8px);
     color: #fff;
     border: 1px solid rgba(255, 255, 255, 0.25);
 
     &:hover {
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba(255, 255, 255, 0.18);
       border-color: rgba(255, 255, 255, 0.4);
     }
   `
       : `
-    background: #fff;
-    color: ${theme.colors.primary};
+    background: ${theme.colors.gold};
+    color: ${theme.colors.primaryDark};
 
     &:hover {
-      background: rgba(255, 255, 255, 0.95);
+      background: #D4AE2F;
       transform: translateY(-2px);
       box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
     }
@@ -139,8 +158,39 @@ const Button = styled(motion.button)<{ variant?: "primary" | "secondary" }>`
 
   @media (max-width: 600px) {
     width: 100%;
-    max-width: 300px;
+    max-width: 320px;
     justify-content: center;
+  }
+`;
+
+const ContactRow = styled.div`
+  margin-top: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  p {
+    font-size: 14px;
+    color: rgba(255, 255, 255, 0.7);
+  }
+
+  a {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    color: ${theme.colors.gold};
+    font-weight: 600;
+    font-size: 14px;
+
+    &:hover {
+      color: #E8BE2F;
+    }
+  }
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 6px;
   }
 `;
 
@@ -153,15 +203,17 @@ export default function CTA({ onNavigate }: CTAProps) {
     <Section>
       <Container>
         <Content>
-          <Glow />
+          <GoldLine />
+          <GoldOverlay />
           <ContentInner>
+            <Eyebrow>Start Today</Eyebrow>
             <Title
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              Ready to Grow Your Wealth?
+              Begin Your Investment Journey
             </Title>
             <Description
               initial={{ opacity: 0, y: 20 }}
@@ -169,7 +221,8 @@ export default function CTA({ onNavigate }: CTAProps) {
               transition={{ delay: 0.1, duration: 0.5 }}
               viewport={{ once: true }}
             >
-              Join our community of successful investors and start your journey to financial freedom with Amdako Strategies.
+              Contact our investment team or authorized agent, complete the Amdako Strategy
+              Investment Form, and begin earning guaranteed 10% monthly returns.
             </Description>
             <ButtonGroup>
               <Button
@@ -197,6 +250,13 @@ export default function CTA({ onNavigate }: CTAProps) {
                 Sign In
               </Button>
             </ButtonGroup>
+            <ContactRow>
+              <p>Prefer to speak with an advisor?</p>
+              <a href="tel:08035817324">
+                <PhoneCall size={14} />
+                0803 581 7324
+              </a>
+            </ContactRow>
           </ContentInner>
         </Content>
       </Container>
