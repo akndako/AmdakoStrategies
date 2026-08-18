@@ -1,23 +1,13 @@
 import { type FormEvent, useState } from "react";
 import styled from "styled-components";
-import { User, Mail, Phone, Lock, ArrowRight } from "lucide-react";
+import { User, Mail, Phone, Lock, MapPin, Home, ArrowRight } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { theme } from "../theme";
 import { signUp } from "../lib/auth";
-
-type AuthUser = {
-  id: string;
-  name: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-};
-
-type AuthState = { token: string; user: AuthUser };
+import type { AuthState } from "../types";
 
 type CreateAccountPageProps = {
-  onAuthSuccess: (auth: AuthState) => void;
+  onSignUpSuccess: (auth: AuthState) => void;
 };
 
 const Page = styled.section`
@@ -207,13 +197,16 @@ const ErrorMessage = styled.div`
   font-size: 14px;
 `;
 
-export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPageProps) {
+export default function CreateAccountPage({ onSignUpSuccess }: CreateAccountPageProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [address, setAddress] = useState("");
+  const [location, setLocation] = useState("");
+  const [stateOfOrigin, setStateOfOrigin] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -229,7 +222,16 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
     setLoading(true);
 
     try {
-      const { authState, error, requiresEmailConfirmation } = await signUp(firstName, lastName, email, password, phone);
+      const { authState, error, requiresEmailConfirmation } = await signUp(
+        firstName,
+        lastName,
+        email,
+        password,
+        phone,
+        address,
+        location,
+        stateOfOrigin
+      );
 
       if (error) {
         setError(error.message || "Unable to create account.");
@@ -246,7 +248,7 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
         return;
       }
 
-      onAuthSuccess(authState);
+      onSignUpSuccess(authState);
     } catch (err) {
       setError((err as Error)?.message || "Unable to create account.");
     } finally {
@@ -312,6 +314,32 @@ export default function CreateAccountPage({ onAuthSuccess }: CreateAccountPagePr
               <InputWrapper>
                 <Lock size={18} />
                 <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" placeholder="Re-enter your password" required disabled={loading} />
+              </InputWrapper>
+            </Field>
+          </Row>
+
+          <Field>
+            Address
+            <InputWrapper>
+              <Home size={18} />
+              <Input value={address} onChange={(e) => setAddress(e.target.value)} type="text" placeholder="Your residential address" required disabled={loading} />
+            </InputWrapper>
+          </Field>
+
+          <Row>
+            <Field>
+              Location
+              <InputWrapper>
+                <MapPin size={18} />
+                <Input value={location} onChange={(e) => setLocation(e.target.value)} type="text" placeholder="City / Town" required disabled={loading} />
+              </InputWrapper>
+            </Field>
+
+            <Field>
+              State of Origin
+              <InputWrapper>
+                <MapPin size={18} />
+                <Input value={stateOfOrigin} onChange={(e) => setStateOfOrigin(e.target.value)} type="text" placeholder="Your state of origin" required disabled={loading} />
               </InputWrapper>
             </Field>
           </Row>

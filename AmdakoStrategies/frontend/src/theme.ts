@@ -1,9 +1,9 @@
 export const theme = {
   colors: {
     // Institutional wealth-management palette
-    primary: "#0B3D2E", // deep forest green
-    primaryDark: "#07291F", // darker green for hover
-    primaryLight: "#E8F0EC", // soft green tint
+    primary: "#0271c4", // brand blue
+    primaryDark: "#015a9e", // darker blue for hover
+    primaryLight: "#E6F1FA", // soft blue tint
     secondary: "#1A1A18", // charcoal
     gold: "#C9A227", // refined gold accent
     goldLight: "#F5EDD8", // soft gold tint
@@ -15,7 +15,7 @@ export const theme = {
     text: "#1A1A18", // charcoal
     textSecondary: "#5C5A52", // warm gray
     textMuted: "#8A877B", // muted warm gray
-    success: "#0B7A55",
+    success: "#0E8A9E", // teal-blue success (no green)
     danger: "#B3403A",
     warning: "#C9A227",
     shadow: "rgba(26, 26, 24, 0.07)",
@@ -37,8 +37,8 @@ export const theme = {
   shadows: {
     card: "0 1px 2px rgba(26, 26, 24, 0.04), 0 4px 12px rgba(26, 26, 24, 0.04)",
     cardHover: "0 2px 4px rgba(26, 26, 24, 0.06), 0 12px 28px rgba(26, 26, 24, 0.08)",
-    button: "0 2px 6px rgba(11, 61, 46, 0.25)",
-    buttonHover: "0 4px 14px rgba(11, 61, 46, 0.35)",
+    button: "0 2px 6px rgba(2, 113, 196, 0.25)",
+    buttonHover: "0 4px 14px rgba(2, 113, 196, 0.35)",
   },
   breakpoints: {
     sm: "480px",

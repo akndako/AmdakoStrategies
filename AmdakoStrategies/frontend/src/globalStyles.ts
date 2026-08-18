@@ -97,12 +97,12 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   a {
-    color: #0B3D2E;
+    color: #0271c4;
     text-decoration: none;
     transition: color 0.2s ease;
 
     &:hover {
-      color: #07291F;
+      color: #015a9e;
     }
   }
 

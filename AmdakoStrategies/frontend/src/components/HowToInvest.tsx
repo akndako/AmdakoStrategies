@@ -140,7 +140,7 @@ const StepIcon = styled.div`
   align-items: center;
   justify-content: center;
   margin: 0 auto 16px;
-  border: 1px solid rgba(11, 61, 46, 0.1);
+  border: 1px solid rgba(2, 113, 196, 0.1);
 
   @media (max-width: 600px) {
     margin: 0;

@@ -98,7 +98,7 @@ const ContactIcon = styled.div`
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  border: 1px solid rgba(11, 61, 46, 0.1);
+  border: 1px solid rgba(2, 113, 196, 0.1);
 `;
 
 const ContactContent = styled.div`

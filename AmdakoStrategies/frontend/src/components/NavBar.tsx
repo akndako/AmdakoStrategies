@@ -1,12 +1,15 @@
-﻿﻿import { useState } from "react";
+﻿﻿import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { Menu, X, LogOut, LayoutDashboard, UserPlus, LogIn } from "lucide-react";
+import { Menu, X, LayoutDashboard, UserPlus, LogIn, ChevronDown, User, Settings, LogOut } from "lucide-react";
 import { theme } from "../theme";
+import type { AuthState } from "../types";
+
+type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement" | "settings" | "edit-profile";
 
 type NavbarProps = {
-  activePage: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement";
-  auth: { token: string; user: { id: string; name: string; firstName: string; lastName: string; phone: string; email: string } } | null;
-  onNavigate: (page: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement") => void;
+  activePage: PageView;
+  auth: AuthState;
+  onNavigate: (page: PageView) => void;
   onLogout: () => void;
 };
 
@@ -105,12 +108,12 @@ const NavLinks = styled.div`
   }
 `;
 
-const NavLink = styled.button<{ active?: boolean }>`
+const NavLink = styled.button<{$active?: boolean}>`
   padding: 8px 14px;
   border-radius: ${theme.radii.small};
   background: transparent;
-  color: ${({ active }) => (active ? theme.colors.primary : theme.colors.textSecondary)};
-  font-weight: ${({ active }) => (active ? 600 : 500)};
+  color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.textSecondary)};
+  font-weight: ${({ $active }) => ($active ? 600 : 500)};
   font-size: 14px;
   transition: all 0.2s ease;
 
@@ -186,11 +189,11 @@ const MobileMenu = styled.div`
   }
 `;
 
-const MobileLink = styled.button<{ active?: boolean }>`
+const MobileLink = styled.button<{$active?: boolean}>`
   padding: 12px 16px;
   border-radius: ${theme.radii.small};
-  background: ${({ active }) => (active ? theme.colors.primaryLight : "transparent")};
-  color: ${({ active }) => (active ? theme.colors.primary : theme.colors.text)};
+  background: ${({ $active }) => ($active ? theme.colors.primaryLight : "transparent")};
+  color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.text)};
   font-weight: 500;
   font-size: 15px;
   text-align: left;
@@ -209,12 +212,138 @@ const MobileDivider = styled.div`
   margin: 8px 0;
 `;
 
+// Avatar Dropdown styles
+const AvatarButton = styled.button`
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-radius: ${theme.radii.small};
+  background: transparent;
+  color: ${theme.colors.textSecondary};
+  font-weight: 500;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: 1px solid transparent;
+
+  &:hover {
+    background: ${theme.colors.primaryLight};
+    color: ${theme.colors.primary};
+  }
+`;
+
+const AvatarCircle = styled.div`
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: ${theme.colors.primary};
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  font-family: 'Playfair Display', Georgia, serif;
+  border: 2px solid ${theme.colors.gold};
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const DropdownMenu = styled.div`
+  position: absolute;
+  top: 70px;
+  right: 24px;
+  width: 200px;
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.large};
+  box-shadow: 0 10px 40px rgba(26, 26, 24, 0.15);
+  padding: 8px;
+  z-index: 99;
+
+  @media (max-width: 768px) {
+    right: 20px;
+  }
+
+  @media (max-width: 480px) {
+    right: 16px;
+  }
+`;
+
+const DropdownItem = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border: none;
+  background: transparent;
+  color: ${theme.colors.text};
+  font-size: 14px;
+  font-weight: 500;
+  border-radius: ${theme.radii.small};
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: left;
+
+  &:hover {
+    background: ${theme.colors.primaryLight};
+    color: ${theme.colors.primary};
+  }
+`;
+
+const DropdownDivider = styled.div`
+  height: 1px;
+  background: ${theme.colors.borderLight};
+  margin: 6px 0;
+`;
+
+const NavBarWrapper = styled.div`
+  position: relative;
+  display: inline-block;
+`;
+
 export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const handleNavigate = (page: "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement") => {
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setDropdownOpen(false);
+      }
+    };
+
+    if (dropdownOpen) {
+      document.addEventListener("mousedown", handleClickOutside);
+    }
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [dropdownOpen]);
+
+  const handleNavigate = (page: PageView) => {
     setMenuOpen(false);
+    setDropdownOpen(false);
     onNavigate(page);
+  };
+
+  const getInitials = (name: string): string => {
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .slice(0, 2)
+      .toUpperCase();
   };
 
   return (
@@ -235,13 +364,13 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         <NavLinks>
           {!auth && (
             <>
-              <NavLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+              <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
                 Home
               </NavLink>
-              <NavLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+              <NavLink $active={activePage === "about"} onClick={() => handleNavigate("about")}>
                 About Us
               </NavLink>
-              <NavLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+              <NavLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
                 Contact
               </NavLink>
             </>
@@ -250,16 +379,47 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
         <Actions>
           {auth ? (
-            <>
-              <Button variant="outline" onClick={() => handleNavigate("dashboard")}>
-                <LayoutDashboard size={16} />
-                Dashboard
-              </Button>
-              <Button variant="primary" onClick={onLogout}>
-                <LogOut size={16} />
-                Logout
-              </Button>
-            </>
+            <NavBarWrapper ref={dropdownRef}>
+              <AvatarButton
+                onClick={() => setDropdownOpen((current) => !current)}
+                aria-label="Toggle user menu"
+              >
+                <AvatarCircle>
+                  {auth.user.avatar_url ? (
+                    <img src={auth.user.avatar_url} alt={auth.user.name} />
+                  ) : (
+                    getInitials(auth.user.name)
+                  )}
+                </AvatarCircle>
+                <span>{auth.user.name}</span>
+                <ChevronDown size={14} />
+              </AvatarButton>
+
+              {dropdownOpen && (
+                <DropdownMenu>
+                  <DropdownItem onClick={() => handleNavigate("dashboard")}>
+                    <LayoutDashboard size={16} />
+                    Dashboard
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleNavigate("edit-profile")}>
+                    <User size={16} />
+                    Edit Profile
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleNavigate("settings")}>
+                    <Settings size={16} />
+                    Settings
+                  </DropdownItem>
+                  <DropdownDivider />
+                  <DropdownItem onClick={() => {
+                    setDropdownOpen(false);
+                    onLogout();
+                  }}>
+                    <LogOut size={16} />
+                    Logout
+                  </DropdownItem>
+                </DropdownMenu>
+              )}
+            </NavBarWrapper>
           ) : (
             <>
               <Button variant="outline" onClick={() => handleNavigate("login")}>
@@ -283,13 +443,13 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         <MobileMenu>
           {!auth && (
             <>
-              <MobileLink active={activePage === "home"} onClick={() => handleNavigate("home")}>
+              <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
                 Home
               </MobileLink>
-              <MobileLink active={activePage === "about"} onClick={() => handleNavigate("about")}>
+              <MobileLink $active={activePage === "about"} onClick={() => handleNavigate("about")}>
                 About Us
               </MobileLink>
-              <MobileLink active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+              <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
                 Contact
               </MobileLink>
               <MobileDivider />
@@ -298,22 +458,34 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
           {auth ? (
             <>
-              <MobileLink active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
+              <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
                 <LayoutDashboard size={18} />
                 Dashboard
               </MobileLink>
-              <MobileLink onClick={() => { setMenuOpen(false); onLogout(); }}>
+              <MobileLink $active={activePage === "edit-profile"} onClick={() => handleNavigate("edit-profile")}>
+                <User size={18} />
+                Edit Profile
+              </MobileLink>
+              <MobileLink $active={activePage === "settings"} onClick={() => handleNavigate("settings")}>
+                <Settings size={18} />
+                Settings
+              </MobileLink>
+              <MobileDivider />
+              <MobileLink onClick={() => {
+                setMenuOpen(false);
+                onLogout();
+              }}>
                 <LogOut size={18} />
                 Logout
               </MobileLink>
             </>
           ) : (
             <>
-              <MobileLink active={activePage === "login"} onClick={() => handleNavigate("login")}>
+              <MobileLink $active={activePage === "login"} onClick={() => handleNavigate("login")}>
                 <LogIn size={18} />
                 Sign In
               </MobileLink>
-              <MobileLink active={activePage === "create"} onClick={() => handleNavigate("create")}>
+              <MobileLink $active={activePage === "create"} onClick={() => handleNavigate("create")}>
                 <UserPlus size={18} />
                 Create Account
               </MobileLink>

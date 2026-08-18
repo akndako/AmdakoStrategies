@@ -4,8 +4,9 @@ import SignatureCanvas from "react-signature-canvas";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import type { PageView } from "../App";
-import { FileText, Download, Eraser, ArrowLeft } from "lucide-react";
+import { FileText, Download, Eraser, ArrowLeft, Loader2 } from "lucide-react";
 import { theme } from "../theme";
+import { saveAgreement } from "../services/agreementService";
 
 // Fix for TypeScript error: 'SignatureCanvas' cannot be used as a JSX component.
 const SignatureCanvasComponent = SignatureCanvas as any;
@@ -18,6 +19,10 @@ type AgreementFormPageProps = {
     lastName: string;
     phone: string;
     email: string;
+    address: string;
+    location: string;
+    stateOfOrigin: string;
+    monthlyRoi: number;
   };
   onNavigate: (page: PageView) => void;
 };
@@ -282,7 +287,7 @@ const DownloadButton = styled(Button)`
   background: ${theme.colors.success} !important;
 
   &:hover {
-    background: #08916d !important;
+    background: #015a9e !important;
   }
 `;
 
@@ -297,8 +302,8 @@ const ClearButton = styled(Button)`
 export default function AgreementFormPage({ user, onNavigate }: AgreementFormPageProps) {
   const [name, setName] = useState(user.name);
   const [email, setEmail] = useState(user.email);
-  const [address, setAddress] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState(user.address || "");
+  const [phoneNumber, setPhoneNumber] = useState(user.phone || "");
   const [occupation, setOccupation] = useState("");
   const [idNumber, setIdNumber] = useState("");
   const [idTypes, setIdTypes] = useState({
@@ -320,6 +325,8 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
   const [returnsPhoneNumber, setReturnsPhoneNumber] = useState("");
   const date = new Date().toISOString().split("T")[0];
   const [submitted, setSubmitted] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const sigCanvas = useRef<SignatureCanvas>(null);
   const formRef = useRef<HTMLDivElement>(null);
   const agreementTextRef = useRef<HTMLDivElement>(null);
@@ -332,11 +339,58 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
     sigCanvas.current?.clear();
   };
 
-  const handleSubmit = () => {
-    if (!sigCanvas.current?.isEmpty()) {
-      setSubmitted(true);
-    } else {
+  const getSelectedIdType = (): "nationalId" | "votersCard" | "internationalPassport" | "driversLicense" | null => {
+    if (idTypes.nationalId) return "nationalId";
+    if (idTypes.votersCard) return "votersCard";
+    if (idTypes.internationalPassport) return "internationalPassport";
+    if (idTypes.driversLicense) return "driversLicense";
+    return null;
+  };
+
+  const handleSubmit = async () => {
+    if (sigCanvas.current?.isEmpty()) {
       alert("Please sign the agreement before submitting.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const signatureDataUrl = sigCanvas.current?.toDataURL?.() || null;
+
+      await saveAgreement({
+        user_id: user.id,
+        full_name: name,
+        address: address || null,
+        phone: phoneNumber || user.phone,
+        email,
+        id_type: getSelectedIdType(),
+        id_number: idNumber || null,
+        investment_amount: Number(investmentAmount) || 0,
+        monthly_roi: user.monthlyRoi || 10,
+        start_date: startDate,
+        maturity_date: maturityDate || null,
+        payment_method: paymentMethod,
+        payment_bank_name: paymentBankName || null,
+        payment_account_name: paymentAccountName || null,
+        transaction_reference: transactionReference || null,
+        returns_bank_name: returnsBankName || null,
+        returns_account_number: returnsAccountNumber || null,
+        returns_account_name: returnsAccountName || null,
+        returns_phone_number: returnsPhoneNumber || null,
+        signature_url: signatureDataUrl,
+        status: "pending",
+        signed_at: new Date().toISOString(),
+      });
+
+      setSubmitted(true);
+    } catch (err) {
+      const message = err instanceof Error ? err.message : "Unable to save the agreement. Please try again.";
+      console.error("Agreement save error:", err);
+      setError(message);
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -524,7 +578,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
             <label>Expected ROI</label>
             <input
               type="text"
-              value="10% Monthly returns on investment"
+              value={`${user.monthlyRoi || 10}% Monthly returns on investment`}
               readOnly
               className="readonly"
             />
@@ -626,15 +680,30 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
             />
           </SignatureContainer>
 
+          {error && (
+            <div style={{
+              background: "rgba(179, 64, 58, 0.08)",
+              border: "1px solid rgba(179, 64, 58, 0.25)",
+              color: theme.colors.danger,
+              padding: "12px 16px",
+              borderRadius: theme.radii.medium,
+              fontSize: "14px",
+              marginBottom: "16px",
+              lineHeight: 1.5,
+            }}>
+              {error}
+            </div>
+          )}
+
           <ButtonGroup>
-            <ClearButton onClick={clearSignature}>
+            <ClearButton onClick={clearSignature} disabled={saving}>
               <Eraser size={16} />
               Clear Signature
             </ClearButton>
             {!submitted ? (
-              <Button onClick={handleSubmit}>
-                <FileText size={16} />
-                Submit Agreement
+              <Button onClick={handleSubmit} disabled={saving}>
+                {saving ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <FileText size={16} />}
+                {saving ? "Saving..." : "Submit Agreement"}
               </Button>
             ) : (
               <DownloadButton onClick={downloadAgreement}>
@@ -642,7 +711,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
                 Download Agreement
               </DownloadButton>
             )}
-            <Button variant="outline" onClick={() => onNavigate("dashboard")}>
+            <Button variant="outline" onClick={() => onNavigate("dashboard")} disabled={saving}>
               <ArrowLeft size={16} />
               Back to Dashboard
             </Button>

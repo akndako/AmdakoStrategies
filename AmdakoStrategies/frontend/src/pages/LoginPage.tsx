@@ -4,17 +4,7 @@ import { Mail, Lock, ArrowRight } from "lucide-react";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { theme } from "../theme";
 import { logIn } from "../lib/auth";
-
-type AuthUser = {
-  id: string;
-  name: string;
-  firstName: string;
-  lastName: string;
-  phone: string;
-  email: string;
-};
-
-type AuthState = { token: string; user: AuthUser };
+import type { AuthState } from "../types";
 
 type LoginPageProps = {
   onAuthSuccess: (auth: AuthState) => void;

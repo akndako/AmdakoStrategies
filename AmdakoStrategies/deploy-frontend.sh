@@ -42,8 +42,8 @@ cat > "$FRONTEND_DIR/.htaccess" << 'HTACCESS'
 # Security and MIME Headers
 <IfModule mod_headers.c>
     Header set X-Content-Type-Options "nosniff"
-    # Updated CSP to allow 'eval' for libraries like jsPDF/html2canvas
-    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
+    # Updated CSP to allow 'eval' for libraries like jsPDF/html2canvas and Supabase
+    Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng https://dsepwmthxtgkwgemaglv.supabase.co wss://dsepwmthxtgkwgemaglv.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
 </IfModule>
 
 # Standard MIME Types

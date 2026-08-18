@@ -128,7 +128,7 @@ const IconBox = styled.div`
   align-items: center;
   justify-content: center;
   margin-bottom: 18px;
-  border: 1px solid rgba(11, 61, 46, 0.1);
+  border: 1px solid rgba(2, 113, 196, 0.1);
 `;
 
 const CardTitle = styled.h3`

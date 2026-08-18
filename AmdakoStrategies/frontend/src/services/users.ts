@@ -36,6 +36,22 @@ export const usersService: UsersService = {
   },
 
   getProfileById: async (id: string): Promise<Profile | null> => {
+    const user = await getCurrentUser();
+    if (!user) return null;
+
+    // Prevent cross-user data access: users can only fetch their own profile
+    // Admins can fetch any profile
+    const { data: currentProfile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (currentProfile?.role !== "admin" && id !== user.id) {
+      console.warn("Unauthorized: Attempted to access another user's profile");
+      return null;
+    }
+
     const { data, error } = await supabase
       .from("profiles")
       .select("*")
@@ -104,11 +120,15 @@ export const usersService: UsersService = {
     return data || [];
   },
 
-  // Records methods
+  // Records methods - all scoped to the current user to prevent cross-user data access
   getRecords: async (): Promise<Record[]> => {
+    const user = await getCurrentUser();
+    if (!user) return [];
+
     const { data, error } = await supabase
       .from("records")
       .select("*")
+      .eq("user_id", user.id)
       .order("created_at", { ascending: false });
 
     if (error) {
@@ -119,10 +139,14 @@ export const usersService: UsersService = {
   },
 
   getRecordById: async (id: string): Promise<Record | null> => {
+    const user = await getCurrentUser();
+    if (!user) return null;
+
     const { data, error } = await supabase
       .from("records")
       .select("*")
       .eq("id", id)
+      .eq("user_id", user.id)
       .single();
 
     if (error) {
@@ -172,6 +196,7 @@ export const usersService: UsersService = {
         type: data.type,
       })
       .eq("id", id)
+      .eq("user_id", user.id)
       .select()
       .single();
 
@@ -192,7 +217,8 @@ export const usersService: UsersService = {
     const { error: deleteError } = await supabase
       .from("records")
       .delete()
-      .eq("id", id);
+      .eq("id", id)
+      .eq("user_id", user.id);
 
     if (deleteError) {
       console.error("Error deleting record:", deleteError);
