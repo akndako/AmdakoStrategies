@@ -18,15 +18,15 @@ jobs:
         with:
           node-version: '20'
           cache: 'npm'
-          cache-dependency-path: package-lock.json
+          cache-dependency-path: AmdakoStrategies/package-lock.json
  
 
       - name: Install frontend dependencies
-        working-directory: frontend
+        working-directory: AmdakoStrategies/frontend
         run: npm ci
 
       - name: Build frontend
-        working-directory: frontend
+        working-directory: AmdakoStrategies/frontend
         run: npm run build
         env:
           VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
@@ -34,8 +34,8 @@ jobs:
 
       - name: Verify build output
         run: |
-          test -f frontend/dist/index.html && echo "✅ index.html exists"
-          test -d frontend/dist/assets && echo "✅ assets folder exists"
+          test -f AmdakoStrategies/frontend/dist/index.html && echo "✅ index.html exists"
+          test -d AmdakoStrategies/frontend/dist/assets && echo "✅ assets folder exists"
 
       - name: Prepare server (create dir & clean old assets)
         uses: appleboy/ssh-action@v1.0.3
@@ -60,7 +60,7 @@ jobs:
           username: ${{ secrets.SSH_USERNAME }}
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: ${{ secrets.SSH_PORT || '22' }}
-          source: "frontend/dist/*"
+          source: "AmdakoStrategies/frontend/dist/*"
           target: "/home/${{ secrets.SSH_USERNAME }}/public_html/amdako"
           strip_components: 2
 
