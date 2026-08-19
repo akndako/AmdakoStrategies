@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Mail, Phone, MapPin, Globe, Twitter, Send, Facebook } from "lucide-react";
+import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
 import { theme } from "../theme";
 
 const FooterContainer = styled.footer`
