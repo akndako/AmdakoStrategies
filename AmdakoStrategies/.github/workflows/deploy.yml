@@ -1,0 +1,121 @@
+name: Auto Deploy to SmartWeb cPanel
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch: # Allow manual trigger from GitHub Actions tab
+
+jobs:
+  deploy:
+    name: Build & Deploy Frontend
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        working-directory: frontend
+        run: npm ci
+
+      - name: Build frontend
+        working-directory: frontend
+        run: npm run build
+        env:
+          VITE_SUPABASE_URL: ${{ secrets.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ secrets.VITE_SUPABASE_ANON_KEY }}
+
+      - name: Verify build output
+        run: |
+          test -f frontend/dist/index.html && echo "✅ index.html exists"
+          test -d frontend/dist/assets && echo "✅ assets folder exists"
+
+      - name: Prepare server (create dir & clean old assets)
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script: |
+            DEPLOY_DIR="/home/${{ secrets.SSH_USERNAME }}/public_html/amdako"
+            mkdir -p "$DEPLOY_DIR"
+            # Remove old assets to prevent stale/deleted files lingering
+            rm -rf "$DEPLOY_DIR/assets"
+            rm -f "$DEPLOY_DIR/index.html"
+            # Keep .htaccess (will be re-created/verified later)
+            echo "✅ Server directory ready: $DEPLOY_DIR"
+
+      - name: Deploy to SmartWeb via SSH
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          source: "frontend/dist/*"
+          target: "/home/${{ secrets.SSH_USERNAME }}/public_html/amdako"
+          strip_components: 2
+
+      - name: Set permissions & create .htaccess
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT || '22' }}
+          script: |
+            DEPLOY_DIR="/home/${{ secrets.SSH_USERNAME }}/public_html/amdako"
+
+            # Set proper permissions
+            chmod -R 755 "$DEPLOY_DIR"
+            find "$DEPLOY_DIR" -type f -exec chmod 644 {} \;
+
+            # Create .htaccess for SPA routing if it doesn't exist
+            HTACCESS="/home/${{ secrets.SSH_USERNAME }}/public_html/amdako/.htaccess"
+            if [ ! -f "$HTACCESS" ]; then
+              cat > "$HTACCESS" << 'EOF'
+            <IfModule mod_headers.c>
+                Header set X-Content-Type-Options "nosniff"
+                Header always set Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob:; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng https://dsepwmthxtgkwgemaglv.supabase.co wss://dsepwmthxtgkwgemaglv.supabase.co; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
+            </IfModule>
+
+            AddType application/javascript .js
+            AddType application/javascript .mjs
+            AddType text/css .css
+
+            <IfModule mod_rewrite.c>
+                RewriteEngine On
+
+                # 1. Force HTTPS
+                RewriteCond %{HTTPS} off
+                RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
+
+                RewriteBase /
+
+                # 2. Fix MIME issues: Do NOT rewrite requests for static assets that don't exist
+                RewriteCond %{REQUEST_FILENAME} !-f
+                RewriteRule \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|otf)$ - [L,R=404]
+
+                # 3. SPA Routing: Handle deep-linking by sending all non-file requests to index.html
+                RewriteCond %{REQUEST_FILENAME} !-f
+                RewriteCond %{REQUEST_FILENAME} !-d
+                RewriteRule ^ index.html [L]
+            </IfModule>
+            EOF
+              chmod 644 "$HTACCESS"
+              echo "✅ .htaccess created"
+            else
+              echo "✅ .htaccess already exists"
+            fi
+
+            # Verify deployment
+            echo "📁 Deployed files:"
+            ls -la /home/${{ secrets.SSH_USERNAME }}/public_html/amdako/ | head -20
+            echo "✅ Deployment complete to https://amdakostrategies.com.ng"
