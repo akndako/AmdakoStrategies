@@ -5,9 +5,11 @@ import LoadingSpinner from "../components/LoadingSpinner";
 import { theme } from "../theme";
 import { signUp } from "../lib/auth";
 import type { AuthState } from "../types";
+import type { PageView } from "../App";
 
 type CreateAccountPageProps = {
   onSignUpSuccess: (auth: AuthState) => void;
+  onNavigate: (page: PageView) => void;
 };
 
 const Page = styled.section`
@@ -197,7 +199,35 @@ const ErrorMessage = styled.div`
   font-size: 14px;
 `;
 
-export default function CreateAccountPage({ onSignUpSuccess }: CreateAccountPageProps) {
+const CardFooter = styled.div`
+  margin-top: 28px;
+  padding-top: 24px;
+  border-top: 1px solid ${theme.colors.borderLight};
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  font-size: 14px;
+  color: ${theme.colors.textSecondary};
+`;
+
+const InlineLink = styled.button`
+  appearance: none;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  font-weight: 600;
+  color: ${theme.colors.primary};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.colors.primaryDark};
+    text-decoration: underline;
+  }
+`;
+
+export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: CreateAccountPageProps) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [phone, setPhone] = useState("");
@@ -352,6 +382,18 @@ export default function CreateAccountPage({ onSignUpSuccess }: CreateAccountPage
           {error && <ErrorMessage>{error}</ErrorMessage>}
           <Notice>By creating an account, you agree to our terms of service and privacy policy.</Notice>
         </Form>
+
+        <CardFooter>
+          <p>
+            Already registered?{" "}
+            <InlineLink type="button" onClick={() => onNavigate("login")}>
+              Sign in
+            </InlineLink>
+          </p>
+          <InlineLink type="button" onClick={() => onNavigate("home")}>
+            ← Back to home
+          </InlineLink>
+        </CardFooter>
       </Card>
     </Page>
   );

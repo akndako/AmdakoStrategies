@@ -1,5 +1,5 @@
 import styled from "styled-components";
-import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
+import { Mail, Phone, MapPin, Globe } from "lucide-react";
 import { theme } from "../theme";
 
 const FooterContainer = styled.footer`
@@ -211,38 +211,13 @@ const Bottom = styled.div`
   }
 `;
 
-const Social = styled.div`
-  display: flex;
-  gap: 8px;
-  align-items: center;
-
-  a {
-    width: 32px;
-    height: 32px;
-    border-radius: ${theme.radii.small};
-    background: rgba(255, 255, 255, 0.08);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: rgba(255, 255, 255, 0.7);
-    text-decoration: none;
-    transition: all 0.2s ease;
-
-    &:hover {
-      background: ${theme.colors.gold};
-      color: ${theme.colors.primaryDark};
-      transform: translateY(-1px);
-    }
-  }
-`;
-
 export default function Footer() {
   return (
     <FooterContainer>
       <Container>
         <Top>
           <BrandColumn>
-            <h3>Amdako <span>Strategies</span></h3>
+            <h3><span>Amdakostrategies</span></h3>
             <div className="rc">AMDAKO STRATEGY NIG. LTD. — RC. 9560518</div>
             <p>
               A Strategic Wealth Creation, Digital Finance and Institutional Partnership Company —
@@ -303,7 +278,7 @@ export default function Footer() {
         <Bottom>
           <p>© {new Date().getFullYear()} Amdako Strategy Nig. Ltd. All rights reserved. | RC. 9560518</p>
 
-          <Social>
+          {/* <Social>
             <a href="#twitter" title="Twitter">
               <Twitter size={14} />
             </a>
@@ -313,7 +288,7 @@ export default function Footer() {
             <a href="#facebook" title="Facebook">
               <Facebook size={14} />
             </a>
-          </Social>
+          </Social> */}
         </Bottom>
       </Container>
     </FooterContainer>

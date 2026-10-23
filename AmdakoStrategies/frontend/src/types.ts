@@ -64,6 +64,7 @@ export type Database = {
           id: string;
           user_id: string;
           full_name: string;
+          occupation: string | null;
           address: string | null;
           phone: string;
           email: string;
@@ -92,6 +93,7 @@ export type Database = {
           id?: string;
           user_id: string;
           full_name: string;
+          occupation?: string | null;
           address?: string;
           phone: string;
           email: string;
@@ -116,6 +118,7 @@ export type Database = {
         };
         Update: {
           full_name?: string;
+          occupation?: string | null;
           address?: string;
           phone?: string;
           email?: string;
@@ -365,7 +368,7 @@ export type Database = {
         };
       };
     };
-    Views: {};
+    Views: { [_ in never]: never };
     Functions: {
       has_role: {
         Args: {
@@ -444,6 +447,7 @@ export type Agreement = {
   id: string;
   user_id: string;
   full_name: string;
+  occupation: string | null;
   address: string | null;
   phone: string;
   email: string;

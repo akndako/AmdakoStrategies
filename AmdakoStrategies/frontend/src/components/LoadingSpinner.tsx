@@ -31,9 +31,9 @@ interface LoadingSpinnerProps {
 
 export default function LoadingSpinner({ message = "Loading..." }: LoadingSpinnerProps) {
   return (
-    <LoadingContainer>
-      <Spinner />
-      {message}
+    <LoadingContainer role="status" aria-live="polite" aria-busy="true">
+      <Spinner aria-hidden="true" />
+      <span>{message}</span>
     </LoadingContainer>
   );
 }

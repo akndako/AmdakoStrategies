@@ -8,6 +8,14 @@ export const GlobalStyles = createGlobalStyle`
   html {
     scroll-behavior: smooth;
     min-height: 100%;
+
+    @media (prefers-reduced-motion: reduce) {
+      scroll-behavior: auto;
+    }
+  }
+
+  #main-content:focus {
+    outline: none;
   }
 
   body {
@@ -20,6 +28,23 @@ export const GlobalStyles = createGlobalStyle`
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    overflow-x: clip;
+  }
+
+  img,
+  video,
+  svg {
+    max-width: 100%;
+    height: auto;
+  }
+
+  table {
+    max-width: 100%;
+  }
+
+  [id^="home-"],
+  [id^="about-"] {
+    scroll-margin-top: 120px;
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -109,12 +134,23 @@ export const GlobalStyles = createGlobalStyle`
   button {
     cursor: pointer;
     border: none;
-    outline: none;
     font-family: inherit;
   }
 
   input, select, textarea {
     font-family: inherit;
+  }
+
+  :focus-visible {
+    outline: 2px solid #0271c4;
+    outline-offset: 2px;
+  }
+
+  button:focus:not(:focus-visible),
+  input:focus:not(:focus-visible),
+  select:focus:not(:focus-visible),
+  textarea:focus:not(:focus-visible) {
+    outline: none;
   }
 
   ::selection {

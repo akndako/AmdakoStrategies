@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
+import { motion, useReducedMotion } from "framer-motion";
 import {
   User,
   Mail,
@@ -11,8 +12,10 @@ import {
   ArrowLeft,
   CheckCircle,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 import { theme } from "../theme";
+import { changePassword } from "../lib/auth";
 import { updateProfile, getCurrentProfile } from "../services/profileService";
 import type { AuthUser, Profile } from "../types";
 import type { PageView } from "../App";
@@ -23,10 +26,13 @@ type SettingsPageProps = {
   onAuthUpdate: (user: AuthUser) => void;
 };
 
-const Page = styled.section`
+const Page = styled(motion.section)`
   min-height: calc(100vh - 68px);
   padding: 80px 24px;
-  background: ${theme.colors.ivory};
+  background:
+    linear-gradient(135deg, rgba(2, 113, 196, 0.045), transparent 42%),
+    linear-gradient(315deg, rgba(201, 162, 39, 0.055), transparent 36%),
+    ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 60px 20px;
@@ -37,16 +43,17 @@ const Page = styled.section`
   }
 `;
 
-const Container = styled.div`
+const Container = styled(motion.div)`
   max-width: 800px;
   margin: 0 auto;
 `;
 
-const Header = styled.div`
+const Header = styled(motion.div)`
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 32px;
+  flex-wrap: wrap;
 
   .eyebrow {
     font-size: 12px;
@@ -60,6 +67,7 @@ const Header = styled.div`
     font-size: 28px;
     color: ${theme.colors.text};
     margin: 0;
+    line-height: 1.2;
 
     @media (max-width: 480px) {
       font-size: 24px;
@@ -79,21 +87,46 @@ const BackButton = styled.button`
   font-weight: 600;
   color: ${theme.colors.textSecondary};
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
+    transform 0.2s ease;
 
   &:hover {
     background: ${theme.colors.primaryLight};
     color: ${theme.colors.primary};
+    border-color: ${theme.colors.primary};
+    transform: translateY(-1px);
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(2, 113, 196, 0.3);
+    outline-offset: 2px;
   }
 `;
 
-const Card = styled.div`
+const Card = styled(motion.div)`
+  position: relative;
+  overflow: hidden;
   background: #fff;
   border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
+  border-radius: ${theme.radii.large};
   padding: 36px;
   box-shadow: ${theme.shadows.card};
   margin-bottom: 24px;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 0 auto;
+    height: 3px;
+    background: linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.gold});
+    opacity: 0.7;
+  }
+
+  &:hover {
+    border-color: ${theme.colors.borderLight};
+    box-shadow: ${theme.shadows.cardHover};
+  }
 
   @media (max-width: 768px) {
     padding: 28px;
@@ -114,6 +147,7 @@ const CardTitle = styled.h3`
 
   svg {
     color: ${theme.colors.gold};
+    flex: 0 0 auto;
   }
 `;
 
@@ -161,7 +195,7 @@ const Input = styled.input`
   padding: 14px 16px 14px 44px;
   color: ${theme.colors.text};
   font-size: 15px;
-  transition: all 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 
   &::placeholder {
     color: ${theme.colors.textMuted};
@@ -171,6 +205,12 @@ const Input = styled.input`
     outline: none;
     border-color: ${theme.colors.primary};
     box-shadow: 0 0 0 4px ${theme.colors.primaryLight};
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    background: #f7f7f5;
+    color: ${theme.colors.textMuted};
   }
 `;
 
@@ -188,7 +228,7 @@ const Button = styled.button`
   justify-content: center;
   gap: 8px;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   box-shadow: ${theme.shadows.button};
 
   &:hover {
@@ -202,6 +242,11 @@ const Button = styled.button`
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
+  }
+
+  &:focus-visible {
+    outline: 3px solid rgba(2, 113, 196, 0.3);
+    outline-offset: 3px;
   }
 `;
 
@@ -231,7 +276,7 @@ const SuccessMessage = styled.div`
   font-size: 14px;
 `;
 
-const ActionRow = styled.div`
+const ActionRow = styled(motion.div)`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -250,7 +295,28 @@ const Notice = styled.p`
   line-height: 1.6;
 `;
 
+const pageVariants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3 } },
+};
+
 export default function SettingsPage({ user, onNavigate, onAuthUpdate }: SettingsPageProps) {
+  const shouldReduceMotion = useReducedMotion();
+  const containerVariants = {
+    hidden: {},
+    visible: {
+      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.08 },
+    },
+  };
+  const sectionVariants = {
+    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { duration: shouldReduceMotion ? 0 : 0.35 },
+    },
+  };
+
   const [firstName, setFirstName] = useState(user.firstName || "");
   const [lastName, setLastName] = useState(user.lastName || "");
   const [phone, setPhone] = useState(user.phone || "");
@@ -261,6 +327,12 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [pwLoading, setPwLoading] = useState(false);
+  const [pwError, setPwError] = useState<string | null>(null);
+  const [pwSuccess, setPwSuccess] = useState<string | null>(null);
 
   // Load current profile data on mount
   useEffect(() => {
@@ -330,10 +402,41 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
     }
   };
 
+  const handleChangePassword = async () => {
+    if (newPassword.length < 6) {
+      setPwError("Password must be at least 6 characters long.");
+      return;
+    }
+    if (newPassword !== confirmPassword) {
+      setPwError("Passwords do not match. Please try again.");
+      return;
+    }
+
+    setPwLoading(true);
+    setPwError(null);
+    setPwSuccess(null);
+
+    try {
+      const { error } = await changePassword(currentPassword, newPassword);
+      if (error) {
+        setPwError(error.message || "Unable to change your password. Please try again.");
+        return;
+      }
+      setPwSuccess("Your password has been changed successfully.");
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setPwError((err as Error)?.message || "Unable to change your password. Please try again.");
+    } finally {
+      setPwLoading(false);
+    }
+  };
+
   return (
-    <Page>
-      <Container>
-        <Header>
+    <Page initial="hidden" animate="visible" variants={pageVariants}>
+      <Container variants={containerVariants}>
+        <Header variants={sectionVariants}>
           <BackButton onClick={() => onNavigate("dashboard")}>
             <ArrowLeft size={16} />
             Back to Dashboard
@@ -358,7 +461,7 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
           </SuccessMessage>
         )}
 
-        <Card>
+        <Card variants={sectionVariants}>
           <CardTitle>
             <User size={18} />
             Personal Information
@@ -468,7 +571,7 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
           </FormGrid>
         </Card>
 
-        <Card>
+        <Card variants={sectionVariants}>
           <CardTitle>Investment Information</CardTitle>
           <FormGrid>
             <Field>
@@ -484,7 +587,76 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
           </FormGrid>
         </Card>
 
-        <ActionRow>
+        <Card variants={sectionVariants}>
+          <CardTitle>
+            <Lock size={18} />
+            Change Password
+          </CardTitle>
+          {pwError && (
+            <ErrorMessage>
+              <AlertCircle size={16} /> {pwError}
+            </ErrorMessage>
+          )}
+          {pwSuccess && (
+            <SuccessMessage>
+              <CheckCircle size={16} /> {pwSuccess}
+            </SuccessMessage>
+          )}
+          <FormGrid>
+            <Field>
+              Current password
+              <InputWrapper>
+                <Lock size={18} />
+                <Input
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  type="password"
+                  placeholder="Enter your current password"
+                  disabled={pwLoading}
+                  autoComplete="current-password"
+                />
+              </InputWrapper>
+            </Field>
+
+            <Row>
+              <Field>
+                New password
+                <InputWrapper>
+                  <Lock size={18} />
+                  <Input
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    type="password"
+                    placeholder="Enter a new password"
+                    disabled={pwLoading}
+                    autoComplete="new-password"
+                  />
+                </InputWrapper>
+              </Field>
+
+              <Field>
+                Confirm new password
+                <InputWrapper>
+                  <Lock size={18} />
+                  <Input
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    type="password"
+                    placeholder="Re-enter your new password"
+                    disabled={pwLoading}
+                    autoComplete="new-password"
+                  />
+                </InputWrapper>
+              </Field>
+            </Row>
+
+            <Button onClick={handleChangePassword} disabled={pwLoading}>
+              {pwLoading ? "Updating..." : "Update Password"}
+            </Button>
+          </FormGrid>
+        </Card>
+
+        <ActionRow variants={sectionVariants}>
           <Button onClick={handleSave} disabled={loading}>
             {loading ? "Saving..." : "Save Changes"}
             {!loading && <Save size={16} />}

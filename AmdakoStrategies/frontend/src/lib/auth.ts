@@ -18,6 +18,7 @@ const mapSupabaseUser = (supabaseUser: {
   const monthlyRoi = typeof meta.monthly_roi === "number" ? meta.monthly_roi : 10;
   const avatarUrl = typeof meta.avatar_url === "string" ? meta.avatar_url : null;
 
+  
   return {
     id: supabaseUser.id,
     name: fullName || supabaseUser.email?.split("@")[0] || "",
@@ -154,3 +155,137 @@ export async function isAdmin(): Promise<boolean> {
 }
 
 export type { AuthUser, AuthState };
+
+// ===== Password Recovery & Change (by phone number) =====
+
+// Normalize Nigerian phone numbers for comparison. This allows the local
+// 0803... form and the international +234803... form to resolve the same user.
+export function normalizePhone(phone: string): string {
+  const digits = (phone || "").replace(/[^\d]/g, "");
+  if (digits.startsWith("234")) return digits;
+  if (digits.startsWith("0")) return `234${digits.slice(1)}`;
+  return digits;
+}
+
+// Resolve the email linked to a phone number (via a security-definer RPC on the server)..
+// Returns null when no account matches.
+
+export async function findEmailByPhone(phone: string): Promise<string | null> {
+  const normalized = normalizePhone(phone);
+  if (!normalized) return null;
+
+  const { data, error } = await supabase.rpc("find_email_by_phone", { p_phone: normalized });
+  if (error) {
+    console.error("Error resolving email by phone:", error);
+    throw error;
+  }
+
+  const rows = (data ?? []) as Array<{ email?: string | null }>;
+  return rows.length > 0 ? (rows[0].email ?? null) : null;
+}
+
+// Request a verification code email for the account linked to the given phone number.
+// The account's email is resolved on the server (find_email_by_phone), then Supabase
+// emails a numerical code to it. Returns a generic success result so we never reveal
+// whether an account exists (anti-enumeration). Only hard failures (rate limits,
+// network errors) surface. `email` is returned internally so the caller can verify
+// the code with verifyPasswordResetCode.
+export async function sendPasswordResetCodeByPhone(
+  phone: string
+): Promise<{ success: boolean; error: Error | null; email: string | null }> {
+  try {
+    const email = await findEmailByPhone(phone);
+    if (!email) {
+      // Deliberately generic: never reveal that the phone number is unknown.
+
+
+      return { success: true, error: null, email: null };
+    }
+
+    const { error } = await supabase.auth.signInWithOtp({
+      email,
+      options: {
+        shouldCreateUser: false,
+      },
+    });
+
+    if (error) {
+      // If the linked account no longer exists (or signups are blocked), respond
+      // generically rather than leaking whether the account is still active.
+      const message = (error.message || "").toLowerCase();
+      if (message.includes("signup") || message.includes("not found")) {
+        return { success: true, error: null, email: null };
+      }
+      console.error("Error sending verification code:", error);
+      return { success: false, error, email: null };
+    }
+
+    return { success: true, error: null, email };
+  } catch (err) {
+    console.error("Error sending verification code:", err);
+    return { success: false, error: (err as Error) || new Error("Unable to send a verification code."), email: null };
+  }
+}
+
+// Verify the code the user received by email. On success supabase-js establishes a
+// short-lived session which lets us set a new password via supabase.auth.updateUser.
+export async function verifyPasswordResetCode(
+  email: string,
+  code: string
+): Promise<{ error: Error | null }> {
+  const { error } = await supabase.auth.verifyOtp({
+    email,
+    token: code,
+    type: "email",
+  });
+
+  if (error) {
+    console.error("Error verifying code:", error);
+    return { error };
+  }
+  return { error: null };
+}
+
+// Set a new password once the user has verified the recovery link (session established by supabase-js)..
+export async function resetPassword(newPassword: string): Promise<{ error: Error | null }> {
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) {
+    console.error("Error updating password:", error);
+    return { error };
+  }
+  return { error: null };
+}
+
+// Signed-in users: verify the current password and then set a new one..
+export async function changePassword(
+  currentPassword: string,
+  newPassword: string
+): Promise<{ error: Error | null }> {
+  try {
+    const { data: sessionData } = await supabase.auth.getSession();
+    const email = sessionData?.session?.user?.email;
+    if (!email) {
+      return { error: new Error("Unable to verify your current password. Please sign in again.") };
+    }
+
+    // Verify current credentials before allowing the change
+    const { error: verifyError } = await supabase.auth.signInWithPassword({
+      email,
+      password: currentPassword,
+    });
+
+    if (verifyError) {
+      return { error: new Error("Your current password is incorrect.") };
+    }
+
+    const { error } = await supabase.auth.updateUser({ password: newPassword });
+    if (error) {
+      console.error("Error changing password:", error);
+      return { error };
+    }
+
+    return { error: null };
+  } catch (err) {
+    return { error: (err as Error) || new Error("Unable to change password.") };
+ }
+}

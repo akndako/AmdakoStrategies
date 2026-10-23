@@ -9,13 +9,13 @@
 export class AppError extends Error {
   public readonly type: "validation" | "authentication" | "authorization" | "not-found" | "network" | "database";
   public readonly code: string;
-  public readonly metadata?: any;
+  public readonly metadata?: unknown;
 
   constructor(
     message: string,
     type: "validation" | "authentication" | "authorization" | "not-found" | "network" | "database",
     code: string,
-    metadata?: any
+    metadata?: unknown
   ) {
     super(message);
     this.name = "AppError";
@@ -26,7 +26,7 @@ export class AppError extends Error {
 }
 
 // Map Supabase errors to AppError types (singleton export)
-export function mapSupabaseError(error: any): AppError {
+export function mapSupabaseError(error: unknown): AppError {
   if (!error) {
     return new AppError(
       "An unexpected error occurred",
@@ -35,8 +35,15 @@ export function mapSupabaseError(error: any): AppError {
     );
   }
 
-  const errorMessage = error.message || error.error_description || "Unknown error";
-  const errorCode = error.code || error.status || "UNKNOWN";
+  const errorDetails = typeof error === "object" ? error as Record<string, unknown> : {};
+  const errorMessage =
+    (typeof errorDetails.message === "string" && errorDetails.message) ||
+    (typeof errorDetails.error_description === "string" && errorDetails.error_description) ||
+    "Unknown error";
+  const rawErrorCode = errorDetails.code || errorDetails.status;
+  const errorCode = typeof rawErrorCode === "string" || typeof rawErrorCode === "number"
+    ? String(rawErrorCode)
+    : "UNKNOWN";
 
   // Authentication errors
   if (
@@ -97,10 +104,14 @@ export function mapSupabaseError(error: any): AppError {
 
   // Validation errors
   if (errorCode === "PGRST209" || errorMessage.includes("validation")) {
-    const details = error?.details || [];
+    const details = Array.isArray(errorDetails.details) ? errorDetails.details : [];
     const messages = details
-      .map((d: any) => d.message)
-      .filter((m: string) => m)
+      .map((detail) => {
+        if (typeof detail !== "object" || detail === null) return "";
+        const message = (detail as Record<string, unknown>).message;
+        return typeof message === "string" ? message : "";
+      })
+      .filter(Boolean)
       .join(". ");
     return new AppError(
       messages || "Validation error. Please check your input.",
@@ -118,7 +129,7 @@ export function mapSupabaseError(error: any): AppError {
 }
 
 // Format error for display to user - never expose raw database errors
-export function formatErrorForDisplay(error: any): string {
+export function formatErrorForDisplay(error: unknown): string {
   const appError = mapSupabaseError(error);
 
   const errorMessages: Record<string, string> = {

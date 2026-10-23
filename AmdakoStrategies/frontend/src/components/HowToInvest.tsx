@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { PhoneCall, FileText, ArrowDownToLine, ScrollText, TrendingUp } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-invest" })`
   padding: 100px 24px;
   background: ${theme.colors.ivory};
 

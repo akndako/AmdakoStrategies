@@ -206,11 +206,6 @@ const ContactItem = styled.div`
   align-items: flex-start;
   gap: 12px;
 
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
   svg {
     color: ${theme.colors.gold};
     flex-shrink: 0;

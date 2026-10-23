@@ -1,10 +1,11 @@
-﻿﻿import { useState, useRef, useEffect } from "react";
+﻿import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { Menu, X, LayoutDashboard, UserPlus, LogIn, ChevronDown, User, Settings, LogOut } from "lucide-react";
+import { Menu, X, LayoutDashboard, UserPlus, LogIn, ChevronDown, User, Settings, LogOut, FileText } from "lucide-react";
 import { theme } from "../theme";
 import type { AuthState } from "../types";
+import logoImage from "../assets/amdakostrategies.jpeg";
 
-type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement" | "settings" | "edit-profile";
+type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement" | "settings" | "edit-profile" | "reset-password";
 
 type NavbarProps = {
   activePage: PageView;
@@ -29,10 +30,24 @@ const TopBar = styled.div`
   letter-spacing: 0.4px;
   text-align: center;
   padding: 7px 16px;
+  line-height: 1.45;
 
   strong {
     color: #fff;
     font-weight: 600;
+  }
+
+  .top-bar-meta {
+    display: inline;
+  }
+
+  @media (max-width: 640px) {
+    font-size: 11px;
+    padding: 6px 12px;
+
+    .top-bar-meta {
+      display: none;
+    }
   }
 `;
 
@@ -62,15 +77,16 @@ const BrandMark = styled.div`
   width: 40px;
   height: 40px;
   border-radius: ${theme.radii.small};
-  background: linear-gradient(135deg, ${theme.colors.primary}, ${theme.colors.primaryDark});
   border: 1px solid ${theme.colors.gold};
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  font-size: 15px;
-  font-weight: 800;
-  letter-spacing: 0.5px;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #fff;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
 const BrandText = styled.div`
@@ -331,6 +347,24 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
     };
   }, [dropdownOpen]);
 
+  useEffect(() => {
+    if (!menuOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener("keydown", onKeyDown);
+
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", onKeyDown);
+    };
+  }, [menuOpen]);
+
   const handleNavigate = (page: PageView) => {
     setMenuOpen(false);
     setDropdownOpen(false);
@@ -349,12 +383,15 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
   return (
     <Container>
       <TopBar>
-        <strong>AMDAKO STRATEGY NIG. LTD.</strong> — RC. 9560518 &nbsp;·&nbsp; Registered Investment & Digital Finance Company
+        <strong>AMDAKO STRATEGY NIG. LTD.</strong>
+        <span className="top-bar-meta"> — RC. 9560518 · Registered Investment & Digital Finance Company</span>
       </TopBar>
 
       <Nav>
-        <Brand onClick={() => handleNavigate("home")}>
-          <BrandMark>A</BrandMark>
+        <Brand onClick={() => handleNavigate(auth ? "dashboard" : "home")} aria-label="Go to home">
+          <BrandMark>
+            <img src={logoImage} alt="" />
+          </BrandMark>
           <BrandText>
             <h3>Amdako <span>Strategies</span></h3>
             <p>Strategic Wealth & Digital Finance</p>
@@ -362,7 +399,11 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         </Brand>
 
         <NavLinks>
-          {!auth && (
+          {auth ? (
+            <NavLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
+              Dashboard
+            </NavLink>
+          ) : (
             <>
               <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
                 Home
@@ -400,6 +441,10 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
                   <DropdownItem onClick={() => handleNavigate("dashboard")}>
                     <LayoutDashboard size={16} />
                     Dashboard
+                  </DropdownItem>
+                  <DropdownItem onClick={() => handleNavigate("agreement")}>
+                    <FileText size={16} />
+                    Agreement
                   </DropdownItem>
                   <DropdownItem onClick={() => handleNavigate("edit-profile")}>
                     <User size={16} />
@@ -441,7 +486,14 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       {menuOpen && (
         <MobileMenu>
-          {!auth && (
+          {auth ? (
+            <>
+              <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
+                Dashboard
+              </MobileLink>
+              <MobileDivider />
+            </>
+          ) : (
             <>
               <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
                 Home
@@ -458,9 +510,9 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
           {auth ? (
             <>
-              <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
-                <LayoutDashboard size={18} />
-                Dashboard
+              <MobileLink $active={activePage === "agreement"} onClick={() => handleNavigate("agreement")}>
+                <FileText size={18} />
+                Agreement
               </MobileLink>
               <MobileLink $active={activePage === "edit-profile"} onClick={() => handleNavigate("edit-profile")}>
                 <User size={18} />

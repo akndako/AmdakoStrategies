@@ -1,15 +1,21 @@
-import { useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
+import type { FormEvent } from "react";
 import styled from "styled-components";
-import SignatureCanvas from "react-signature-canvas";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import type { PageView } from "../App";
-import { FileText, Download, Eraser, ArrowLeft, Loader2 } from "lucide-react";
+import { FileText, Download, ArrowLeft, Loader2, PenLine } from "lucide-react";
 import { theme } from "../theme";
-import { saveAgreement } from "../services/agreementService";
-
-// Fix for TypeScript error: 'SignatureCanvas' cannot be used as a JSX component.
-const SignatureCanvasComponent = SignatureCanvas as any;
+import {
+  downloadAgreementPdf,
+  downloadAgreementSignature,
+  getAgreement,
+  saveAgreement,
+  saveAgreementPdf,
+  saveAgreementSignature,
+  type AgreementSubmission,
+} from "../services/agreementService";
+import type { Agreement } from "../types";
+import SignaturePad, { type SignaturePadHandle } from "../components/SignaturePad";
 
 type AgreementFormPageProps = {
   user: {
@@ -46,7 +52,31 @@ const Container = styled.div`
   margin: 0 auto;
 `;
 
-const Card = styled.div`
+const BackRow = styled.div`
+  margin-bottom: 20px;
+`;
+
+const BackLink = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.medium};
+  background: #fff;
+  color: ${theme.colors.textSecondary};
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.colors.primary};
+    border-color: ${theme.colors.primary};
+    background: ${theme.colors.primaryLight};
+  }
+`;
+
+const Card = styled.form`
   background: #fff;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.xl};
@@ -145,6 +175,10 @@ const FormGroup = styled.div`
     font-size: 15px;
     transition: all 0.2s ease;
 
+    @media (max-width: 480px) {
+      font-size: 16px;
+    }
+
     &::placeholder {
       color: ${theme.colors.textMuted};
     }
@@ -198,26 +232,6 @@ const FormGroup = styled.div`
   }
 `;
 
-const SignatureContainer = styled.div`
-  margin: 32px 0 28px;
-
-  label {
-    display: block;
-    margin-bottom: 12px;
-    color: ${theme.colors.text};
-    font-weight: 600;
-    font-size: 14px;
-  }
-
-  .sigCanvas {
-    width: 100%;
-    min-height: 220px;
-    border: 1px solid ${theme.colors.border};
-    border-radius: ${theme.radii.large};
-    background: ${theme.colors.surfaceAlt};
-  }
-`;
-
 const ButtonGroup = styled.div`
   display: flex;
   flex-wrap: wrap;
@@ -228,6 +242,13 @@ const ButtonGroup = styled.div`
   @media (max-width: 600px) {
     flex-direction: column;
   }
+`;
+
+const FormFields = styled.fieldset`
+  min-width: 0;
+  padding: 0;
+  margin: 0;
+  border: 0;
 `;
 
 const Button = styled.button<{ variant?: "primary" | "outline" }>`
@@ -291,13 +312,156 @@ const DownloadButton = styled(Button)`
   }
 `;
 
-const ClearButton = styled(Button)`
-  background: ${theme.colors.danger} !important;
+const SignatureSection = styled.div`
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid ${theme.colors.borderLight};
+  border-radius: ${theme.radii.large};
+  background: ${theme.colors.surfaceAlt};
 
-  &:hover {
-    background: #c13e3e !important;
+  h4 {
+    font-family: "Inter", sans-serif;
+    font-size: 1rem;
+    margin: 0 0 8px;
+    color: ${theme.colors.text};
+  }
+
+  p {
+    font-size: 14px;
+    color: ${theme.colors.textSecondary};
+    margin: 0 0 16px;
+    line-height: 1.6;
   }
 `;
+
+const SignedMeta = styled.p`
+  font-size: 13px;
+  color: ${theme.colors.success};
+  margin: 12px 0 0;
+  font-weight: 500;
+`;
+
+const AckRow = styled.label`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 14px;
+  color: ${theme.colors.textSecondary};
+  line-height: 1.55;
+  margin-bottom: 20px;
+  cursor: pointer;
+
+  input {
+    width: 18px;
+    height: 18px;
+    margin-top: 2px;
+    accent-color: ${theme.colors.primary};
+    flex-shrink: 0;
+  }
+`;
+
+const identificationLabels: Record<NonNullable<Agreement["id_type"]>, string> = {
+  nationalId: "National ID",
+  votersCard: "Voter's Card",
+  internationalPassport: "International Passport",
+  driversLicense: "Driver's License",
+};
+
+function createAgreementPdf(agreement: Agreement, signatureDataUrl?: string | null): Blob {
+  const pdf = new jsPDF();
+  const margin = 18;
+  const pageWidth = pdf.internal.pageSize.getWidth();
+  const pageHeight = pdf.internal.pageSize.getHeight();
+  const contentWidth = pageWidth - margin * 2;
+  let cursorY = 20;
+
+  const addText = (text: string, fontSize = 10, gap = 4, bold = false) => {
+    pdf.setFont("helvetica", bold ? "bold" : "normal");
+    pdf.setFontSize(fontSize);
+    const lines = pdf.splitTextToSize(text, contentWidth) as string[];
+    const textHeight = lines.length * (fontSize * 0.45);
+    if (cursorY + textHeight > pageHeight - margin) {
+      pdf.addPage();
+      cursorY = margin;
+    }
+    pdf.text(lines, margin, cursorY);
+    cursorY += textHeight + gap;
+  };
+
+  addText("AMDAKO STRATEGY NIG. LTD.", 16, 3, true);
+  addText("INVESTMENT AGREEMENT", 13, 8, true);
+  addText(`Agreement reference: ${agreement.id}`, 10, 3);
+  addText(`Agreement date: ${new Date(agreement.created_at).toLocaleDateString()}`, 10, 8);
+  addText("INVESTOR DETAILS", 11, 5, true);
+
+  const fields: Array<[string, string]> = [
+    ["Full name", agreement.full_name],
+    ["Occupation", agreement.occupation || "Not provided"],
+    ["Address", agreement.address || "Not provided"],
+    ["Phone", agreement.phone],
+    ["Email", agreement.email],
+    ["Identification", agreement.id_type ? identificationLabels[agreement.id_type] : "Not provided"],
+    ["ID number", agreement.id_number || "Not provided"],
+    ["Investment amount", `NGN ${Number(agreement.investment_amount).toLocaleString()}`],
+    ["Expected ROI", `${agreement.monthly_roi}% monthly`],
+    ["Start date", agreement.start_date],
+    ["Maturity date", agreement.maturity_date || "Open-ended"],
+    ["Payment method", agreement.payment_method],
+    ["Payment bank", agreement.payment_bank_name || "Not provided"],
+    ["Payment account name", agreement.payment_account_name || "Not provided"],
+    ["Transaction reference", agreement.transaction_reference || "Not provided"],
+    ["Returns bank", agreement.returns_bank_name || "Not provided"],
+    ["Returns account number", agreement.returns_account_number || "Not provided"],
+    ["Returns account name", agreement.returns_account_name || "Not provided"],
+    ["Returns phone", agreement.returns_phone_number || "Not provided"],
+  ];
+
+  fields.forEach(([label, value]) => addText(`${label}: ${value}`));
+  addText("TERMS AND CONDITIONS", 11, 5, true);
+  [
+    "1. The Investor agrees to invest the stated amount with Amdako Strategy Nig. Ltd. under the agreed plan and duration.",
+    "2. Returns on Investment (ROI) are paid directly to the investor's bank account on or before the 30th of every month.",
+    "3. The Company reserves the right to manage invested funds in line with its trading and investment strategies.",
+    "4. The Investor agrees not to hold the Company liable for losses incurred due to market volatility.",
+    "5. This agreement is governed by the laws of the Federal Republic of Nigeria.",
+    "By submitting this form, the Investor confirms that the information provided is true and acknowledges these terms and conditions.",
+  ].forEach((term) => addText(term, 10, 5));
+
+  if (signatureDataUrl) {
+    addText("INVESTOR SIGNATURE", 11, 6, true);
+    const sigWidth = 80;
+    const sigHeight = 32;
+    if (cursorY + sigHeight > pageHeight - margin) {
+      pdf.addPage();
+      cursorY = margin;
+    }
+    pdf.addImage(signatureDataUrl, "PNG", margin, cursorY, sigWidth, sigHeight);
+    cursorY += sigHeight + 6;
+    if (agreement.signed_at) {
+      addText(`Signed on: ${new Date(agreement.signed_at).toLocaleString()}`, 10, 4);
+    }
+  }
+
+  return pdf.output("blob");
+}
+
+async function blobToDataUrl(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result as string);
+    reader.onerror = () => reject(new Error("Unable to read signature image"));
+    reader.readAsDataURL(blob);
+  });
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  link.click();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+}
 
 export default function AgreementFormPage({ user, onNavigate }: AgreementFormPageProps) {
   const [name, setName] = useState(user.name);
@@ -306,12 +470,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
   const [phoneNumber, setPhoneNumber] = useState(user.phone || "");
   const [occupation, setOccupation] = useState("");
   const [idNumber, setIdNumber] = useState("");
-  const [idTypes, setIdTypes] = useState({
-    nationalId: false,
-    votersCard: false,
-    internationalPassport: false,
-    driversLicense: false,
-  });
+  const [idType, setIdType] = useState<Agreement["id_type"]>(null);
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
   const [maturityDate, setMaturityDate] = useState("");
@@ -323,70 +482,195 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
   const [returnsAccountNumber, setReturnsAccountNumber] = useState("");
   const [returnsAccountName, setReturnsAccountName] = useState("");
   const [returnsPhoneNumber, setReturnsPhoneNumber] = useState("");
-  const date = new Date().toISOString().split("T")[0];
-  const [submitted, setSubmitted] = useState(false);
+  const date = new Date().toLocaleDateString();
+  const [savedAgreement, setSavedAgreement] = useState<Agreement | null>(null);
   const [saving, setSaving] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [loadingAgreement, setLoadingAgreement] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const sigCanvas = useRef<SignatureCanvas>(null);
-  const formRef = useRef<HTMLDivElement>(null);
-  const agreementTextRef = useRef<HTMLDivElement>(null);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [acknowledged, setAcknowledged] = useState(false);
+  const [signaturePreviewUrl, setSignaturePreviewUrl] = useState<string | null>(null);
+  const signaturePadRef = useRef<SignaturePadHandle>(null);
 
-  const toggleIdType = (type: keyof typeof idTypes) => {
-    setIdTypes((current) => ({ ...current, [type]: !current[type] }));
-  };
+  const buildSubmission = useCallback((): AgreementSubmission => {
+    return {
+      full_name: name.trim(),
+      occupation: occupation.trim() || null,
+      address: address.trim() || null,
+      phone: phoneNumber.trim(),
+      email: email.trim(),
+      id_type: idType,
+      id_number: idNumber.trim() || null,
+      investment_amount: Number(investmentAmount),
+      monthly_roi: user.monthlyRoi || 10,
+      start_date: startDate,
+      maturity_date: maturityDate || null,
+      payment_method: paymentMethod,
+      payment_bank_name: paymentBankName.trim() || null,
+      payment_account_name: paymentAccountName.trim() || null,
+      transaction_reference: transactionReference.trim() || null,
+      returns_bank_name: returnsBankName.trim() || null,
+      returns_account_number: returnsAccountNumber.trim() || null,
+      returns_account_name: returnsAccountName.trim() || null,
+      returns_phone_number: returnsPhoneNumber.trim() || null,
+    };
+  }, [
+    name,
+    occupation,
+    address,
+    phoneNumber,
+    email,
+    idType,
+    idNumber,
+    investmentAmount,
+    user.monthlyRoi,
+    startDate,
+    maturityDate,
+    paymentMethod,
+    paymentBankName,
+    paymentAccountName,
+    transactionReference,
+    returnsBankName,
+    returnsAccountNumber,
+    returnsAccountName,
+    returnsPhoneNumber,
+  ]);
 
-  const clearSignature = () => {
-    sigCanvas.current?.clear();
-  };
-
-  const getSelectedIdType = (): "nationalId" | "votersCard" | "internationalPassport" | "driversLicense" | null => {
-    if (idTypes.nationalId) return "nationalId";
-    if (idTypes.votersCard) return "votersCard";
-    if (idTypes.internationalPassport) return "internationalPassport";
-    if (idTypes.driversLicense) return "driversLicense";
+  const validateFormFields = useCallback((): string | null => {
+    if (!name.trim() || !phoneNumber.trim() || !email.trim()) {
+      return "Please complete your name, phone, and email on the Your details step.";
+    }
+    if (!Number.isFinite(Number(investmentAmount)) || Number(investmentAmount) <= 0) {
+      return "Enter an investment amount greater than zero.";
+    }
+    if (maturityDate && maturityDate < startDate) {
+      return "Maturity date must be on or after the start date.";
+    }
     return null;
+  }, [name, phoneNumber, email, investmentAmount, maturityDate, startDate]);
+
+  useEffect(() => {
+    let active = true;
+
+    getAgreement()
+      .then((agreement) => {
+        if (!active || !agreement) return;
+        setSavedAgreement(agreement);
+        setName(agreement.full_name);
+        setEmail(agreement.email);
+        setAddress(agreement.address || "");
+        setPhoneNumber(agreement.phone);
+        setOccupation(agreement.occupation || "");
+        setIdNumber(agreement.id_number || "");
+        setIdType(agreement.id_type);
+        setInvestmentAmount(String(agreement.investment_amount));
+        setStartDate(agreement.start_date);
+        setMaturityDate(agreement.maturity_date || "");
+        setPaymentMethod(agreement.payment_method);
+        setPaymentBankName(agreement.payment_bank_name || "");
+        setPaymentAccountName(agreement.payment_account_name || "");
+        setTransactionReference(agreement.transaction_reference || "");
+        setReturnsBankName(agreement.returns_bank_name || "");
+        setReturnsAccountNumber(agreement.returns_account_number || "");
+        setReturnsAccountName(agreement.returns_account_name || "");
+        setReturnsPhoneNumber(agreement.returns_phone_number || "");
+      })
+      .catch((loadError) => {
+        if (active) {
+          setError(loadError instanceof Error ? loadError.message : "Unable to load your saved agreement.");
+        }
+      })
+      .finally(() => {
+        if (active) setLoadingAgreement(false);
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const path = savedAgreement?.signature_url;
+    if (!path) {
+      setSignaturePreviewUrl(null);
+      return;
+    }
+
+    let objectUrl: string | null = null;
+    downloadAgreementSignature(path)
+      .then((blob) => {
+        objectUrl = URL.createObjectURL(blob);
+        setSignaturePreviewUrl(objectUrl);
+      })
+      .catch((loadError) => {
+        console.error("Signature load error:", loadError);
+      });
+
+    return () => {
+      if (objectUrl) URL.revokeObjectURL(objectUrl);
+    };
+  }, [savedAgreement?.signature_url]);
+
+  const persistAgreementDetails = async (): Promise<Agreement> => {
+    const submission = buildSubmission();
+    return saveAgreement(submission, savedAgreement?.id);
   };
 
-  const handleSubmit = async () => {
-    if (sigCanvas.current?.isEmpty()) {
-      alert("Please sign the agreement before submitting.");
+  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+
+    if (savedAgreement?.status === "approved") {
+      setError("Approved agreements cannot be changed.");
+      return;
+    }
+
+    const validationError = validateFormFields();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
+
+    if (!acknowledged) {
+      setError("Please confirm that you agree to the terms before signing.");
+      return;
+    }
+
+    const hasStoredSignature = Boolean(savedAgreement?.signature_url);
+    const hasNewSignature = signaturePadRef.current?.hasSignature() ?? false;
+    if (!hasStoredSignature && !hasNewSignature) {
+      setError("Please draw your signature in the box to complete the agreement.");
       return;
     }
 
     setSaving(true);
     setError(null);
+    setSuccess(null);
 
     try {
-      const signatureDataUrl = sigCanvas.current?.toDataURL?.() || null;
+      let agreement = await persistAgreementDetails();
+      let signatureDataUrl: string | null = null;
 
-      await saveAgreement({
-        user_id: user.id,
-        full_name: name,
-        address: address || null,
-        phone: phoneNumber || user.phone,
-        email,
-        id_type: getSelectedIdType(),
-        id_number: idNumber || null,
-        investment_amount: Number(investmentAmount) || 0,
-        monthly_roi: user.monthlyRoi || 10,
-        start_date: startDate,
-        maturity_date: maturityDate || null,
-        payment_method: paymentMethod,
-        payment_bank_name: paymentBankName || null,
-        payment_account_name: paymentAccountName || null,
-        transaction_reference: transactionReference || null,
-        returns_bank_name: returnsBankName || null,
-        returns_account_number: returnsAccountNumber || null,
-        returns_account_name: returnsAccountName || null,
-        returns_phone_number: returnsPhoneNumber || null,
-        signature_url: signatureDataUrl,
-        status: "pending",
-        signed_at: new Date().toISOString(),
-      });
+      if (hasNewSignature) {
+        const signatureBlob = await signaturePadRef.current!.exportPngBlob();
+        signatureDataUrl = signaturePadRef.current!.exportDataUrl();
+        agreement = await saveAgreementSignature(agreement.id, signatureBlob);
+        setSavedAgreement(agreement);
+      } else if (hasStoredSignature && agreement.signature_url) {
+        const blob = await downloadAgreementSignature(agreement.signature_url);
+        signatureDataUrl = await blobToDataUrl(blob);
+      }
 
-      setSubmitted(true);
+      const documentPath = await saveAgreementPdf(
+        agreement.id,
+        createAgreementPdf(agreement, signatureDataUrl),
+      );
+      setSavedAgreement({ ...agreement, document_url: documentPath });
+      setSuccess("Your signed agreement is saved securely. You can download your copy below.");
     } catch (err) {
-      const message = err instanceof Error ? err.message : "Unable to save the agreement. Please try again.";
+      const message = err instanceof Error
+        ? err.message
+        : "Unable to save the agreement. Please try again.";
       console.error("Agreement save error:", err);
       setError(message);
     } finally {
@@ -394,47 +678,50 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
     }
   };
 
-  const downloadAgreement = async () => {
-    if (formRef.current) {
-      // Temporarily expand the scrollable text so it's fully captured in the PDF
-      if (agreementTextRef.current) {
-        agreementTextRef.current.classList.add("expanded-for-print");
+  const handleDownloadAgreement = async () => {
+    if (!savedAgreement) return;
+
+    setDownloading(true);
+    setError(null);
+
+    try {
+      let documentPath = savedAgreement.document_url;
+      if (!documentPath) {
+        let signatureDataUrl: string | null = null;
+        if (savedAgreement.signature_url) {
+          const sigBlob = await downloadAgreementSignature(savedAgreement.signature_url);
+          signatureDataUrl = await blobToDataUrl(sigBlob);
+        }
+        documentPath = await saveAgreementPdf(
+          savedAgreement.id,
+          createAgreementPdf(savedAgreement, signatureDataUrl),
+        );
+        setSavedAgreement({ ...savedAgreement, document_url: documentPath });
       }
-
-      const canvas = await html2canvas(formRef.current);
-      const imgData = canvas.toDataURL("image/png");
-      const pdf = new jsPDF();
-      const imgWidth = 210; // A4 width in mm
-      const pageHeight = 297; // A4 standard height in mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-      let heightLeft = imgHeight;
-
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
-      heightLeft -= pageHeight;
-
-      while (heightLeft >= 0) {
-        pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, -heightLeft, imgWidth, imgHeight);
-        heightLeft -= pageHeight;
-      }
-
-      pdf.save("agreement.pdf");
-
-      // Revert the expansion
-      if (agreementTextRef.current) {
-        agreementTextRef.current.classList.remove("expanded-for-print");
-      }
+      const pdf = await downloadAgreementPdf(documentPath);
+      downloadBlob(pdf, "amdako-investment-agreement.pdf");
+    } catch (downloadError) {
+      setError(downloadError instanceof Error ? downloadError.message : "Unable to download the agreement.");
+    } finally {
+      setDownloading(false);
     }
   };
 
   return (
     <Page>
       <Container>
-        <Card ref={formRef}>
+        <BackRow>
+          <BackLink type="button" onClick={() => onNavigate("dashboard")}>
+            <ArrowLeft size={16} />
+            Back to Dashboard
+          </BackLink>
+        </BackRow>
+        <Card onSubmit={handleSubmit}>
           <Eyebrow>Official Investment Contract</Eyebrow>
           <Title>Agreement Form</Title>
 
-          <AgreementText ref={agreementTextRef}>
+          <FormFields disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}>
+          <AgreementText>
             <h3>AMDAKO STRATEGY NIG. LTD. INVESTMENT AGREEMENT FORM</h3>
             <p>
               This Investment Agreement is made on {date} between Amdako Strategy Nig. Ltd. and the investor named below.
@@ -456,7 +743,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               5. This agreement is governed by the laws of the Federal Republic of Nigeria.
             </p>
             <p>
-              By signing below, the Investor confirms that all information provided is true and correct and agrees to the terms and conditions of this investment.
+              By submitting this form, the Investor confirms that all information provided is true and correct and acknowledges the terms and conditions of this investment.
             </p>
           </AgreementText>
 
@@ -467,6 +754,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Investor full name"
+              required
             />
           </FormGroup>
 
@@ -487,6 +775,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               placeholder="Investor phone number"
+              required
             />
           </FormGroup>
 
@@ -497,6 +786,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder="Investor email address"
+              required
             />
           </FormGroup>
 
@@ -511,47 +801,18 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
           </FormGroup>
 
           <FormGroup>
-            <label>Means of Identification</label>
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={idTypes.nationalId}
-                  onChange={() => toggleIdType("nationalId")}
-                />
-                National ID
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={idTypes.votersCard}
-                  onChange={() => toggleIdType("votersCard")}
-                />
-                Voter's Card
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={idTypes.internationalPassport}
-                  onChange={() => toggleIdType("internationalPassport")}
-                />
-                International Passport
-              </label>
-            </div>
-            <div>
-              <label>
-                <input
-                  type="checkbox"
-                  checked={idTypes.driversLicense}
-                  onChange={() => toggleIdType("driversLicense")}
-                />
-                Driver's License
-              </label>
-            </div>
+            <label htmlFor="id-type">Means of Identification</label>
+            <select
+              id="id-type"
+              value={idType || ""}
+              onChange={(event) => setIdType((event.target.value || null) as Agreement["id_type"])}
+            >
+              <option value="">Select an identification type</option>
+              <option value="nationalId">National ID</option>
+              <option value="votersCard">Voter's Card</option>
+              <option value="internationalPassport">International Passport</option>
+              <option value="driversLicense">Driver's License</option>
+            </select>
           </FormGroup>
 
           <FormGroup>
@@ -571,6 +832,9 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               value={investmentAmount}
               onChange={(e) => setInvestmentAmount(e.target.value)}
               placeholder="Investment amount"
+              min="0.01"
+              step="0.01"
+              required
             />
           </FormGroup>
 
@@ -590,6 +854,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
+              required
             />
           </FormGroup>
 
@@ -599,6 +864,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               type="date"
               value={maturityDate}
               onChange={(e) => setMaturityDate(e.target.value)}
+              min={startDate}
             />
           </FormGroup>
 
@@ -669,16 +935,36 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
             />
           </FormGroup>
 
-          <SignatureContainer>
-            <label>Signature</label>
-            <SignatureCanvasComponent
-              ref={sigCanvas}
-              canvasProps={{
-                className: "sigCanvas",
-                height: 200,
-              }}
-            />
-          </SignatureContainer>
+            <SignatureSection>
+              <h4>Electronic signature</h4>
+              <p>
+                By signing below, you confirm that the information in this agreement is accurate and that
+                you accept the terms and conditions.
+              </p>
+              <AckRow>
+                <input
+                  type="checkbox"
+                  checked={acknowledged}
+                  onChange={(e) => setAcknowledged(e.target.checked)}
+                  disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}
+                />
+                <span>
+                  I have read and agree to the investment agreement terms, and I confirm that all details
+                  provided are true and correct.
+                </span>
+              </AckRow>
+              <SignaturePad
+                ref={signaturePadRef}
+                disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}
+                existingImageUrl={signaturePreviewUrl}
+              />
+              {savedAgreement?.signed_at && (
+                <SignedMeta>
+                  Signed on {new Date(savedAgreement.signed_at).toLocaleString()}
+                </SignedMeta>
+              )}
+            </SignatureSection>
+          </FormFields>
 
           {error && (
             <div style={{
@@ -695,23 +981,50 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
             </div>
           )}
 
+          {success && (
+            <div role="status" style={{
+              background: "rgba(14, 138, 158, 0.08)",
+              border: "1px solid rgba(14, 138, 158, 0.25)",
+              color: theme.colors.success,
+              padding: "12px 16px",
+              borderRadius: theme.radii.medium,
+              fontSize: "14px",
+              marginBottom: "16px",
+              lineHeight: 1.5,
+            }}>
+              {success}
+            </div>
+          )}
+
           <ButtonGroup>
-            <ClearButton onClick={clearSignature} disabled={saving}>
-              <Eraser size={16} />
-              Clear Signature
-            </ClearButton>
-            {!submitted ? (
-              <Button onClick={handleSubmit} disabled={saving}>
-                {saving ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : <FileText size={16} />}
-                {saving ? "Saving..." : "Submit Agreement"}
-              </Button>
-            ) : (
-              <DownloadButton onClick={downloadAgreement}>
+            <Button
+              type="submit"
+              disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}
+            >
+              {saving || loadingAgreement
+                ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
+                : <PenLine size={16} />}
+              {loadingAgreement
+                ? "Loading..."
+                : saving
+                  ? "Saving..."
+                  : savedAgreement?.signature_url
+                    ? "Update signed agreement"
+                    : "Sign & submit agreement"}
+            </Button>
+            {savedAgreement && (
+              <DownloadButton
+                type="button"
+                onClick={handleDownloadAgreement}
+                disabled={saving || downloading}
+              >
+                {downloading ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : (
                 <Download size={16} />
-                Download Agreement
+                )}
+                {downloading ? "Preparing Copy..." : "Download Agreement"}
               </DownloadButton>
             )}
-            <Button variant="outline" onClick={() => onNavigate("dashboard")} disabled={saving}>
+            <Button type="button" variant="outline" onClick={() => onNavigate("dashboard")} disabled={saving}>
               <ArrowLeft size={16} />
               Back to Dashboard
             </Button>

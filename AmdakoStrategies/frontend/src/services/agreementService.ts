@@ -11,6 +11,8 @@ export async function getAgreement(): Promise<Agreement | null> {
     .from("agreements")
     .select("*")
     .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(1)
     .maybeSingle();
 
   if (error) {
@@ -20,45 +22,156 @@ export async function getAgreement(): Promise<Agreement | null> {
   return data as Agreement | null;
 }
 
-export async function saveAgreement(data: Partial<Agreement>): Promise<Agreement> {
+export type AgreementSubmission = Pick<
+  Agreement,
+  | "full_name"
+  | "occupation"
+  | "address"
+  | "phone"
+  | "email"
+  | "id_type"
+  | "id_number"
+  | "investment_amount"
+  | "monthly_roi"
+  | "start_date"
+  | "maturity_date"
+  | "payment_method"
+  | "payment_bank_name"
+  | "payment_account_name"
+  | "transaction_reference"
+  | "returns_bank_name"
+  | "returns_account_number"
+  | "returns_account_name"
+  | "returns_phone_number"
+>;
+
+export async function saveAgreement(data: AgreementSubmission, agreementId?: string): Promise<Agreement> {
   const user = await getCurrentUser();
   if (!user) {
     throw new Error("User not authenticated");
   }
 
-  const { data: result, error } = await supabase
-    .from("agreements")
-    .upsert({
-      user_id: user.id,
-      full_name: data.full_name || "",
-      address: data.address || null,
-      phone: data.phone || "",
-      email: data.email || "",
-      id_type: data.id_type || null,
-      id_number: data.id_number || null,
-      investment_amount: data.investment_amount || 0,
-      monthly_roi: data.monthly_roi || 10,
-      start_date: data.start_date || new Date().toISOString().split("T")[0],
-      maturity_date: data.maturity_date || null,
-      payment_method: data.payment_method || "Bank Transfer",
-      payment_bank_name: data.payment_bank_name || null,
-      payment_account_name: data.payment_account_name || null,
-      transaction_reference: data.transaction_reference || null,
-      returns_bank_name: data.returns_bank_name || null,
-      returns_account_number: data.returns_account_number || null,
-      returns_account_name: data.returns_account_name || null,
-      returns_phone_number: data.returns_phone_number || null,
-      signature_url: data.signature_url || null,
-      status: data.status || "pending",
-      signed_at: data.signed_at || new Date().toISOString(),
-      document_url: data.document_url || null,
-    })
-    .select()
-    .single();
+  const baseValues = {
+    ...data,
+    status: "pending" as const,
+  };
+  const query = supabase.from("agreements");
+  const { data: result, error } = agreementId
+    ? await query
+        .update(baseValues)
+        .eq("id", agreementId)
+        .eq("user_id", user.id)
+        .select()
+        .single()
+    : await query
+        .insert({
+          ...baseValues,
+          user_id: user.id,
+          signature_url: null,
+          signed_at: null,
+          document_url: null,
+        })
+        .select()
+        .single();
 
   if (error) {
     console.error("Error saving agreement:", error);
     throw new Error(formatErrorForDisplay(error));
   }
   return result as Agreement;
+}
+
+export async function saveAgreementSignature(agreementId: string, signaturePng: Blob): Promise<Agreement> {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const signaturePath = `${user.id}/${agreementId}-signature.png`;
+  const { error: uploadError } = await supabase.storage
+    .from("agreements")
+    .upload(signaturePath, signaturePng, {
+      contentType: "image/png",
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new Error(formatErrorForDisplay(uploadError));
+  }
+
+  const signedAt = new Date().toISOString();
+  const { data, error } = await supabase
+    .from("agreements")
+    .update({
+      signature_url: signaturePath,
+      signed_at: signedAt,
+    })
+    .eq("id", agreementId)
+    .eq("user_id", user.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(formatErrorForDisplay(error));
+  }
+
+  return data as Agreement;
+}
+
+export async function downloadAgreementSignature(signaturePath: string): Promise<Blob> {
+  const user = await getCurrentUser();
+  if (!user || signaturePath.split("/")[0] !== user.id) {
+    throw new Error("You do not have access to this signature.");
+  }
+
+  const { data, error } = await supabase.storage.from("agreements").download(signaturePath);
+  if (error) {
+    throw new Error(formatErrorForDisplay(error));
+  }
+  return data;
+}
+
+export async function saveAgreementPdf(agreementId: string, pdf: Blob): Promise<string> {
+  const user = await getCurrentUser();
+  if (!user) {
+    throw new Error("User not authenticated");
+  }
+
+  const documentPath = `${user.id}/${agreementId}.pdf`;
+  const { error: uploadError } = await supabase.storage
+    .from("agreements")
+    .upload(documentPath, pdf, {
+      contentType: "application/pdf",
+      upsert: true,
+    });
+
+  if (uploadError) {
+    throw new Error(formatErrorForDisplay(uploadError));
+  }
+
+  const { error: updateError } = await supabase
+    .from("agreements")
+    .update({ document_url: documentPath })
+    .eq("id", agreementId)
+    .eq("user_id", user.id);
+
+  if (updateError) {
+    await supabase.storage.from("agreements").remove([documentPath]);
+    throw new Error(formatErrorForDisplay(updateError));
+  }
+
+  return documentPath;
+}
+
+export async function downloadAgreementPdf(documentPath: string): Promise<Blob> {
+  const user = await getCurrentUser();
+  if (!user || documentPath.split("/")[0] !== user.id) {
+    throw new Error("You do not have access to this agreement.");
+  }
+
+  const { data, error } = await supabase.storage.from("agreements").download(documentPath);
+  if (error) {
+    throw new Error(formatErrorForDisplay(error));
+  }
+  return data;
 }

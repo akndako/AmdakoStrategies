@@ -1,7 +1,6 @@
 import styled from "styled-components";
 import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
 import { theme } from "../theme";
-
 const Page = styled.section`
   min-height: calc(100vh - 68px);
   padding: 60px 24px;

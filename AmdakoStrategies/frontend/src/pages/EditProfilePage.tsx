@@ -432,7 +432,7 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
             Back to Dashboard
           </BackButton>
           <div>
-            <div className="eyebrow">Account Settings</div>
+            <div className="eyebrow">Account</div>
             <h2>Edit Profile</h2>
           </div>
         </Header>

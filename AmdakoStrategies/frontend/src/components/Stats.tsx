@@ -253,7 +253,10 @@ export default function Stats() {
                   tickFormatter={(value) => `₦${(value / 1000000).toFixed(1)}M`}
                 />
                 <Tooltip
-                  formatter={(value: number) => [`₦${value.toLocaleString()}`, "Portfolio Value"]}
+                  formatter={(value) => [
+                    `₦${Number(value ?? 0).toLocaleString()}`,
+                    "Portfolio Value",
+                  ]}
                   contentStyle={{
                     background: "#fff",
                     border: `1px solid ${theme.colors.border}`,

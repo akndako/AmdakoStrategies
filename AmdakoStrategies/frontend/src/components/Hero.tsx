@@ -1,9 +1,9 @@
-﻿﻿import styled from "styled-components";
+﻿import styled from "styled-components";
 import { motion } from "framer-motion";
 import { ShieldCheck, ArrowRight, TrendingUp, Lock } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-top" })`
   position: relative;
   overflow: hidden;
   background: ${theme.colors.ivory};

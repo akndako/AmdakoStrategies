@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
+import { PageShell, PageContainer } from "../components/layout/pageLayout";
 import {
   FileText,
   TrendingUp,
@@ -15,13 +16,14 @@ import {
   AlertTriangle,
   Eye,
   Loader2,
-  LogOut,
   Bell,
   CheckCheck,
-  User,
-  Edit,
   ShieldCheck,
   CreditCard,
+  ArrowLeftRight,
+  User,
+  Settings,
+  Edit,
 } from "lucide-react";
 import type { PageView } from "../App";
 import { theme } from "../theme";
@@ -40,23 +42,42 @@ type DashboardPageProps = {
   refreshKey?: number;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 40px 24px 80px;
-  background: ${theme.colors.ivory};
+const Page = PageShell;
 
-  @media (max-width: 768px) {
-    padding: 28px 20px 60px;
-  }
+const Container = PageContainer;
 
-  @media (max-width: 480px) {
-    padding: 20px 16px 48px;
+const MainGrid = styled.div`
+  display: grid;
+  grid-template-columns: 1.6fr 1fr;
+  gap: 24px;
+  align-items: start;
+
+  @media (max-width: 1024px) {
+    grid-template-columns: 1fr;
   }
 `;
 
-const Container = styled.div`
-  max-width: 1240px;
-  margin: 0 auto;
+const EditProfileButton = styled.button`
+  flex: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 11px 16px;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  color: ${theme.colors.text};
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+
+  &:hover {
+    border-color: ${theme.colors.primary};
+    color: ${theme.colors.primary};
+    background: ${theme.colors.primaryLight};
+  }
 `;
 
 const Header = styled.div`
@@ -64,7 +85,7 @@ const Header = styled.div`
   justify-content: space-between;
   align-items: center;
   gap: 20px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 
   @media (max-width: 768px) {
     flex-direction: column;
@@ -513,28 +534,6 @@ const ProfileStatusBadge = styled.span<{ $status: string }>`
   }}
 `;
 
-const EditProfileButton = styled.button`
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  background: ${theme.colors.primaryLight};
-  color: ${theme.colors.primary};
-  border: 1px solid ${theme.colors.primary};
-  border-radius: ${theme.radii.medium};
-  padding: 9px 16px;
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex: 1;
-
-  &:hover {
-    background: ${theme.colors.primary};
-    color: #fff;
-  }
-`;
-
 /* ============ STATS GRID ============ */
 
 const StatsGrid = styled.div`
@@ -613,19 +612,6 @@ const StatCard = styled.div<{ accent?: "blue" | "gold" | "red" }>`
     color: ${theme.colors.textMuted};
     margin-top: 4px;
     font-family: 'Inter', sans-serif;
-  }
-`;
-
-/* ============ MAIN CONTENT GRID ============ */
-
-const MainGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 24px;
-  align-items: start;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
   }
 `;
 
@@ -736,6 +722,7 @@ const EmptyState = styled.div`
   p {
     font-size: 0.875rem;
     color: ${theme.colors.textMuted};
+    margin-bottom: 16px;
   }
 `;
 
@@ -843,13 +830,6 @@ const NotificationItem = styled.div<{ $unread: boolean }>`
   }
 `;
 
-const NotificationActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 14px;
-`;
-
 /* ============ AGREEMENT BANNER ============ */
 
 const AgreementBanner = styled.div`
@@ -933,7 +913,7 @@ const getInitials = (name: string): string => {
     .toUpperCase();
 };
 
-export default function DashboardPage({ user, onLogout, onNavigate }: DashboardPageProps) {
+export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: DashboardPageProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [investorAccount, setInvestorAccount] = useState<InvestorAccount | null>(null);
   const [investments, setInvestments] = useState<Investment[]>([]);
@@ -1042,7 +1022,7 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
 
   useEffect(() => {
     loadDashboard();
-  }, [loadDashboard]);
+  }, [loadDashboard, refreshKey]);
 
   const handleMarkAllNotificationsRead = async () => {
     try {
@@ -1052,6 +1032,8 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
       console.error("Error marking notifications as read:", err);
     }
   };
+
+  const unreadNotificationCount = notifications.filter((n) => !n.is_read).length;
 
   if (loading) {
     return (
@@ -1076,7 +1058,6 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
   const displayMonthlyRoi = profile?.monthly_roi ?? user.monthlyRoi ?? 10;
 
   const agreementCompleted = agreement != null && agreement.status === "approved";
-  const unreadNotificationCount = notifications.filter((n) => !n.is_read).length;
   const accountBalance = investorAccount ? Number(investorAccount.available_balance) : summary.currentValue;
 
   return (
@@ -1086,12 +1067,8 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
           <div>
             <div className="eyebrow">Investor Dashboard</div>
             <h2>Welcome, {displayName}</h2>
-            <p>Track your investments, review transactions, and manage your portfolio.</p>
+            <p>Your portfolio, activity, and notifications in one place. Use the menu above for profile and settings.</p>
           </div>
-          {/* <Button variant="outline" onClick={onLogout} style={{ height: "40px", width: "auto" }}>
-            <LogOut size={16} />
-            Logout
-          </Button> */}
         </Header>
 
         {error && (
@@ -1101,7 +1078,6 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
           </ErrorBanner>
         )}
 
-        {/* ===== HERO: Portfolio Overview + Profile Sidebar ===== */}
         <HeroGrid>
           <PortfolioHero>
             <div className="hero-eyebrow">
@@ -1176,12 +1152,16 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
               </div>
             </div>
 
-            {/* <div className="profile-footer">
-              <EditProfileButton onClick={() => onNavigate("edit-profile")}>
-                <Edit size={14} />
-                Edit Profile
+            <div className="profile-footer">
+              <EditProfileButton type="button" onClick={() => onNavigate("edit-profile")}>
+                <Edit size={14} aria-hidden />
+                Edit profile
               </EditProfileButton>
-            </div> */}
+              <EditProfileButton type="button" onClick={() => switchTab("account")}>
+                <User size={14} aria-hidden />
+                Full details
+              </EditProfileButton>
+            </div>
           </ProfileSideCard>
         </HeroGrid>
 
@@ -1237,167 +1217,164 @@ export default function DashboardPage({ user, onLogout, onNavigate }: DashboardP
           </StatCard>
         </StatsGrid>
 
-        {/* ===== AGREEMENT BANNER ===== */}
-        <AgreementBanner>
-          <div className="agreement-info">
-            <FileText size={20} />
-            <div>
-              <h4>Agreement Status</h4>
-              <p>{agreementCompleted ? "Completed" : "Not Completed"}</p>
+        {!agreementCompleted && (
+          <AgreementBanner>
+            <div className="agreement-info">
+              <FileText size={20} />
+              <div>
+                <h4>Next step: sign your agreement</h4>
+                <p>Complete this once to activate your investor account.</p>
+              </div>
             </div>
-          </div>
-          {agreementCompleted ? (
-            <Button variant="outline" onClick={() => onNavigate("agreement")} style={{ width: "auto" }}>
-              <Eye size={16} />
-              View Agreement
-            </Button>
-          ) : (
             <Button variant="success" onClick={() => onNavigate("agreement")} style={{ width: "auto" }}>
               <FileText size={16} />
-              Complete Agreement
+              Complete agreement
             </Button>
-          )}
-        </AgreementBanner>
+          </AgreementBanner>
+        )}
 
-        {/* ===== MAIN CONTENT: Investments + Notifications ===== */}
         <MainGrid>
           <div>
-            <SectionCard>
-              <SectionTitle>
-                <h3>
-                  <Briefcase size={18} />
-                  My Investments
-                </h3>
-              </SectionTitle>
-              {investments.length === 0 ? (
-                <EmptyState>
-                  <p>You currently have no investments.</p>
-                </EmptyState>
-              ) : (
-                <TableWrap>
-                  <Table>
-                    <thead>
-                      <tr>
-                        <Th>Investment</Th>
-                        <Th>Amount</Th>
-                        <Th>Current Value</Th>
-                        <Th>Return</Th>
-                        <Th>Status</Th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {investments.map((inv) => {
-                        const returnPct = inv.amount > 0 ? (inv.profit_loss / inv.amount) * 100 : 0;
-                        return (
-                          <Tr key={inv.id}>
-                            <Td>
-                              <strong>{inv.investment_name}</strong>
-                            </Td>
-                            <Td>{formatNaira(inv.amount)}</Td>
-                            <Td>{formatNaira(inv.current_value)}</Td>
-                            <Td>
-                              <ProfitLossPill positive={returnPct > 0} negative={returnPct < 0}>
-                                {returnPct > 0 ? "+" : ""}
-                                {returnPct.toFixed(1)}%
-                              </ProfitLossPill>
-                            </Td>
-                            <Td>
-                              <StatusBadge tone={inv.status}>{inv.status}</StatusBadge>
-                            </Td>
-                          </Tr>
-                        );
-                      })}
-                    </tbody>
-                  </Table>
-                </TableWrap>
-              )}
-            </SectionCard>
-
-            <SectionCard>
-              <SectionTitle>
-                <h3>
-                  <TrendingUp size={18} />
-                  Recent Transactions
-                </h3>
-              </SectionTitle>
-              {transactions.length === 0 ? (
-                <EmptyState>
-                  <p>No transactions yet.</p>
-                </EmptyState>
-              ) : (
-                <TableWrap>
-                  <Table>
-                    <thead>
-                      <tr>
-                        <Th>Date</Th>
-                        <Th>Description</Th>
-                        <Th>Amount</Th>
-                        <Th>Type</Th>
-                        <Th>Status</Th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {transactions.map((tx) => (
-                        <Tr key={tx.id}>
-                          <Td>{formatDate(tx.created_at)}</Td>
-                          <Td>{tx.description || tx.type}</Td>
+          <SectionCard>
+            <SectionTitle>
+              <h3>
+                <Briefcase size={18} />
+                My investments
+              </h3>
+            </SectionTitle>
+            {investments.length === 0 ? (
+              <EmptyState>
+                <p>You do not have any investments yet. Complete your agreement to get started.</p>
+                <Button variant="primary" onClick={() => onNavigate("agreement")} style={{ width: "auto", margin: "0 auto" }}>
+                  <FileText size={16} />
+                  Go to agreement
+                </Button>
+              </EmptyState>
+            ) : (
+              <TableWrap>
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>Investment</Th>
+                      <Th>Amount</Th>
+                      <Th>Current value</Th>
+                      <Th>Return</Th>
+                      <Th>Status</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {investments.map((inv) => {
+                      const returnPct = inv.amount > 0 ? (inv.profit_loss / inv.amount) * 100 : 0;
+                      return (
+                        <Tr key={inv.id}>
                           <Td>
-                            <AmountText positive={tx.type === "deposit" || tx.type === "profit" || tx.type === "referral"}>
-                              {tx.type === "withdrawal" || tx.type === "fee" ? "-" : "+"}
-                              {formatNaira(Math.abs(tx.amount))}
-                            </AmountText>
+                            <strong>{inv.investment_name}</strong>
+                          </Td>
+                          <Td>{formatNaira(inv.amount)}</Td>
+                          <Td>{formatNaira(inv.current_value)}</Td>
+                          <Td>
+                            <ProfitLossPill positive={returnPct > 0} negative={returnPct < 0}>
+                              {returnPct > 0 ? "+" : ""}
+                              {returnPct.toFixed(1)}%
+                            </ProfitLossPill>
                           </Td>
                           <Td>
-                            <span style={{ textTransform: "capitalize" }}>{tx.type}</span>
-                          </Td>
-                          <Td>
-                            <StatusBadge tone={tx.status}>{tx.status}</StatusBadge>
+                            <StatusBadge tone={inv.status}>{inv.status}</StatusBadge>
                           </Td>
                         </Tr>
-                      ))}
-                    </tbody>
-                  </Table>
-                </TableWrap>
-              )}
-            </SectionCard>
+                      );
+                    })}
+                  </tbody>
+                </Table>
+              </TableWrap>
+            )}
+          </SectionCard>
+
+          <SectionCard>
+            <SectionTitle>
+              <h3>
+                <ArrowLeftRight size={18} />
+                Transaction history
+              </h3>
+            </SectionTitle>
+            {transactions.length === 0 ? (
+              <EmptyState>
+                <p>No transactions yet.</p>
+              </EmptyState>
+            ) : (
+              <TableWrap>
+                <Table>
+                  <thead>
+                    <tr>
+                      <Th>Date</Th>
+                      <Th>Description</Th>
+                      <Th>Amount</Th>
+                      <Th>Type</Th>
+                      <Th>Status</Th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {transactions.map((tx) => (
+                      <Tr key={tx.id}>
+                        <Td>{formatDate(tx.created_at)}</Td>
+                        <Td>{tx.description || tx.type}</Td>
+                        <Td>
+                          <AmountText positive={tx.type === "deposit" || tx.type === "profit" || tx.type === "referral"}>
+                            {tx.type === "withdrawal" || tx.type === "fee" ? "-" : "+"}
+                            {formatNaira(Math.abs(tx.amount))}
+                          </AmountText>
+                        </Td>
+                        <Td>
+                          <span style={{ textTransform: "capitalize" }}>{tx.type}</span>
+                        </Td>
+                        <Td>
+                          <StatusBadge tone={tx.status}>{tx.status}</StatusBadge>
+                        </Td>
+                      </Tr>
+                    ))}
+                  </tbody>
+                </Table>
+              </TableWrap>
+            )}
+          </SectionCard>
           </div>
 
           <div>
-            <SectionCard>
-              <SectionTitle>
-                <h3>
-                  <Bell size={18} />
-                  Notifications
-                </h3>
-                {unreadNotificationCount > 0 && (
-                  <Button variant="outline" onClick={handleMarkAllNotificationsRead} style={{ fontSize: "12px", padding: "8px 14px", width: "auto" }}>
-                    <CheckCheck size={14} />
-                    Mark All Read
-                  </Button>
-                )}
-              </SectionTitle>
-              {notifications.length === 0 ? (
-                <EmptyState>
-                  <p>You have no notifications.</p>
-                </EmptyState>
-              ) : (
-                <NotificationList>
-                  {notifications.map((notification) => (
-                    <NotificationItem key={notification.id} $unread={!notification.is_read}>
-                      <div className="notification-icon">
-                        <Bell size={15} />
-                      </div>
-                      <div className="notification-content">
-                        <div className="notification-title">{notification.title}</div>
-                        <div className="notification-message">{notification.message}</div>
-                        <div className="notification-time">{formatDateTime(notification.created_at)}</div>
-                      </div>
-                      {!notification.is_read && <div className="unread-dot" />}
-                    </NotificationItem>
-                  ))}
-                </NotificationList>
+          <SectionCard>
+            <SectionTitle>
+              <h3>
+                <Bell size={18} />
+                Notifications
+              </h3>
+              {unreadNotificationCount > 0 && (
+                <Button variant="outline" onClick={handleMarkAllNotificationsRead} style={{ fontSize: "12px", padding: "8px 14px", width: "auto" }}>
+                  <CheckCheck size={14} />
+                  Mark all read
+                </Button>
               )}
-            </SectionCard>
+            </SectionTitle>
+            {notifications.length === 0 ? (
+              <EmptyState>
+                <p>You are all caught up — no notifications right now.</p>
+              </EmptyState>
+            ) : (
+              <NotificationList>
+                {notifications.map((notification) => (
+                  <NotificationItem key={notification.id} $unread={!notification.is_read}>
+                    <div className="notification-icon">
+                      <Bell size={15} />
+                    </div>
+                    <div className="notification-content">
+                      <div className="notification-title">{notification.title}</div>
+                      <div className="notification-message">{notification.message}</div>
+                      <div className="notification-time">{formatDateTime(notification.created_at)}</div>
+                    </div>
+                    {!notification.is_read && <div className="unread-dot" />}
+                  </NotificationItem>
+                ))}
+              </NotificationList>
+            )}
+          </SectionCard>
           </div>
         </MainGrid>
       </Container>

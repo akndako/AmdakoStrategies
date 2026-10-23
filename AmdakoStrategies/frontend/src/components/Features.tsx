@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Target, Eye, Building2, ShieldCheck } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-features" })`
   padding: 100px 24px;
   background: ${theme.colors.surface};
 
