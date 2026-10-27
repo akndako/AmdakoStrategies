@@ -437,10 +437,10 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
   return (
     <Container>
-      <TopBar>
+      {/* <TopBar>
         <strong>AMDAKO STRATEGY NIG. LTD.</strong>
         <span className="top-bar-meta"> — RC. 9560518 · Registered Investment & Digital Finance Company</span>
-      </TopBar>
+      </TopBar> */}
 
       <Nav>
         <Brand onClick={() => handleNavigate("home")} aria-label="Go to home">

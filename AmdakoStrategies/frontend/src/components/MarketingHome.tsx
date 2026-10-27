@@ -4,9 +4,6 @@ import ProjectionTable from "./ProjectionTable";
 import Opportunities from "./Opportunities";
 import HowToInvest from "./HowToInvest";
 import CTA from "./CTA";
-import TrustRibbon from "./landing/TrustRibbon";
-import LandingSectionNav from "./landing/LandingSectionNav";
-import InvestFlowBand from "./landing/InvestFlowBand";
 import type { PageView } from "../App";
 
 type MarketingHomeProps = {
@@ -22,13 +19,9 @@ export default function MarketingHome({ onNavigate, isAuthenticated }: Marketing
         onOpenDashboard={() => onNavigate("dashboard")}
         onNavigate={onNavigate}
       />
-      <TrustRibbon />
-      <LandingSectionNav />
 
-      <InvestFlowBand>
-        <InvestmentPlan flush />
-        <ProjectionTable flush />
-      </InvestFlowBand>
+      <InvestmentPlan flush />
+      <ProjectionTable flush />
 
       <Opportunities onNavigate={onNavigate} />
       <HowToInvest />
