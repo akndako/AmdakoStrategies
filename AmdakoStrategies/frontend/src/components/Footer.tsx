@@ -219,11 +219,7 @@ export default function Footer() {
           <BrandColumn>
             <h3><span>Amdakostrategies</span></h3>
             <div className="rc">AMDAKO STRATEGY NIG. LTD. — RC. 9560518</div>
-            <p>
-              A Strategic Wealth Creation, Digital Finance and Institutional Partnership Company —
-              empowering individuals, institutions, governments, and organizations through strategic
-              wealth creation and innovative investment opportunities.
-            </p>
+            <p>Registered investment & digital finance — RC. 9560518.</p>
             <ContactInfo>
               <a href="mailto:amdakoStrategy@gmail.com">
                 <Mail size={15} />
@@ -245,9 +241,8 @@ export default function Footer() {
           </BrandColumn>
 
           <LinksColumn>
-            <h4>Company</h4>
+            <h4>Explore</h4>
             <a href="#home">Home</a>
-            <a href="#about">About Us</a>
             <a href="#investment-plan">Investment Plan</a>
             <a href="#contact">Contact</a>
             <a href="#terms">Terms of Service</a>

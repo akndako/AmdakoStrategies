@@ -1,8 +1,9 @@
 import { type FormEvent, useState } from "react";
 import styled from "styled-components";
-import { User, Mail, Phone, Lock, MapPin, Home, ArrowRight } from "lucide-react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { User, Mail, Phone, Lock, ArrowRight, Eye, EyeOff, ShieldCheck } from "lucide-react";
+import { LogoLoader } from "../components/LoadingSpinner";
 import { theme } from "../theme";
+import { AuthPageShell } from "../components/layout/pageLayout";
 import { signUp } from "../lib/auth";
 import type { AuthState } from "../types";
 import type { PageView } from "../App";
@@ -12,55 +13,53 @@ type CreateAccountPageProps = {
   onNavigate: (page: PageView) => void;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 80px 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: ${theme.colors.ivory};
-
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 40px 16px;
-  }
+const Page = styled(AuthPageShell)`
+  background-image:
+    radial-gradient(ellipse 75% 55% at 0% 0%, rgba(2, 113, 196, 0.06), transparent 60%),
+    radial-gradient(ellipse 65% 45% at 100% 100%, rgba(201, 162, 39, 0.07), transparent 55%);
 `;
 
 const Card = styled.div`
-  width: min(560px, 100%);
+  width: min(640px, 100%);
+  min-width: 0;
   background: #fff;
   border: 1px solid ${theme.colors.border};
+  border-top: 3px solid ${theme.colors.gold};
   border-radius: ${theme.radii.xl};
-  padding: 48px;
-  box-shadow: ${theme.shadows.card};
+  padding: 40px;
+  box-shadow: ${theme.shadows.cardHover};
 
   @media (max-width: 768px) {
-    padding: 36px;
+    padding: 32px;
   }
 
   @media (max-width: 480px) {
-    padding: 28px;
+    padding: 24px;
     border-radius: ${theme.radii.large};
   }
 `;
 
 const Header = styled.div`
-  margin-bottom: 30px;
+  margin-bottom: 28px;
 
   @media (max-width: 480px) {
     margin-bottom: 24px;
   }
 
   .eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
     font-size: 12px;
     font-weight: 600;
-    letter-spacing: 2px;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
     color: ${theme.colors.gold};
     margin-bottom: 10px;
+
+    svg {
+      color: ${theme.colors.primary};
+    }
   }
 
   h2 {
@@ -85,7 +84,7 @@ const Header = styled.div`
 
 const Form = styled.form`
   display: grid;
-  gap: 18px;
+  gap: 16px;
 `;
 
 const Row = styled.div`
@@ -93,9 +92,9 @@ const Row = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 16px;
 
-  @media (max-width: 480px) {
+  @media (max-width: 560px) {
     grid-template-columns: 1fr;
-    gap: 18px;
+    gap: 16px;
   }
 `;
 
@@ -110,7 +109,7 @@ const Field = styled.label`
 const InputWrapper = styled.div`
   position: relative;
 
-  svg {
+  > svg {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -125,7 +124,7 @@ const Input = styled.input`
   border-radius: ${theme.radii.medium};
   border: 1px solid ${theme.colors.border};
   background: #fff;
-  padding: 14px 16px 14px 44px;
+  padding: 13px 46px 13px 44px;
   color: ${theme.colors.text};
   font-size: 15px;
   transition: all 0.2s ease;
@@ -141,8 +140,40 @@ const Input = styled.input`
   }
 
   @media (max-width: 480px) {
-    padding: 13px 14px 13px 40px;
+    padding: 13px 44px 13px 40px;
     font-size: 15px;
+  }
+`;
+
+const PasswordToggle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: ${theme.radii.small};
+  background: transparent;
+  color: ${theme.colors.textMuted};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.colors.primary};
+    background: ${theme.colors.primaryLight};
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${theme.colors.primary};
+    outline-offset: 1px;
+  }
+
+  svg {
+    position: static;
+    transform: none;
   }
 `;
 
@@ -199,6 +230,32 @@ const ErrorMessage = styled.div`
   font-size: 14px;
 `;
 
+const SuccessMessage = styled.div`
+  color: ${theme.colors.success};
+  background: rgba(25, 135, 84, 0.08);
+  border: 1px solid rgba(25, 135, 84, 0.22);
+  padding: 12px 16px;
+  border-radius: ${theme.radii.medium};
+  font-size: 14px;
+  line-height: 1.5;
+`;
+
+const SecurityNote = styled.p`
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin: 0;
+  color: ${theme.colors.textMuted};
+  font-size: 13px;
+  line-height: 1.5;
+
+  svg {
+    flex: 0 0 auto;
+    margin-top: 1px;
+    color: ${theme.colors.primary};
+  }
+`;
+
 const CardFooter = styled.div`
   margin-top: 28px;
   padding-top: 24px;
@@ -234,15 +291,16 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [address, setAddress] = useState("");
-  const [location, setLocation] = useState("");
-  const [stateOfOrigin, setStateOfOrigin] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [confirmationMessage, setConfirmationMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
+    setConfirmationMessage(null);
 
     if (password !== confirmPassword) {
       setError("Passwords do not match.");
@@ -257,10 +315,7 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
         lastName,
         email,
         password,
-        phone,
-        address,
-        location,
-        stateOfOrigin
+        phone
       );
 
       if (error) {
@@ -269,7 +324,7 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
       }
 
       if (requiresEmailConfirmation) {
-        setError("Account created. Check your email to confirm before logging in.");
+        setConfirmationMessage("Account created. Check your email to confirm your address before signing in.");
         return;
       }
 
@@ -290,9 +345,9 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
     <Page>
       <Card>
         <Header>
-          <div className="eyebrow">Investor Registration</div>
+          <div className="eyebrow"><ShieldCheck size={15} /> Investor Registration</div>
           <h2>Create Your Account</h2>
-          <p>Join today to start investing in premium digital finance strategies with trusted security and expert guidance.</p>
+          <p>Set up your investor account to access your portfolio and manage your investments.</p>
         </Header>
 
         <Form onSubmit={handleSubmit}>
@@ -301,7 +356,7 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
               First name
               <InputWrapper>
                 <User size={18} />
-                <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="Your first name" required disabled={loading} />
+                <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} type="text" placeholder="Your first name" autoComplete="given-name" required disabled={loading} />
               </InputWrapper>
             </Field>
 
@@ -309,33 +364,38 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
               Last name
               <InputWrapper>
                 <User size={18} />
-                <Input value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" placeholder="Your last name" required disabled={loading} />
+                <Input value={lastName} onChange={(e) => setLastName(e.target.value)} type="text" placeholder="Your last name" autoComplete="family-name" required disabled={loading} />
               </InputWrapper>
             </Field>
           </Row>
 
-          <Field>
-            Phone number
-            <InputWrapper>
-              <Phone size={18} />
-              <Input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="Your phone number" required disabled={loading} />
-            </InputWrapper>
-          </Field>
+          <Row>
+            <Field>
+              Phone number
+              <InputWrapper>
+                <Phone size={18} />
+                <Input value={phone} onChange={(e) => setPhone(e.target.value)} type="tel" placeholder="Your phone number" autoComplete="tel" required disabled={loading} />
+              </InputWrapper>
+            </Field>
 
-          <Field>
-            Email address
-            <InputWrapper>
-              <Mail size={18} />
-              <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" required disabled={loading} />
-            </InputWrapper>
-          </Field>
+            <Field>
+              Email address
+              <InputWrapper>
+                <Mail size={18} />
+                <Input value={email} onChange={(e) => setEmail(e.target.value)} type="email" placeholder="you@example.com" autoComplete="email" required disabled={loading} />
+              </InputWrapper>
+            </Field>
+          </Row>
 
           <Row>
             <Field>
               Password
               <InputWrapper>
                 <Lock size={18} />
-                <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Create a strong password" required disabled={loading} />
+                <Input value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} placeholder="Create a strong password" autoComplete="new-password" required disabled={loading} />
+                <PasswordToggle type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword}>
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </PasswordToggle>
               </InputWrapper>
             </Field>
 
@@ -343,43 +403,30 @@ export default function CreateAccountPage({ onSignUpSuccess, onNavigate }: Creat
               Confirm password
               <InputWrapper>
                 <Lock size={18} />
-                <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type="password" placeholder="Re-enter your password" required disabled={loading} />
-              </InputWrapper>
-            </Field>
-          </Row>
-
-          <Field>
-            Address
-            <InputWrapper>
-              <Home size={18} />
-              <Input value={address} onChange={(e) => setAddress(e.target.value)} type="text" placeholder="Your residential address" required disabled={loading} />
-            </InputWrapper>
-          </Field>
-
-          <Row>
-            <Field>
-              Location
-              <InputWrapper>
-                <MapPin size={18} />
-                <Input value={location} onChange={(e) => setLocation(e.target.value)} type="text" placeholder="City / Town" required disabled={loading} />
-              </InputWrapper>
-            </Field>
-
-            <Field>
-              State of Origin
-              <InputWrapper>
-                <MapPin size={18} />
-                <Input value={stateOfOrigin} onChange={(e) => setStateOfOrigin(e.target.value)} type="text" placeholder="Your state of origin" required disabled={loading} />
+                <Input value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} type={showConfirmPassword ? "text" : "password"} placeholder="Re-enter your password" autoComplete="new-password" required disabled={loading} />
+                <PasswordToggle type="button" onClick={() => setShowConfirmPassword((visible) => !visible)} aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"} aria-pressed={showConfirmPassword}>
+                  {showConfirmPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </PasswordToggle>
               </InputWrapper>
             </Field>
           </Row>
 
           <Button type="submit" disabled={loading}>
-            {loading ? "Creating account..." : "Create Account"}
-            {!loading && <ArrowRight size={16} />}
+            {loading ? (
+              <>
+                <LogoLoader compact />
+                Creating account...
+              </>
+            ) : (
+              <>
+                Create Account
+                <ArrowRight size={16} />
+              </>
+            )}
           </Button>
-          {loading && <LoadingSpinner message="Creating your account..." />}
-          {error && <ErrorMessage>{error}</ErrorMessage>}
+          {error && <ErrorMessage role="alert">{error}</ErrorMessage>}
+          {confirmationMessage && <SuccessMessage role="status">{confirmationMessage}</SuccessMessage>}
+          <SecurityNote><ShieldCheck size={16} /> You can add or update your profile details after creating your account.</SecurityNote>
           <Notice>By creating an account, you agree to our terms of service and privacy policy.</Notice>
         </Form>
 

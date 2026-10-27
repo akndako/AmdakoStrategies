@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
-import { PageShell, PageContainer } from "../components/layout/pageLayout";
+import { PageShell, PageContainer, TableScroll } from "../components/layout/pageLayout";
 import {
   FileText,
   TrendingUp,
@@ -14,25 +14,25 @@ import {
   ArrowDownRight,
   ArrowUpRight,
   AlertTriangle,
-  Eye,
-  Loader2,
   Bell,
   CheckCheck,
   ShieldCheck,
   CreditCard,
   ArrowLeftRight,
   User,
-  Settings,
   Edit,
+  Inbox,
 } from "lucide-react";
 import type { PageView } from "../App";
 import { theme } from "../theme";
 import { getCurrentProfile } from "../services/profileService";
+import { useResolvedAvatarUrl } from "../hooks/useResolvedAvatarUrl";
 import { getInvestments } from "../services/investmentService";
 import { getTransactions } from "../services/transactionService";
 import { getAgreement } from "../services/agreementService";
 import { getNotifications, markAllNotificationsAsRead } from "../services/notificationService";
 import { getInvestorAccount } from "../services/investorAccountService";
+import LoadingSpinner from "../components/LoadingSpinner";
 import type { Profile, Investment, Transaction, Agreement, DashboardSummary, InvestorAccount, Notification, AuthUser } from "../types";
 
 type DashboardPageProps = {
@@ -104,12 +104,9 @@ const Header = styled.div`
   }
 
   h2 {
-    font-size: 26px;
+    font-size: clamp(1.25rem, 4.5vw, 26px);
     margin-bottom: 8px;
-
-    @media (max-width: 480px) {
-      font-size: 22px;
-    }
+    overflow-wrap: anywhere;
   }
 
   p {
@@ -217,16 +214,6 @@ const LoadingCard = styled.div`
   min-height: 300px;
   color: ${theme.colors.textSecondary};
   font-size: 15px;
-
-  svg {
-    animation: spin 1s linear infinite;
-    color: ${theme.colors.primary};
-  }
-
-  @keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
 `;
 
 /* ============ HERO SECTION ============ */
@@ -637,7 +624,14 @@ const SectionTitle = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   margin-bottom: 18px;
+  flex-wrap: wrap;
+
+  @media (max-width: 600px) {
+    flex-direction: column;
+    align-items: stretch;
+  }
 
   h3 {
     font-size: 1.0625rem;
@@ -652,10 +646,7 @@ const SectionTitle = styled.div`
   }
 `;
 
-const TableWrap = styled.div`
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-`;
+const TableWrap = TableScroll;
 
 const Table = styled.table`
   width: 100%;
@@ -715,14 +706,33 @@ const Tr = styled.tr`
 `;
 
 const EmptyState = styled.div`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  padding: 32px 20px;
-  color: ${theme.colors.textMuted};
+  padding: 36px 24px;
+  border-radius: ${theme.radii.large};
+  background: ${theme.colors.surfaceAlt};
+  border: 1px dashed ${theme.colors.border};
+
+  .empty-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: ${theme.colors.primaryLight};
+    color: ${theme.colors.primary};
+    margin-bottom: 14px;
+  }
 
   p {
-    font-size: 0.875rem;
-    color: ${theme.colors.textMuted};
+    font-size: 0.9rem;
+    color: ${theme.colors.textSecondary};
     margin-bottom: 16px;
+    max-width: 28rem;
+    line-height: 1.55;
   }
 `;
 
@@ -845,10 +855,10 @@ const AgreementBanner = styled.div`
   margin-bottom: 24px;
   flex-wrap: wrap;
 
-  @media (max-width: 480px) {
+  @media (max-width: 640px) {
     padding: 14px 16px;
     flex-direction: column;
-    align-items: flex-start;
+    align-items: stretch;
   }
 
   .agreement-info {
@@ -929,6 +939,7 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
   });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const profileAvatarUrl = useResolvedAvatarUrl(profile?.avatar_url);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
@@ -1040,8 +1051,7 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
       <Page>
         <Container>
           <LoadingCard>
-            <Loader2 size={32} />
-            <p>Loading your dashboard...</p>
+            <LoadingSpinner message="Loading your dashboard..." layout="center" />
           </LoadingCard>
         </Container>
       </Page>
@@ -1116,8 +1126,8 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
 
           <ProfileSideCard>
             <div className="profile-top">
-              {profile?.avatar_url ? (
-                <AvatarImage src={profile.avatar_url} alt={displayName} />
+              {profileAvatarUrl ? (
+                <AvatarImage src={profileAvatarUrl} alt={displayName} />
               ) : (
                 <Avatar>{getInitials(displayName)}</Avatar>
               )}
@@ -1244,6 +1254,9 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             </SectionTitle>
             {investments.length === 0 ? (
               <EmptyState>
+                <div className="empty-icon" aria-hidden>
+                  <Briefcase size={22} />
+                </div>
                 <p>You do not have any investments yet. Complete your agreement to get started.</p>
                 <Button variant="primary" onClick={() => onNavigate("agreement")} style={{ width: "auto", margin: "0 auto" }}>
                   <FileText size={16} />
@@ -1299,7 +1312,10 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             </SectionTitle>
             {transactions.length === 0 ? (
               <EmptyState>
-                <p>No transactions yet.</p>
+                <div className="empty-icon" aria-hidden>
+                  <ArrowLeftRight size={22} />
+                </div>
+                <p>No transactions yet. Activity will appear here after deposits and payouts.</p>
               </EmptyState>
             ) : (
               <TableWrap>
@@ -1355,6 +1371,9 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             </SectionTitle>
             {notifications.length === 0 ? (
               <EmptyState>
+                <div className="empty-icon" aria-hidden>
+                  <Inbox size={22} />
+                </div>
                 <p>You are all caught up — no notifications right now.</p>
               </EmptyState>
             ) : (

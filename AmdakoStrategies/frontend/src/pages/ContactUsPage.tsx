@@ -1,23 +1,12 @@
 import styled from "styled-components";
 import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
 import { theme } from "../theme";
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 60px 24px;
-  background: ${theme.colors.ivory};
+import { MarketingPageShell, PageContainer } from "../components/layout/pageLayout";
 
-  @media (max-width: 768px) {
-    padding: 40px 20px;
-  }
+const Page = MarketingPageShell;
 
-  @media (max-width: 480px) {
-    padding: 30px 16px;
-  }
-`;
-
-const Container = styled.div`
+const Container = styled(PageContainer)`
   max-width: 1080px;
-  margin: 0 auto;
 `;
 
 const Grid = styled.div`

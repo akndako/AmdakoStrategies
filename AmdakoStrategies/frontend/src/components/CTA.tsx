@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { ArrowRight, PhoneCall } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-cta" })`
   padding: 100px 24px;
   background: ${theme.colors.ivory};
 
@@ -213,7 +213,7 @@ export default function CTA({ onNavigate }: CTAProps) {
               transition={{ duration: 0.5 }}
               viewport={{ once: true }}
             >
-              Begin Your Investment Journey
+              Open your investor account
             </Title>
             <Description
               initial={{ opacity: 0, y: 20 }}
@@ -221,8 +221,7 @@ export default function CTA({ onNavigate }: CTAProps) {
               transition={{ delay: 0.1, duration: 0.5 }}
               viewport={{ once: true }}
             >
-              Contact our investment team or authorized agent, complete the Amdako Strategy
-              Investment Form, and begin earning guaranteed 10% monthly returns.
+              Register in minutes, complete your profile and agreement, then fund when you are ready—existing members can sign in below.
             </Description>
             <ButtonGroup>
               <Button
@@ -234,7 +233,7 @@ export default function CTA({ onNavigate }: CTAProps) {
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.97 }}
               >
-                Get Started
+                Register
                 <ArrowRight size={16} />
               </Button>
               <Button

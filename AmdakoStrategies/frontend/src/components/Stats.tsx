@@ -3,7 +3,7 @@ import { LineChart, Line, ResponsiveContainer, XAxis, YAxis, CartesianGrid, Tool
 import { motion } from "framer-motion";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-performance" })`
   padding: 100px 24px;
   background: ${theme.colors.surface};
 
@@ -80,8 +80,9 @@ const StatsGrid = styled.div`
   grid-template-columns: 1fr 1fr;
   gap: 20px;
 
-  @media (max-width: 600px) {
-    gap: 16px;
+  @media (max-width: 480px) {
+    grid-template-columns: 1fr;
+    gap: 14px;
   }
 `;
 
@@ -174,63 +175,20 @@ export default function Stats() {
     <Section>
       <Container>
         <Header>
-          <Eyebrow>Portfolio Performance</Eyebrow>
-          <Title>Consistent, Predictable Returns</Title>
+          <Eyebrow>Illustration</Eyebrow>
+          <Title>How your balance can compound</Title>
           <Subtitle>
-            Our structured investment approach delivers steady growth through disciplined
-            market strategies and professional risk management.
+            Sample six-month path for ₦1,000,000 at the published monthly rate—your amount scales the same way.
           </Subtitle>
         </Header>
 
         <Content>
-          <StatsGrid>
-            <StatCard
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h4>Monthly ROI</h4>
-              <div className="value">10%</div>
-              <p>Guaranteed monthly return on your invested capital</p>
-            </StatCard>
-            <StatCard
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.1, duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h4>Annual ROI</h4>
-              <div className="value">120%</div>
-              <p>Calculated at 10% monthly growth strategy</p>
-            </StatCard>
-            <StatCard
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.2, duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h4>Capital Lock</h4>
-              <div className="value">3 mo</div>
-              <p>Minimum lock period to ensure sustainable growth</p>
-            </StatCard>
-            <StatCard
-              initial={{ opacity: 0, scale: 0.95 }}
-              whileInView={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.3, duration: 0.4 }}
-              viewport={{ once: true }}
-            >
-              <h4>Capital Protection</h4>
-              <div className="value">100%</div>
-              <p>Protected under our verified risk-controlled systems</p>
-            </StatCard>
-          </StatsGrid>
-
           <ChartBox
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2, duration: 0.5 }}
+            transition={{ duration: 0.5 }}
             viewport={{ once: true }}
+            style={{ gridColumn: "1 / -1" }}
           >
             <h3>6-Month Growth Projection</h3>
             <p>Compound growth on a ₦1,000,000 investment at 10% monthly ROI</p>

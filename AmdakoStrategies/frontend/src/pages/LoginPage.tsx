@@ -1,7 +1,8 @@
 import { type FormEvent, useState } from "react";
 import styled from "styled-components";
 import { Mail, Lock, ArrowRight, ArrowLeft, Phone, KeyRound } from "lucide-react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import { LogoLoader } from "../components/LoadingSpinner";
+import { AuthPageShell } from "../components/layout/pageLayout";
 import { theme } from "../theme";
 import { logIn, sendPasswordResetCodeByPhone, verifyPasswordResetCode } from "../lib/auth";
 import type { AuthState } from "../types";
@@ -12,30 +13,17 @@ type LoginPageProps = {
   onNavigate: (page: PageView) => void;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 80px 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: ${theme.colors.ivory};
-
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 40px 16px;
-  }
-`;
+const Page = AuthPageShell;
 
 const Card = styled.div`
   width: min(480px, 100%);
+  min-width: 0;
   background: #fff;
   border: 1px solid ${theme.colors.border};
+  border-top: 3px solid ${theme.colors.gold};
   border-radius: ${theme.radii.xl};
   padding: 48px;
-  box-shadow: ${theme.shadows.card};
+  box-shadow: ${theme.shadows.cardHover};
 
   @media (max-width: 768px) {
     padding: 36px;
@@ -535,11 +523,19 @@ export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps)
                     Back to Sign In
                   </BackButton>
                   <Button type="submit" disabled={forgotLoading}>
-                    {forgotLoading ? "Sending code..." : "Send Verification Code"}
-                    {!forgotLoading && <ArrowRight size={16} />}
+                    {forgotLoading ? (
+                      <>
+                        <LogoLoader compact />
+                        Sending code...
+                      </>
+                    ) : (
+                      <>
+                        Send Verification Code
+                        <ArrowRight size={16} />
+                      </>
+                    )}
                   </Button>
                 </Actions>
-                {forgotLoading && <LoadingSpinner message="Sending your verification code..." />}
                 {forgotError && <ErrorMessage>{forgotError}</ErrorMessage>}
                 {forgotMessage && <SuccessNotice>{forgotMessage}</SuccessNotice>}
               </Form>
@@ -579,8 +575,17 @@ export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps)
                     Back
                   </BackButton>
                   <Button type="submit" disabled={forgotLoading}>
-                    {forgotLoading ? "Verifying..." : "Verify Code"}
-                    {!forgotLoading && <ArrowRight size={16} />}
+                    {forgotLoading ? (
+                      <>
+                        <LogoLoader compact />
+                        Verifying...
+                      </>
+                    ) : (
+                      <>
+                        Verify Code
+                        <ArrowRight size={16} />
+                      </>
+                    )}
                   </Button>
                 </Actions>
 
@@ -590,8 +595,6 @@ export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps)
                     Resend code
                   </ResendButton>
                 </ResendRow>
-
-                {forgotLoading && <LoadingSpinner message="Verifying your code..." />}
                 {forgotError && <ErrorMessage>{forgotError}</ErrorMessage>}
               </Form>
             )}
@@ -622,11 +625,19 @@ export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps)
             <Actions>
               <Secondary>Remember me</Secondary>
               <Button type="submit" disabled={loading}>
-                {loading ? "Signing in..." : "Sign In"}
-                {!loading && <ArrowRight size={16} />}
+                {loading ? (
+                  <>
+                    <LogoLoader compact />
+                    Signing in...
+                  </>
+                ) : (
+                  <>
+                    Sign In
+                    <ArrowRight size={16} />
+                  </>
+                )}
               </Button>
             </Actions>
-            {loading && <LoadingSpinner message="Signing you in..." />}
             {error && <ErrorMessage>{error}</ErrorMessage>}
             {notice && <SuccessNotice>{notice}</SuccessNotice>}
           </Form>

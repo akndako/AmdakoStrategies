@@ -1,0 +1,17 @@
+{
+  "framework": "vite",
+  "buildCommand": "npm run build",
+  "outputDirectory": "dist",
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }],
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "Content-Security-Policy",
+          "value": "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' blob: https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: blob: https://*.supabase.co; connect-src 'self' https://amdakostrategies.com.ng https://www.amdakostrategies.com.ng https://*.supabase.co wss://*.supabase.co https://amdako-frontend.vercel.app; font-src 'self' https://fonts.gstatic.com; worker-src 'self' blob:; frame-ancestors 'none';"
+        }
+      ]
+    }
+  ]
+}

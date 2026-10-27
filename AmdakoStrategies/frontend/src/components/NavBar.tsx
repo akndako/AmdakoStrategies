@@ -4,6 +4,7 @@ import { Menu, X, LayoutDashboard, UserPlus, LogIn, ChevronDown, User, Settings,
 import { theme } from "../theme";
 import type { AuthState } from "../types";
 import logoImage from "../assets/amdakostrategies.jpeg";
+import { useResolvedAvatarUrl } from "../hooks/useResolvedAvatarUrl";
 
 type PageView = "home" | "about" | "login" | "create" | "contact" | "dashboard" | "agreement" | "settings" | "edit-profile" | "reset-password";
 
@@ -18,9 +19,10 @@ const Container = styled.header`
   position: sticky;
   top: 0;
   z-index: 100;
-  background: rgba(248, 246, 241, 0.92);
+  background: rgba(248, 246, 241, 0.94);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid ${theme.colors.borderLight};
+  box-shadow: 0 1px 0 rgba(26, 26, 24, 0.04);
 `;
 
 const TopBar = styled.div`
@@ -111,6 +113,10 @@ const BrandText = styled.div`
     text-transform: uppercase;
     margin: 0;
     line-height: 1.3;
+
+    @media (max-width: 480px) {
+      display: none;
+    }
   }
 `;
 
@@ -125,13 +131,29 @@ const NavLinks = styled.div`
 `;
 
 const NavLink = styled.button<{$active?: boolean}>`
+  position: relative;
   padding: 8px 14px;
   border-radius: ${theme.radii.small};
-  background: transparent;
+  background: ${({ $active }) => ($active ? theme.colors.primaryLight : "transparent")};
   color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.textSecondary)};
   font-weight: ${({ $active }) => ($active ? 600 : 500)};
   font-size: 14px;
-  transition: all 0.2s ease;
+  transition: background 0.2s ease, color 0.2s ease;
+
+  ${({ $active }) =>
+    $active &&
+    `
+    &::after {
+      content: '';
+      position: absolute;
+      left: 14px;
+      right: 14px;
+      bottom: 4px;
+      height: 2px;
+      border-radius: 2px;
+      background: ${theme.colors.gold};
+    }
+  `}
 
   &:hover {
     background: ${theme.colors.primaryLight};
@@ -176,6 +198,37 @@ const Button = styled.button<{ variant?: "primary" | "outline" }>`
   }
 `;
 
+const MobileAuthActions = styled.div`
+  display: none;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+
+  @media (max-width: 860px) {
+    display: flex;
+  }
+`;
+
+const MobileAuthButton = styled.button<{ $primary?: boolean }>`
+  padding: 8px 12px;
+  border-radius: ${theme.radii.small};
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: ${({ $primary }) => ($primary ? theme.colors.primary : "#fff")};
+  color: ${({ $primary }) => ($primary ? "#fff" : theme.colors.textSecondary)};
+  border: ${({ $primary }) => ($primary ? "none" : `1px solid ${theme.colors.border}`)};
+
+  &:hover {
+    background: ${({ $primary }) =>
+      $primary ? theme.colors.primaryDark : theme.colors.primaryLight};
+    color: ${({ $primary }) => ($primary ? "#fff" : theme.colors.primary)};
+  }
+`;
+
 const MobileToggle = styled.button`
   display: none;
   width: 40px;
@@ -186,6 +239,7 @@ const MobileToggle = styled.button`
   color: ${theme.colors.text};
   align-items: center;
   justify-content: center;
+  flex-shrink: 0;
 
   @media (max-width: 860px) {
     display: flex;
@@ -275,7 +329,7 @@ const DropdownMenu = styled.div`
   position: absolute;
   top: 70px;
   right: 24px;
-  width: 200px;
+  width: min(220px, calc(100vw - 32px));
   background: #fff;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.large};
@@ -326,6 +380,7 @@ const NavBarWrapper = styled.div`
 `;
 
 export default function Navbar({ activePage, auth, onNavigate, onLogout }: NavbarProps) {
+  const userAvatarUrl = useResolvedAvatarUrl(auth?.user.avatar_url);
   const [menuOpen, setMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -388,7 +443,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
       </TopBar>
 
       <Nav>
-        <Brand onClick={() => handleNavigate(auth ? "dashboard" : "home")} aria-label="Go to home">
+        <Brand onClick={() => handleNavigate("home")} aria-label="Go to home">
           <BrandMark>
             <img src={logoImage} alt="" />
           </BrandMark>
@@ -399,23 +454,17 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         </Brand>
 
         <NavLinks>
-          {auth ? (
+          {auth && (
             <NavLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
               Dashboard
             </NavLink>
-          ) : (
-            <>
-              <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
-                Home
-              </NavLink>
-              <NavLink $active={activePage === "about"} onClick={() => handleNavigate("about")}>
-                About Us
-              </NavLink>
-              <NavLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-                Contact
-              </NavLink>
-            </>
           )}
+          <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
+            Home
+          </NavLink>
+          <NavLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+            Contact
+          </NavLink>
         </NavLinks>
 
         <Actions>
@@ -426,8 +475,8 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
                 aria-label="Toggle user menu"
               >
                 <AvatarCircle>
-                  {auth.user.avatar_url ? (
-                    <img src={auth.user.avatar_url} alt={auth.user.name} />
+                  {userAvatarUrl ? (
+                    <img src={userAvatarUrl} alt={auth.user.name} />
                   ) : (
                     getInitials(auth.user.name)
                   )}
@@ -473,11 +522,24 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
               </Button>
               <Button variant="primary" onClick={() => handleNavigate("create")}>
                 <UserPlus size={16} />
-                Create Account
+                Register
               </Button>
             </>
           )}
         </Actions>
+
+        {!auth && (
+          <MobileAuthActions>
+            <MobileAuthButton type="button" onClick={() => handleNavigate("login")}>
+              <LogIn size={14} />
+              Sign In
+            </MobileAuthButton>
+            <MobileAuthButton type="button" $primary onClick={() => handleNavigate("create")}>
+              <UserPlus size={14} />
+              Register
+            </MobileAuthButton>
+          </MobileAuthActions>
+        )}
 
         <MobileToggle onClick={() => setMenuOpen((current) => !current)} aria-label="Toggle navigation menu">
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
@@ -486,27 +548,19 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       {menuOpen && (
         <MobileMenu>
-          {auth ? (
-            <>
-              <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
-                Dashboard
-              </MobileLink>
-              <MobileDivider />
-            </>
-          ) : (
-            <>
-              <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
-                Home
-              </MobileLink>
-              <MobileLink $active={activePage === "about"} onClick={() => handleNavigate("about")}>
-                About Us
-              </MobileLink>
-              <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-                Contact
-              </MobileLink>
-              <MobileDivider />
-            </>
+          {auth && (
+            <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
+              <LayoutDashboard size={18} />
+              Dashboard
+            </MobileLink>
           )}
+          <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
+            Home
+          </MobileLink>
+          <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+            Contact
+          </MobileLink>
+          <MobileDivider />
 
           {auth ? (
             <>
@@ -539,7 +593,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
               </MobileLink>
               <MobileLink $active={activePage === "create"} onClick={() => handleNavigate("create")}>
                 <UserPlus size={18} />
-                Create Account
+                Register
               </MobileLink>
             </>
           )}

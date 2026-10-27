@@ -1,7 +1,8 @@
 import { type FormEvent, useEffect, useState } from "react";
 import styled from "styled-components";
 import { Lock, ArrowRight, ArrowLeft, CheckCircle, AlertCircle } from "lucide-react";
-import LoadingSpinner from "../components/LoadingSpinner";
+import LoadingSpinner, { LogoLoader } from "../components/LoadingSpinner";
+import { AuthPageShell } from "../components/layout/pageLayout";
 import { theme } from "../theme";
 import { resetPassword } from "../lib/auth";
 import { supabase } from "../lib/supabase";
@@ -12,29 +13,16 @@ type ResetPasswordPageProps = {
   onShowToast?: (message: string) => void;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 80px 24px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  background: ${theme.colors.ivory};
-
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 40px 16px;
-  }
-`;
+const Page = AuthPageShell;
 
 const Card = styled.div`
   width: min(480px, 100%);
+  min-width: 0;
   background: #fff;
-  border:  ̃1px solid ${theme.colors.border};
+  border: 1px solid ${theme.colors.border};
+  border-top: 3px solid ${theme.colors.gold};
   border-radius: ${theme.radii.xl};
-  padding:  ̃48px;
+  padding: 48px;
   box-shadow: ${theme.shadows.card};
 
   @media (max-width: 768px) {
@@ -48,45 +36,45 @@ const Card = styled.div`
 `;
 
 const Header = styled.div`
-  margin-bottom:  ̃32px;
+  margin-bottom: 32px;
 
   .eyebrow {
-    font-size:  ̃12px;
-    font-weight:  ̃600;
-    letter-spacing:ă 2px;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing:2px;
     text-transform: uppercase;
     color: ${theme.colors.gold};
-    margin-bottom:ă 10px;
+    margin-bottom:10px;
   }
 
   h2 {
-    font-size:ă 28px;
-    margin-bottom:ă 10px;
+    font-size:28px;
+    margin-bottom:10px;
     color: ${theme.colors.text};
 
     @media (max-width: 480px) {
-      font-size:ă 24px;
+      font-size:24px;
     }
   }
 
   p {
     color: ${theme.colors.textSecondary};
-    line-height:ă 1.6;
-    font-size:ă 0.9375rem;
+    line-height:1.6;
+    font-size:0.9375rem;
   }
 `;
 
 const Form = styled.form`
   display: grid;
-  gap:ă 20px;
+  gap:20px;
 `;
 
 const Field = styled.label`
   display: grid;
-  gap:ă 8px;
+  gap:8px;
   color: ${theme.colors.text};
-  font-size:ă 14px;
-  font-weight:ă 500;
+  font-size:14px;
+  font-weight:500;
 `;
 
 const InputWrapper = styled.div`
@@ -94,7 +82,7 @@ const InputWrapper = styled.div`
 
   svg {
     position: absolute;
-    left:ă 14px;
+    left:14px;
     top: 50%;
     transform: translateY(-50%);
     color: ${theme.colors.textMuted};
@@ -105,11 +93,11 @@ const InputWrapper = styled.div`
 const Input = styled.input`
   width: 100%;
   border-radius: ${theme.radii.medium};
-  border:ă 1px solid ${theme.colors.border};
+  border:1px solid ${theme.colors.border};
   background: #fff;
   padding: 14px 16px 14px 44px;
   color: ${theme.colors.text};
-  font-size:ă 15px;
+  font-size:15px;
   transition: all 0.2s ease;
 
   &::placeholder {
@@ -127,13 +115,13 @@ const Actions = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap:ă 16px;
+  gap:16px;
   flex-wrap: wrap;
 
   @media (max-width: 480px) {
     flex-direction: column;
     align-items: stretch;
-    gap:ă 12px;
+    gap:12px;
   }
 `;
 
@@ -142,14 +130,14 @@ const Button = styled.button`
   border: none;
   border-radius: ${theme.radii.medium};
   padding: 14px 24px;
-  font-weight:ă 600;
-  font-size:ă 15px;
+  font-weight:600;
+  font-size:15px;
   background: ${theme.colors.primary};
   color: #fff;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap:ă 8px;
+  gap:8px;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: ${theme.shadows.button};
@@ -161,7 +149,7 @@ const Button = styled.button`
   }
 
   &:disabled {
-    opacity:ă 0.6;
+    opacity:0.6;
     cursor: not-allowed;
     transform: none;
     box-shadow: none;
@@ -171,15 +159,15 @@ const Button = styled.button`
 const BackButton = styled.button`
   appearance: none;
   background: transparent;
-  border:ă 1px solid ${theme.colors.border};
+  border:1px solid ${theme.colors.border};
   border-radius: ${theme.radii.medium};
   padding: 12px 18px;
-  font-size:ă 14px;
-  font-weight:ă 600;
+  font-size:14px;
+  font-weight:600;
   color: ${theme.colors.textSecondary};
   display: inline-flex;
   align-items: center;
-  gap:ă 8px;
+  gap:8px;
   cursor: pointer;
   transition: all 0.2s ease;
 
@@ -190,7 +178,7 @@ const BackButton = styled.button`
   }
 
   &:disabled {
-    opacity:ă 0.6;
+    opacity:0.6;
     cursor: not-allowed;
   }
 `;
@@ -198,34 +186,27 @@ const BackButton = styled.button`
 const ErrorMessage = styled.div`
   color: ${theme.colors.danger};
   background: rgba(214, 69, 69, 0.08);
-  border:ă 1px solid rgba(214, 69, 69, 0.2);
+  border:1px solid rgba(214, 69, 69, 0.2);
   padding: 12px 16px;
   border-radius: ${theme.radii.medium};
-  margin-bottom:ă 8px;
-  font-size:ă 14px;
+  margin-bottom:8px;
+  font-size:14px;
   display: flex;
   align-items: center;
-  gap:ă 8px;
+  gap:8px;
 `;
 
 const SuccessMessage = styled.div`
   display: flex;
   align-items: center;
-  gap:ă 8px;
+  gap:8px;
   background: rgba(2, 113, 196, 0.08);
-  border:ă 1px solid rgba(2, 113, 196, 0.25);
+  border:1px solid rgba(2, 113, 196, 0.25);
   border-radius: ${theme.radii.medium};
   padding: 12px 16px;
-  margin-bottom:ă 16px;
+  margin-bottom:16px;
   color: ${theme.colors.success};
-  font-size:ă 14px;
-`;
-
-const SpinnerWrap = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 220px;
+  font-size:14px;
 `;
 
 export default function ResetPasswordPage({ onNavigate, onShowToast }: ResetPasswordPageProps) {
@@ -354,9 +335,7 @@ export default function ResetPasswordPage({ onNavigate, onShowToast }: ResetPass
     return (
       <Page>
         <Card>
-          <SpinnerWrap>
-            <LoadingSpinner message="Verifying your reset link..." />
-          </SpinnerWrap>
+          <LoadingSpinner message="Verifying your reset link..." layout="center" />
         </Card>
       </Page>
     );
@@ -448,11 +427,19 @@ export default function ResetPasswordPage({ onNavigate, onShowToast }: ResetPass
                 <ArrowLeft size={16} /> Back
               </BackButton>
               <Button type="submit" disabled={loading}>
-                {loading ? "Updating password..." : "Update Password"}
-                {!loading && <ArrowRight size={16} />}
+                {loading ? (
+                  <>
+                    <LogoLoader compact />
+                    Updating password...
+                  </>
+                ) : (
+                  <>
+                    Update Password
+                    <ArrowRight size={16} />
+                  </>
+                )}
               </Button>
             </Actions>
-            {loading && <LoadingSpinner message="Updating your password..." />}
           </Form>
         )}
       </Card>

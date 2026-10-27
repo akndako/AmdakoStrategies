@@ -21,8 +21,12 @@ export const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     min-height: 100vh;
+    min-height: 100dvh;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-    background: #F8F6F1;
+    background-color: #F8F6F1;
+    background-image:
+      radial-gradient(ellipse 120% 80% at 50% -20%, rgba(2, 113, 196, 0.06), transparent 55%),
+      radial-gradient(ellipse 80% 50% at 100% 50%, rgba(201, 162, 39, 0.05), transparent 45%);
     color: #1A1A18;
     font-size: 16px;
     line-height: 1.6;
@@ -33,6 +37,7 @@ export const GlobalStyles = createGlobalStyle`
 
   img,
   video,
+  canvas,
   svg {
     max-width: 100%;
     height: auto;
@@ -43,8 +48,17 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   [id^="home-"],
-  [id^="about-"] {
-    scroll-margin-top: 120px;
+  [id^="about-"],
+  #investment-plan {
+    scroll-margin-top: 148px;
+  }
+
+  @media (max-width: 860px) {
+    [id^="home-"],
+    [id^="about-"],
+    #investment-plan {
+      scroll-margin-top: 140px;
+    }
   }
 
   h1, h2, h3, h4, h5, h6 {
@@ -139,6 +153,20 @@ export const GlobalStyles = createGlobalStyle`
 
   input, select, textarea {
     font-family: inherit;
+    max-width: 100%;
+  }
+
+  @media (max-width: 768px) {
+    input,
+    select,
+    textarea {
+      font-size: 16px;
+    }
+  }
+
+  main {
+    overflow-x: clip;
+    min-width: 0;
   }
 
   :focus-visible {

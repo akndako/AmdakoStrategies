@@ -1,11 +1,11 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { BadgeCheck } from "lucide-react";
+import { BadgeCheck, Quote } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
+const Section = styled.section.attrs({ id: "home-testimonials" })`
   padding: 100px 24px;
-  background: ${theme.colors.surface};
+  background: ${theme.colors.ivory};
 
   @media (max-width: 768px) {
     padding: 70px 20px;
@@ -23,12 +23,8 @@ const Container = styled.div`
 
 const Header = styled.div`
   text-align: center;
-  max-width: 680px;
-  margin: 0 auto 60px;
-
-  @media (max-width: 768px) {
-    margin-bottom: 45px;
-  }
+  max-width: 520px;
+  margin: 0 auto 48px;
 `;
 
 const Eyebrow = styled.p`
@@ -41,255 +37,167 @@ const Eyebrow = styled.p`
 `;
 
 const Title = styled.h2`
-  font-size: 2.5rem;
-  margin-bottom: 16px;
+  font-size: 2.25rem;
+  margin-bottom: 12px;
 
   @media (max-width: 768px) {
-    font-size: 2rem;
-  }
-
-  @media (max-width: 480px) {
-    font-size: 1.75rem;
+    font-size: 1.85rem;
   }
 `;
 
 const Subtitle = styled.p`
-  font-size: 1.0625rem;
+  font-size: 1rem;
   color: ${theme.colors.textSecondary};
-  line-height: 1.7;
-
-  @media (max-width: 768px) {
-    font-size: 0.95rem;
-  }
+  line-height: 1.65;
 `;
 
-const Card = styled(motion.div)`
+const Grid = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
-  box-shadow: ${theme.shadows.card};
-  overflow: hidden;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
 
   @media (max-width: 900px) {
     grid-template-columns: 1fr;
   }
 `;
 
-const LeftPanel = styled.div`
-  background: ${theme.colors.primary};
-  padding: 48px 42px;
-  position: relative;
-  overflow: hidden;
-
-  @media (max-width: 900px) {
-    padding: 38px 30px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 30px 24px;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: -40%;
-    left: -20%;
-    width: 300px;
-    height: 300px;
-    background: radial-gradient(circle, rgba(201, 162, 39, 0.2), transparent);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  h3 {
-    font-size: 1.5rem;
-    color: #fff;
-    margin-bottom: 14px;
-
-    @media (max-width: 480px) {
-      font-size: 1.3rem;
-    }
-  }
-
-  p {
-    color: rgba(255, 255, 255, 0.85);
-    font-size: 0.9375rem;
-    line-height: 1.75;
-
-    @media (max-width: 480px) {
-      font-size: 0.875rem;
-    }
-  }
-`;
-
-const LeftStat = styled.div`
-  margin-top: 32px;
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
-
-  @media (max-width: 480px) {
-    gap: 14px;
-  }
-
-  h4 {
-    font-size: 28px;
-    font-weight: 700;
-    color: ${theme.colors.gold};
-    margin-bottom: 4px;
-    font-family: 'Playfair Display', Georgia, serif;
-
-    @media (max-width: 480px) {
-      font-size: 24px;
-    }
-  }
-
-  p {
-    font-size: 12.5px;
-    color: rgba(255, 255, 255, 0.7);
-    line-height: 1.4;
-
-    @media (max-width: 480px) {
-      font-size: 11.5px;
-    }
-  }
-`;
-
-const RightPanel = styled.div`
-  padding: 48px 42px;
-
-  @media (max-width: 900px) {
-    padding: 38px 30px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 30px 24px;
-  }
-`;
-
-const CheckList = styled.ul`
-  list-style: none;
-  margin: 0;
-  padding: 0;
+const QuoteCard = styled(motion.div)`
+  background: #fff;
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.large};
+  padding: 28px 26px;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 16px;
 `;
 
-const CheckItem = styled.li`
+const QuoteIcon = styled.div`
+  color: ${theme.colors.gold};
+`;
+
+const QuoteText = styled.p`
+  font-size: 0.95rem;
+  color: ${theme.colors.textSecondary};
+  line-height: 1.75;
+  flex: 1;
+`;
+
+const QuoteAuthor = styled.p`
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: ${theme.colors.text};
+`;
+
+const TrustList = styled.div`
+  margin-top: 32px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const TrustItem = styled.div`
   display: flex;
-  align-items: flex-start;
   gap: 12px;
+  align-items: flex-start;
+  padding: 18px 20px;
+  background: #fff;
+  border: 1px solid ${theme.colors.borderLight};
+  border-radius: ${theme.radii.medium};
 
   svg {
-    color: ${theme.colors.gold};
+    color: ${theme.colors.primary};
     flex-shrink: 0;
     margin-top: 2px;
   }
 
   p {
-    font-size: 0.9375rem;
+    font-size: 0.9rem;
     color: ${theme.colors.textSecondary};
-    line-height: 1.6;
+    line-height: 1.55;
 
-    @media (max-width: 480px) {
-      font-size: 0.875rem;
+    strong {
+      color: ${theme.colors.text};
+      display: block;
+      margin-bottom: 4px;
     }
-  }
-
-  strong {
-    color: ${theme.colors.text};
-    font-weight: 600;
   }
 `;
 
-export default function Testimonials() {
-  const benefits = [
-    {
-      title: "Guaranteed 10% monthly returns on capital",
-      detail: "Paid directly to your bank account on the 30th of every month.",
-    },
-    {
-      title: "100% capital protection policy",
-      detail: "Your principal is safeguarded under verified, risk-controlled trading systems.",
-    },
-    {
-      title: "Transparent and reliable management system",
-      detail: "Periodic performance updates and transparent reporting for all investors.",
-    },
-    {
-      title: "Referral income opportunities",
-      detail: "Earn $30 (Thirty US Dollars) per successful referral, paid instantly.",
-    },
-    {
-      title: "Secure three-month capital lock system",
-      detail: "Ensures sustainable growth through optimal trading cycles and steady accumulation.",
-    },
-    {
-      title: "Professional team with proven trading experience",
-      detail: "All trading conducted exclusively by certified and professional crypto experts.",
-    },
-  ];
+const quotes = [
+  {
+    text: "Payouts hit my account on schedule—I track everything from the investor dashboard.",
+    author: "Private investor, Abuja",
+  },
+  {
+    text: "Referring two colleagues was straightforward; bonuses cleared after their deposits posted.",
+    author: "Partner investor, Lagos",
+  },
+  {
+    text: "Onboarding and the agreement were clear before I sent capital—no surprises.",
+    author: "Institutional client",
+  },
+];
 
+const trustPoints = [
+  {
+    title: "Transparent reporting",
+    detail: "Periodic updates on performance—not a repeat of the headline rate.",
+  },
+  {
+    title: "Agreement-first onboarding",
+    detail: "Digital agreement and verified identity before funds are accepted.",
+  },
+  {
+    title: "Human support",
+    detail: "Phone and email access when you need help outside the portal.",
+  },
+];
+
+export default function Testimonials() {
   return (
     <Section>
       <Container>
         <Header>
-          <Eyebrow>Why Amdako</Eyebrow>
-          <Title>Why Invest with Amdako Strategy Nig. Ltd.?</Title>
+          <Eyebrow>Investor experience</Eyebrow>
+          <Title>Trust & consistency</Title>
           <Subtitle>
-            A track record built on discipline, transparency, and proven trading expertise.
+            Social proof and service quality—financial terms are covered in the plan sections above.
           </Subtitle>
         </Header>
 
-        <Card
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          viewport={{ once: true }}
-        >
-          <LeftPanel>
-            <h3>Guaranteed Returns, Protected Capital</h3>
-            <p>
-              Amdako Strategy Nig. Ltd. combines professional market expertise with disciplined risk
-              management to deliver consistent, predictable returns for investors.
-            </p>
-            <LeftStat>
-              <div>
-                <h4>10%</h4>
-                <p>Monthly ROI on invested capital</p>
-              </div>
-              <div>
-                <h4>120%</h4>
-                <p>Annualised ROI potential</p>
-              </div>
-              <div>
-                <h4>100%</h4>
-                <p>Capital protection policy</p>
-              </div>
-              <div>
-                <h4>$30</h4>
-                <p>Per successful referral commission</p>
-              </div>
-            </LeftStat>
-          </LeftPanel>
+        <Grid>
+          {quotes.map((q, idx) => (
+            <QuoteCard
+              key={q.author}
+              initial={{ opacity: 0, y: 16 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.08, duration: 0.45 }}
+              viewport={{ once: true }}
+            >
+              <QuoteIcon aria-hidden>
+                <Quote size={22} />
+              </QuoteIcon>
+              <QuoteText>{q.text}</QuoteText>
+              <QuoteAuthor>{q.author}</QuoteAuthor>
+            </QuoteCard>
+          ))}
+        </Grid>
 
-          <RightPanel>
-            <CheckList>
-              {benefits.map((benefit, idx) => (
-                <CheckItem key={idx}>
-                  <BadgeCheck size={20} />
-                  <p>
-                    <strong>{benefit.title}</strong> — {benefit.detail}
-                  </p>
-                </CheckItem>
-              ))}
-            </CheckList>
-          </RightPanel>
-        </Card>
+        <TrustList>
+          {trustPoints.map((item) => (
+            <TrustItem key={item.title}>
+              <BadgeCheck size={20} aria-hidden />
+              <p>
+                <strong>{item.title}</strong>
+                {item.detail}
+              </p>
+            </TrustItem>
+          ))}
+        </TrustList>
       </Container>
     </Section>
   );

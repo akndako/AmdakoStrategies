@@ -1,18 +1,18 @@
 import styled from "styled-components";
 import { motion } from "framer-motion";
-import { TrendingUp, Lock, Wallet, Users, ShieldCheck, LineChart, Award } from "lucide-react";
+import { TrendingUp, Lock, Wallet, Users, ShieldCheck } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section.attrs({ id: "home-plans" })`
-  padding: 100px 24px;
-  background: ${theme.colors.ivory};
+const Section = styled.section<{ $flush?: boolean }>`
+  padding: ${({ $flush }) => ($flush ? "32px 24px 56px" : "100px 24px")};
+  background: ${({ $flush }) => ($flush ? "transparent" : theme.colors.ivory)};
 
   @media (max-width: 768px) {
-    padding: 70px 20px;
+    padding: ${({ $flush }) => ($flush ? "24px 20px 48px" : "70px 20px")};
   }
 
   @media (max-width: 480px) {
-    padding: 60px 16px;
+    padding: ${({ $flush }) => ($flush ? "20px 16px 40px" : "60px 16px")};
   }
 `;
 
@@ -180,139 +180,24 @@ const CardList = styled.ul`
   }
 `;
 
-const HighlightCard = styled(motion.div)`
-  padding: 32px 28px;
-  border-radius: ${theme.radii.large};
-  background: ${theme.colors.primary};
-  color: #fff;
-  border: 1px solid ${theme.colors.primaryDark};
-  transition: all 0.25s ease;
+type InvestmentPlanProps = {
+  flush?: boolean;
+};
 
-  &:hover {
-    box-shadow: ${theme.shadows.cardHover};
-    transform: translateY(-3px);
-  }
-
-  @media (max-width: 720px) {
-    padding: 26px 22px;
-  }
-
-  ${IconBox} {
-    background: rgba(255, 255, 255, 0.12);
-    color: #fff;
-    border-color: rgba(255, 255, 255, 0.2);
-  }
-
-  ${CardTitle} {
-    color: #fff;
-  }
-
-  ${CardDescription} {
-    color: rgba(255, 255, 255, 0.85);
-  }
-
-  ${CardList} {
-    li {
-      color: rgba(255, 255, 255, 0.85);
-
-      &::before {
-        color: ${theme.colors.gold};
-      }
-    }
-  }
-`;
-
-const SecuritySection = styled(motion.div)`
-  display: grid;
-  grid-template-columns: 0.9fr 1.1fr;
-  gap: 40px;
-  align-items: center;
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
-  padding: 48px 44px;
-  box-shadow: ${theme.shadows.card};
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-    gap: 28px;
-    padding: 36px 28px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 28px 22px;
-  }
-`;
-
-const SecurityLeft = styled.div`
-  h3 {
-    font-size: 1.5rem;
-    margin-bottom: 14px;
-    color: ${theme.colors.primary};
-
-    @media (max-width: 480px) {
-      font-size: 1.3rem;
-    }
-  }
-
-  p {
-    color: ${theme.colors.textSecondary};
-    line-height: 1.75;
-    font-size: 0.9375rem;
-
-    @media (max-width: 480px) {
-      font-size: 0.875rem;
-    }
-  }
-`;
-
-const SecurityRight = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
-`;
-
-const SecurityItem = styled.div`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 14px 16px;
-  background: ${theme.colors.surfaceAlt};
-  border: 1px solid ${theme.colors.borderLight};
-  border-radius: ${theme.radii.medium};
-
-  svg {
-    color: ${theme.colors.gold};
-    flex-shrink: 0;
-    margin-top: 1px;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: ${theme.colors.textSecondary};
-    line-height: 1.65;
-
-    @media (max-width: 480px) {
-      font-size: 0.84375rem;
-    }
-  }
-`;
-
-export default function InvestmentPlan() {
+export default function InvestmentPlan({ flush }: InvestmentPlanProps) {
   return (
-    <Section id="investment-plan">
+    <Section id="investment-plan" $flush={flush}>
       <Container>
         <Header>
-          <DocLabel>
-            <ShieldCheck size={14} />
-            Official Investment Plan Document
-          </DocLabel>
-          <Eyebrow>For Prospective Investors</Eyebrow>
-          <Title>Official Investment Plan</Title>
-          <Subtitle>
-            Transparent, structured, and professionally managed investment terms designed for sustainable
-            growth and capital preservation.
-          </Subtitle>
+          {!flush && (
+            <DocLabel>
+              <ShieldCheck size={14} />
+              Official Investment Plan Document
+            </DocLabel>
+          )}
+          <Eyebrow>Rate card</Eyebrow>
+          <Title>Monthly ROI & referral terms</Title>
+          <Subtitle>10% monthly ROI, $30 referrals, and entry requirements.</Subtitle>
         </Header>
 
         <Grid>
@@ -320,26 +205,6 @@ export default function InvestmentPlan() {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.05, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <IconBox>
-              <Wallet size={22} />
-            </IconBox>
-            <CardTitle>Investment Range</CardTitle>
-            <CardDescription>
-              Minimum investment is <strong>₦750,000</strong> (Seven Hundred and Fifty Thousand Naira only).
-            </CardDescription>
-            <CardList>
-              <li>Unlimited maximum — commit as much capital as you wish</li>
-              <li>Flexible, open-ended investment duration</li>
-              <li>Minimum 3 months capital lock period</li>
-            </CardList>
-          </Card>
-
-          <Card
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.5 }}
             viewport={{ once: true }}
           >
             <IconBox>
@@ -360,7 +225,7 @@ export default function InvestmentPlan() {
           <Card
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
+            transition={{ delay: 0.1, duration: 0.5 }}
             viewport={{ once: true }}
           >
             <IconBox>
@@ -374,6 +239,26 @@ export default function InvestmentPlan() {
               <li>Earn $30 (Thirty US Dollars) per successful referral</li>
               <li>Paid instantly once referral's capital is confirmed</li>
               <li>Eligible for Investor & Partner programs</li>
+            </CardList>
+          </Card>
+
+          <Card
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.15, duration: 0.5 }}
+            viewport={{ once: true }}
+          >
+            <IconBox>
+              <Wallet size={22} />
+            </IconBox>
+            <CardTitle>Investment Range</CardTitle>
+            <CardDescription>
+              Minimum investment is <strong>₦750,000</strong> (Seven Hundred and Fifty Thousand Naira only).
+            </CardDescription>
+            <CardList>
+              <li>Unlimited maximum — commit as much capital as you wish</li>
+              <li>Flexible, open-ended investment duration</li>
+              <li>Minimum 3 months capital lock period</li>
             </CardList>
           </Card>
 
@@ -398,78 +283,7 @@ export default function InvestmentPlan() {
             </CardList>
           </Card>
 
-          <Card
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.25, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <IconBox>
-              <ShieldCheck size={22} />
-            </IconBox>
-            <CardTitle>Security of Investment</CardTitle>
-            <CardDescription>
-              Funds are managed through verified, risk-controlled trading systems.
-            </CardDescription>
-            <CardList>
-              <li>Certified professional crypto trading experts</li>
-              <li>Transparent reporting & periodic updates</li>
-              <li>Capital safety is our top priority</li>
-              <li>Never exposed to reckless or unmanaged risks</li>
-            </CardList>
-          </Card>
-
-          <HighlightCard
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3, duration: 0.5 }}
-            viewport={{ once: true }}
-          >
-            <IconBox>
-              <Award size={22} />
-            </IconBox>
-            <CardTitle>Why Invest with Amdako</CardTitle>
-            <CardDescription>
-              Guaranteed returns, full capital protection, and a professional team.
-            </CardDescription>
-            <CardList>
-              <li>Guaranteed 10% monthly returns</li>
-              <li>100% capital protection policy</li>
-              <li>Transparent & reliable management system</li>
-              <li>Professional team with proven trading experience</li>
-            </CardList>
-          </HighlightCard>
         </Grid>
-
-        <SecuritySection
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55 }}
-          viewport={{ once: true }}
-        >
-          <SecurityLeft>
-            <h3>Security & Investor Protection</h3>
-            <p>
-              Amdako Strategy Nig. Ltd. maintains the highest standards of capital safety through
-              verified risk-management protocols. All trading is conducted by certified professionals
-              with strict oversight — never reckless, always calculated.
-            </p>
-          </SecurityLeft>
-          <SecurityRight>
-            <SecurityItem>
-              <ShieldCheck size={18} />
-              <p><strong>100% Capital Protection Policy</strong> — your principal is protected under our verified, risk-controlled trading framework.</p>
-            </SecurityItem>
-            <SecurityItem>
-              <LineChart size={18} />
-              <p><strong>Certified Professional Traders</strong> — trading is conducted exclusively by certified crypto experts.</p>
-            </SecurityItem>
-            <SecurityItem>
-              <TrendingUp size={18} />
-              <p><strong>Transparent Reporting</strong> — periodic performance updates provided to all investors.</p>
-            </SecurityItem>
-          </SecurityRight>
-        </SecuritySection>
       </Container>
     </Section>
   );

@@ -3,16 +3,16 @@ import { motion } from "framer-motion";
 import { Table2 } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section`
-  padding: 100px 24px;
-  background: ${theme.colors.surface};
+const Section = styled.section.attrs({ id: "home-projections" })<{ $flush?: boolean }>`
+  padding: ${({ $flush }) => ($flush ? "24px 24px 72px" : "100px 24px")};
+  background: ${({ $flush }) => ($flush ? "transparent" : theme.colors.surface)};
 
   @media (max-width: 768px) {
-    padding: 70px 20px;
+    padding: ${({ $flush }) => ($flush ? "20px 20px 56px" : "70px 20px")};
   }
 
   @media (max-width: 480px) {
-    padding: 60px 16px;
+    padding: ${({ $flush }) => ($flush ? "16px 16px 48px" : "60px 16px")};
   }
 `;
 
@@ -193,16 +193,18 @@ const rows = [
   { capital: "₦10,000,000", monthly: "₦1,000,000", yearly: "₦12,000,000", highlight: false },
 ];
 
-export default function ProjectionTable() {
+type ProjectionTableProps = {
+  flush?: boolean;
+};
+
+export default function ProjectionTable({ flush }: ProjectionTableProps) {
   return (
-    <Section>
+    <Section $flush={flush}>
       <Container>
         <Header>
-          <Eyebrow>Projected Returns</Eyebrow>
-          <Title>Example of Investment Projection</Title>
-          <Subtitle>
-            A clear illustration of the monthly and annual returns on your invested capital at the guaranteed 10% monthly ROI.
-          </Subtitle>
+          <Eyebrow>At 10% monthly</Eyebrow>
+          <Title>Sample projections</Title>
+          <Subtitle>Monthly and annual figures by capital amount.</Subtitle>
         </Header>
 
         <TableWrap

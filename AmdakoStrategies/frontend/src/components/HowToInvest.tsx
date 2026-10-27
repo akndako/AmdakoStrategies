@@ -199,7 +199,7 @@ const steps = [
   {
     icon: TrendingUp,
     title: "Begin Earning",
-    description: "Start earning 10% monthly profits — plus referral commissions where applicable.",
+    description: "Track payouts and referrals from your investor dashboard.",
   },
 ];
 
@@ -210,10 +210,7 @@ export default function HowToInvest() {
         <Header>
           <Eyebrow>Getting Started</Eyebrow>
           <Title>How to Invest</Title>
-          <Subtitle>
-            A simple, transparent five-step process to begin your investment journey with
-            Amdako Strategy Nig. Ltd.
-          </Subtitle>
+          <Subtitle>Register, fund, and manage everything from your dashboard.</Subtitle>
         </Header>
 
         <Steps>

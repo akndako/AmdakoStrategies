@@ -92,15 +92,34 @@ export async function updateProfile(data: Partial<Profile>): Promise<Profile> {
   return result as Profile;
 }
 
+export const MAX_AVATAR_SIZE_BYTES = 5 * 1024 * 1024;
+
+const ALLOWED_AVATAR_MIME_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+]);
+
+export function validateAvatarFile(file: File): void {
+  if (!ALLOWED_AVATAR_MIME_TYPES.has(file.type)) {
+    throw new Error("Please choose a JPG, PNG, WebP, or GIF image.");
+  }
+  if (file.size > MAX_AVATAR_SIZE_BYTES) {
+    throw new Error("Profile picture must be 5MB or smaller.");
+  }
+}
+
 export async function uploadAvatar(file: File): Promise<string> {
+  validateAvatarFile(file);
+
   const user = await getCurrentUser();
   if (!user) {
     throw new Error("User not authenticated");
   }
 
-  const fileExt = file.name.split(".").pop();
-  const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-  const filePath = `avatars/${fileName}`;
+  const fileExt = file.name.split(".").pop() || "jpg";
+  const filePath = `${user.id}/avatar-${Date.now()}.${fileExt}`;
 
   const { error: uploadError } = await supabase.storage
     .from("agreements")
@@ -115,9 +134,28 @@ export async function uploadAvatar(file: File): Promise<string> {
     throw new Error(formatErrorForDisplay(uploadError));
   }
 
-  const { data: publicUrlData } = supabase.storage
-    .from("agreements")
-    .getPublicUrl(filePath);
+  // Store object path; bucket is private — use resolveAvatarDisplayUrl for <img src>.
+  return filePath;
+}
 
-  return publicUrlData.publicUrl;
+const AVATAR_SIGNED_URL_TTL_SEC = 60 * 60;
+
+/** Resolves a storage path or legacy public URL for display in the UI. */
+export async function resolveAvatarDisplayUrl(
+  avatarUrl: string | null | undefined
+): Promise<string | null> {
+  if (!avatarUrl) return null;
+  if (avatarUrl.startsWith("http://") || avatarUrl.startsWith("https://")) {
+    return avatarUrl;
+  }
+
+  const { data, error } = await supabase.storage
+    .from("agreements")
+    .createSignedUrl(avatarUrl, AVATAR_SIGNED_URL_TTL_SEC);
+
+  if (error) {
+    console.error("Error resolving avatar URL:", error);
+    return null;
+  }
+  return data.signedUrl;
 }

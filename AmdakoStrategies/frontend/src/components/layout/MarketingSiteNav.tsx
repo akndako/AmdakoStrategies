@@ -1,8 +1,8 @@
-import { Home, Info, Mail } from "lucide-react";
+import { Home, Mail } from "lucide-react";
 import type { PageView } from "../../App";
 import { SectionTabNav, type TabNavItem } from "./SectionTabNav";
 
-export type MarketingPage = Extract<PageView, "home" | "about" | "contact">;
+export type MarketingPage = Extract<PageView, "home" | "contact">;
 
 type MarketingSiteNavProps = {
   active: MarketingPage;
@@ -11,7 +11,6 @@ type MarketingSiteNavProps = {
 
 const MARKETING_ITEMS: TabNavItem<MarketingPage>[] = [
   { id: "home", label: "Home", icon: <Home size={16} aria-hidden /> },
-  { id: "about", label: "About us", icon: <Info size={16} aria-hidden /> },
   { id: "contact", label: "Contact", icon: <Mail size={16} aria-hidden /> },
 ];
 

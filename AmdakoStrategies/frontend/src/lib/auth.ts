@@ -39,10 +39,7 @@ export async function signUp(
   lastName: string,
   email: string,
   password: string,
-  phone: string,
-  address?: string,
-  location?: string,
-  stateOfOrigin?: string
+  phone: string
 ): Promise<{ authState: AuthState; error: Error | null; requiresEmailConfirmation?: boolean }> {
   const { data, error } = await supabase.auth.signUp({
     email,
@@ -53,9 +50,6 @@ export async function signUp(
         last_name: lastName,
         full_name: `${firstName} ${lastName}`,
         phone,
-        address: address || "",
-        location: location || "",
-        state_of_origin: stateOfOrigin || "",
         monthly_roi: 10,
       },
     },

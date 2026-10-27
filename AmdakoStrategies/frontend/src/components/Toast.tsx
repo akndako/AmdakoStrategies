@@ -48,7 +48,12 @@ const ToastContainer = styled(motion.div)<{ $accent: string }>`
   line-height: 1.45;
 
   @media (max-width: 480px) {
-    top: 16px;
+    top: auto;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    left: 16px;
+    right: 16px;
+    transform: none;
+    max-width: none;
     font-size: 13px;
   }
 `;

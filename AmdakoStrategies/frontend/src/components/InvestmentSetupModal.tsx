@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { ArrowRight, X } from "lucide-react";
+import { LogoLoader } from "./LoadingSpinner";
 import { theme } from "../theme";
 import { createInvestment } from "../services/investmentService";
 import { getOrCreateInvestorAccount } from "../services/investorAccountService";
@@ -9,11 +10,10 @@ import type { AuthState } from "../types";
 type InvestmentSetupModalProps = {
   authState: AuthState;
   onComplete: () => void;
-  onClose?: () => void;
+  onSkip: () => void;
 };
 
 const MIN_INVESTMENT = 750000;
-const MAX_INVESTMENT = 10000000;
 
 const Overlay = styled.div`
   position: fixed;
@@ -27,7 +27,13 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 1000;
-  padding: 24px;
+  padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
+    max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
+
+  @media (max-width: 600px) {
+    align-items: flex-end;
+    padding: 0;
+  }
 `;
 
 const Modal = styled.div`
@@ -36,12 +42,23 @@ const Modal = styled.div`
   box-shadow: 0 20px 60px rgba(26, 26, 24, 0.15);
   width: min(520px, 100%);
   max-height: min(80vh, 600px);
+  max-height: min(80dvh, 600px);
   overflow-y: auto;
   position: relative;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: 600px) {
+    border-radius: ${theme.radii.xl} ${theme.radii.xl} 0 0;
+    max-height: min(92dvh, 720px);
+  }
 `;
 
 const ModalHeader = styled.div`
   padding: 32px 36px 20px;
+
+  @media (max-width: 600px) {
+    padding: 28px 24px 16px;
+  }
   border-bottom: 1px solid ${theme.colors.borderLight};
   position: relative;
 
@@ -270,7 +287,7 @@ const ErrorMessage = styled.div`
 export default function InvestmentSetupModal({
   authState,
   onComplete,
-  onClose,
+  onSkip,
 }: InvestmentSetupModalProps) {
   const [amount, setAmount] = useState("");
   const [loading, setLoading] = useState(false);
@@ -279,7 +296,7 @@ export default function InvestmentSetupModal({
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
       if (event.key === "Escape" && !loading) {
-        onClose?.();
+        onSkip();
       }
     };
     document.addEventListener("keydown", onKeyDown);
@@ -289,15 +306,15 @@ export default function InvestmentSetupModal({
       document.removeEventListener("keydown", onKeyDown);
       document.body.style.overflow = previousOverflow;
     };
-  }, [loading, onClose]);
+  }, [loading, onSkip]);
 
   if (!authState) return null;
 
   const numericAmount = Number(amount);
   const isValidAmount =
-    !isNaN(numericAmount) &&
-    numericAmount >= MIN_INVESTMENT &&
-    numericAmount <= MAX_INVESTMENT;
+    amount.trim() !== "" &&
+    Number.isFinite(numericAmount) &&
+    numericAmount >= MIN_INVESTMENT;
 
   const handleProceed = async () => {
     if (!isValidAmount) {
@@ -343,7 +360,7 @@ export default function InvestmentSetupModal({
     <Overlay>
       <Modal>
         <ModalHeader>
-          <CloseButton onClick={onClose} disabled={loading}>
+          <CloseButton type="button" onClick={onSkip} disabled={loading} aria-label="Skip for now">
             <X size={18} />
           </CloseButton>
           <div className="eyebrow">Investment Setup</div>
@@ -362,7 +379,7 @@ export default function InvestmentSetupModal({
             </InfoItem>
             <InfoItem>
               <div className="label">Maximum Investment</div>
-              <div className="value">{formatNaira(MAX_INVESTMENT)}</div>
+              <div className="value">Unlimited</div>
             </InfoItem>
           </InfoGrid>
 
@@ -374,14 +391,14 @@ export default function InvestmentSetupModal({
               onChange={(e) => setAmount(e.target.value)}
               placeholder="0.00"
               min={MIN_INVESTMENT}
-              max={MAX_INVESTMENT}
               disabled={loading}
+              inputMode="decimal"
             />
           </AmountInput>
 
           {amount && !isValidAmount && (
             <ValidationMessage $valid={false}>
-              Investment amount must be between ₦{MIN_INVESTMENT.toLocaleString()} and ₦{MAX_INVESTMENT.toLocaleString()}.
+              Enter at least {formatNaira(MIN_INVESTMENT)}. There is no maximum limit.
             </ValidationMessage>
           )}
 
@@ -395,17 +412,25 @@ export default function InvestmentSetupModal({
         </ModalBody>
 
         <ModalFooter>
-          {onClose && (
-            <Button variant="outline" onClick={onClose} disabled={loading}>
-              Cancel
-            </Button>
-          )}
+          <Button type="button" variant="outline" onClick={onSkip} disabled={loading}>
+            Skip for now
+          </Button>
           <Button
+            type="button"
             onClick={handleProceed}
             disabled={loading || !isValidAmount}
           >
-            {loading ? "Setting up..." : "Proceed to Dashboard"}
-            {!loading && <ArrowRight size={16} />}
+            {loading ? (
+              <>
+                <LogoLoader compact />
+                Setting up...
+              </>
+            ) : (
+              <>
+                Proceed to Dashboard
+                <ArrowRight size={16} />
+              </>
+            )}
           </Button>
         </ModalFooter>
       </Modal>

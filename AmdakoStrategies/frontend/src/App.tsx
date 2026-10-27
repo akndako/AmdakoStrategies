@@ -6,22 +6,13 @@ import { logOut, getSession } from "./lib/auth";
 import type { AuthState, AuthUser } from "./types";
 
 import Navbar from "./components/NavBar";
-import Hero from "./components/Hero";
-import Features from "./components/Features";
-import InvestmentPlan from "./components/InvestmentPlan";
-import ProjectionTable from "./components/ProjectionTable";
-import Opportunities from "./components/Opportunities";
-import HowToInvest from "./components/HowToInvest";
-import Testimonials from "./components/Testimonials";
-import Stats from "./components/Stats";
-import CTA from "./components/CTA";
+import MarketingHome from "./components/MarketingHome";
 import Footer from "./components/Footer";
 import LoginPage from "./pages/LoginPage";
 import CreateAccountPage from "./pages/CreateAccountPage";
 import ResetPasswordPage from "./pages/ResetPasswordPage";
 import ContactUsPage from "./pages/ContactUsPage";
 import DashboardPage from "./pages/DashboardPage";
-import AboutUsPage from "./pages/AboutUsPage";
 import AgreementFormPage from "./pages/AgreementFormPage";
 import SettingsPage from "./pages/SettingsPage";
 import EditProfilePage from "./pages/EditProfilePage";
@@ -170,6 +161,11 @@ export default function App() {
     setDashboardRefreshKey((k) => k + 1);
   };
 
+  const handleInvestmentSkip = () => {
+    setShowInvestmentModal(false);
+    setPage("dashboard");
+  };
+
   const handleAuthUpdate = (updatedUser: AuthUser) => {
     setAuth((prev) => {
       if (!prev) return prev;
@@ -192,17 +188,11 @@ export default function App() {
   };
 
   const handleNavigate = useCallback((nextPage: PageView) => {
-    // Authenticated users should stay in the investor portal — redirect marketing pages to dashboard
-    if (auth && (nextPage === "home" || nextPage === "about" || nextPage === "contact")) {
-      setPage("dashboard");
-      return;
-    }
-    // Refresh dashboard data when navigating to it
     if (nextPage === "dashboard") {
       setDashboardRefreshKey((k) => k + 1);
     }
     setPage(nextPage);
-  }, [auth]);
+  }, []);
 
   const renderPage = () => {
     switch (page) {
@@ -212,8 +202,20 @@ export default function App() {
         return <CreateAccountPage onSignUpSuccess={handleSignUpSuccess} onNavigate={handleNavigate} />;
       case "reset-password":
         return <ResetPasswordPage onNavigate={setPage} onShowToast={showToast} />;
+      case "home":
+        return (
+          <MarketingHome
+            onNavigate={handleNavigate}
+            isAuthenticated={Boolean(auth)}
+          />
+        );
       case "about":
-        return <AboutUsPage />;
+        return (
+          <MarketingHome
+            onNavigate={handleNavigate}
+            isAuthenticated={Boolean(auth)}
+          />
+        );
       case "contact":
         return <ContactUsPage />;
       case "agreement":
@@ -250,25 +252,11 @@ export default function App() {
           <LoginPage onAuthSuccess={handleAuthSuccess} onNavigate={handleNavigate} />
         );
       default:
-        return auth ? (
-          <DashboardPage
-            user={auth.user}
-            onLogout={handleLogout}
-            onNavigate={setPage}
-            refreshKey={dashboardRefreshKey}
+        return (
+          <MarketingHome
+            onNavigate={handleNavigate}
+            isAuthenticated={Boolean(auth)}
           />
-        ) : (
-          <>
-            <Hero />
-            <Features />
-            <InvestmentPlan />
-            <ProjectionTable />
-            <Opportunities />
-            <HowToInvest />
-            <Testimonials />
-            <Stats />
-            <CTA onNavigate={setPage} />
-          </>
         );
     }
   };
@@ -279,8 +267,16 @@ export default function App() {
     return (
       <ThemeProvider theme={theme}>
         <GlobalStyles />
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          <LoadingSpinner message="Loading..." />
+        <div
+          style={{
+            minHeight: "100vh",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            background: theme.colors.ivory,
+          }}
+        >
+          <LoadingSpinner message="Loading your account…" layout="center" />
         </div>
       </ThemeProvider>
     );
@@ -305,7 +301,7 @@ export default function App() {
         <InvestmentSetupModal
           authState={auth}
           onComplete={handleInvestmentComplete}
-          onClose={() => setShowInvestmentModal(false)}
+          onSkip={handleInvestmentSkip}
         />
       )}
     </ThemeProvider>

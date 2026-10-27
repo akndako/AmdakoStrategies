@@ -3,7 +3,8 @@ import type { FormEvent } from "react";
 import styled from "styled-components";
 import jsPDF from "jspdf";
 import type { PageView } from "../App";
-import { FileText, Download, ArrowLeft, Loader2, PenLine } from "lucide-react";
+import { FileText, Download, ArrowLeft, PenLine } from "lucide-react";
+import LoadingSpinner, { LogoLoader } from "../components/LoadingSpinner";
 import { theme } from "../theme";
 import {
   downloadAgreementPdf,
@@ -16,6 +17,7 @@ import {
 } from "../services/agreementService";
 import type { Agreement } from "../types";
 import SignaturePad, { type SignaturePadHandle } from "../components/SignaturePad";
+import { PageShell, NarrowContainer } from "../components/layout/pageLayout";
 
 type AgreementFormPageProps = {
   user: {
@@ -33,24 +35,9 @@ type AgreementFormPageProps = {
   onNavigate: (page: PageView) => void;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 60px 24px;
-  background: ${theme.colors.ivory};
+const Page = PageShell;
 
-  @media (max-width: 768px) {
-    padding: 40px 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 30px 16px;
-  }
-`;
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
+const Container = NarrowContainer;
 
 const BackRow = styled.div`
   margin-bottom: 20px;
@@ -82,6 +69,9 @@ const Card = styled.form`
   border-radius: ${theme.radii.xl};
   padding: 48px;
   box-shadow: ${theme.shadows.card};
+  min-width: 0;
+  max-width: 100%;
+  overflow-x: clip;
 
   @media (max-width: 768px) {
     padding: 36px;
@@ -126,6 +116,13 @@ const AgreementText = styled.div`
   max-height: 360px;
   overflow-y: auto;
   border: 1px solid ${theme.colors.borderLight};
+  -webkit-overflow-scrolling: touch;
+  word-break: break-word;
+
+  @media (max-width: 480px) {
+    max-height: 280px;
+    padding: 20px 16px;
+  }
 
   &.expanded-for-print {
     max-height: none;
@@ -246,6 +243,7 @@ const ButtonGroup = styled.div`
 
 const FormFields = styled.fieldset`
   min-width: 0;
+  max-width: 100%;
   padding: 0;
   margin: 0;
   border: 0;
@@ -257,6 +255,11 @@ const Button = styled.button<{ variant?: "primary" | "outline" }>`
   border-radius: ${theme.radii.medium};
   padding: 13px 22px;
   min-width: 150px;
+
+  @media (max-width: 600px) {
+    min-width: 0;
+    width: 100%;
+  }
   font-weight: 600;
   font-size: 14px;
   letter-spacing: 0.01em;
@@ -318,6 +321,14 @@ const SignatureSection = styled.div`
   border: 1px solid ${theme.colors.borderLight};
   border-radius: ${theme.radii.large};
   background: ${theme.colors.surfaceAlt};
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+
+  @media (max-width: 480px) {
+    padding: 16px 12px;
+  }
 
   h4 {
     font-family: "Inter", sans-serif;
@@ -717,10 +728,14 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
           </BackLink>
         </BackRow>
         <Card onSubmit={handleSubmit}>
+          {loadingAgreement ? (
+            <LoadingSpinner message="Loading your agreement..." layout="center" />
+          ) : (
+            <>
           <Eyebrow>Official Investment Contract</Eyebrow>
           <Title>Agreement Form</Title>
 
-          <FormFields disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}>
+          <FormFields disabled={saving || savedAgreement?.status === "approved"}>
           <AgreementText>
             <h3>AMDAKO STRATEGY NIG. LTD. INVESTMENT AGREEMENT FORM</h3>
             <p>
@@ -1001,12 +1016,8 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               type="submit"
               disabled={saving || loadingAgreement || savedAgreement?.status === "approved"}
             >
-              {saving || loadingAgreement
-                ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} />
-                : <PenLine size={16} />}
-              {loadingAgreement
-                ? "Loading..."
-                : saving
+              {saving ? <LogoLoader compact /> : <PenLine size={16} />}
+              {saving
                   ? "Saving..."
                   : savedAgreement?.signature_url
                     ? "Update signed agreement"
@@ -1018,9 +1029,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
                 onClick={handleDownloadAgreement}
                 disabled={saving || downloading}
               >
-                {downloading ? <Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> : (
-                <Download size={16} />
-                )}
+                {downloading ? <LogoLoader compact /> : <Download size={16} />}
                 {downloading ? "Preparing Copy..." : "Download Agreement"}
               </DownloadButton>
             )}
@@ -1029,6 +1038,8 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               Back to Dashboard
             </Button>
           </ButtonGroup>
+            </>
+          )}
         </Card>
       </Container>
     </Page>

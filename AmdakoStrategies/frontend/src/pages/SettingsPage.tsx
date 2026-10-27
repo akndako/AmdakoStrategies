@@ -19,6 +19,7 @@ import { changePassword } from "../lib/auth";
 import { updateProfile, getCurrentProfile } from "../services/profileService";
 import type { AuthUser, Profile } from "../types";
 import type { PageView } from "../App";
+import { LogoLoader } from "../components/LoadingSpinner";
 
 type SettingsPageProps = {
   user: AuthUser;
@@ -28,24 +29,28 @@ type SettingsPageProps = {
 
 const Page = styled(motion.section)`
   min-height: calc(100vh - 68px);
-  padding: 80px 24px;
+  min-height: calc(100dvh - 68px);
+  padding: 40px max(16px, env(safe-area-inset-right)) 72px max(16px, env(safe-area-inset-left));
+  overflow-x: clip;
   background:
     linear-gradient(135deg, rgba(2, 113, 196, 0.045), transparent 42%),
     linear-gradient(315deg, rgba(201, 162, 39, 0.055), transparent 36%),
     ${theme.colors.ivory};
 
   @media (max-width: 768px) {
-    padding: 60px 20px;
+    padding: 28px max(20px, env(safe-area-inset-right)) 56px max(20px, env(safe-area-inset-left));
   }
 
   @media (max-width: 480px) {
-    padding: 40px 16px;
+    padding: 20px max(16px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom))
+      max(16px, env(safe-area-inset-left));
   }
 `;
 
 const Container = styled(motion.div)`
-  max-width: 800px;
+  width: min(800px, 100%);
   margin: 0 auto;
+  min-width: 0;
 `;
 
 const Header = styled(motion.div)`
@@ -651,15 +656,31 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
             </Row>
 
             <Button onClick={handleChangePassword} disabled={pwLoading}>
-              {pwLoading ? "Updating..." : "Update Password"}
+              {pwLoading ? (
+                <>
+                  <LogoLoader compact />
+                  Updating...
+                </>
+              ) : (
+                "Update Password"
+              )}
             </Button>
           </FormGrid>
         </Card>
 
         <ActionRow variants={sectionVariants}>
           <Button onClick={handleSave} disabled={loading}>
-            {loading ? "Saving..." : "Save Changes"}
-            {!loading && <Save size={16} />}
+            {loading ? (
+              <>
+                <LogoLoader compact />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save Changes
+                <Save size={16} />
+              </>
+            )}
           </Button>
         </ActionRow>
       </Container>

@@ -14,9 +14,18 @@ import {
   Camera,
 } from "lucide-react";
 import { theme } from "../theme";
-import { updateProfile, uploadAvatar, getCurrentProfile } from "../services/profileService";
+import { PageShell, NarrowContainer } from "../components/layout/pageLayout";
+import {
+  updateProfile,
+  uploadAvatar,
+  getCurrentProfile,
+  validateAvatarFile,
+  MAX_AVATAR_SIZE_BYTES,
+} from "../services/profileService";
 import type { AuthUser, Profile } from "../types";
+import { useResolvedAvatarUrl } from "../hooks/useResolvedAvatarUrl";
 import type { PageView } from "../App";
+import { LogoLoader } from "../components/LoadingSpinner";
 
 type EditProfilePageProps = {
   user: AuthUser;
@@ -24,30 +33,16 @@ type EditProfilePageProps = {
   onAuthUpdate: (user: AuthUser) => void;
 };
 
-const Page = styled.section`
-  min-height: calc(100vh - 68px);
-  padding: 80px 24px;
-  background: ${theme.colors.ivory};
+const Page = PageShell;
 
-  @media (max-width: 768px) {
-    padding: 60px 20px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 40px 16px;
-  }
-`;
-
-const Container = styled.div`
-  max-width: 800px;
-  margin: 0 auto;
-`;
+const Container = NarrowContainer;
 
 const Header = styled.div`
   display: flex;
   align-items: center;
   gap: 16px;
   margin-bottom: 32px;
+  flex-wrap: wrap;
 
   .eyebrow {
     font-size: 12px;
@@ -325,6 +320,7 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
   const [location, setLocation] = useState(user.location || "");
   const [stateOfOrigin, setStateOfOrigin] = useState(user.stateOfOrigin || "");
   const [avatarUrl, setAvatarUrl] = useState<string | null>(user.avatar_url || null);
+  const avatarDisplayUrl = useResolvedAvatarUrl(avatarUrl);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -355,15 +351,32 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
 
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = "";
     if (!file) return;
 
     setUploading(true);
     setError(null);
+    setSuccess(null);
 
     try {
+      validateAvatarFile(file);
       const url = await uploadAvatar(file);
-      setAvatarUrl(url);
-      setSuccess("Avatar uploaded successfully.");
+      const result = await updateProfile({ avatar_url: url });
+      setAvatarUrl(result.avatar_url || url);
+      onAuthUpdate({
+        id: user.id,
+        name: user.name,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        phone: user.phone,
+        email: user.email,
+        address: user.address,
+        location: user.location,
+        stateOfOrigin: user.stateOfOrigin,
+        monthlyRoi: user.monthlyRoi,
+        avatar_url: result.avatar_url || url,
+      });
+      setSuccess("Profile picture updated.");
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to upload avatar. Please try again.";
       setError(message);
@@ -458,8 +471,8 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
           </CardTitle>
           <AvatarUpload>
             <AvatarPreview>
-              {avatarUrl ? (
-                <img src={avatarUrl} alt="Profile" />
+              {avatarDisplayUrl ? (
+                <img src={avatarDisplayUrl} alt="Profile" />
               ) : (
                 <span>
                   {user.name
@@ -477,17 +490,20 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
               onClick={() => fileInputRef.current?.click()}
               disabled={uploading}
             >
-              <Upload size={16} />
+              {uploading ? <LogoLoader compact /> : <Upload size={16} />}
               {uploading ? "Uploading..." : "Upload Photo"}
             </AvatarUploadButton>
             <input
               type="file"
               ref={fileInputRef}
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp,image/gif"
               onChange={handleAvatarUpload}
               style={{ display: "none" }}
+              aria-label="Upload profile picture"
             />
-            <Notice>Upload a profile picture (PNG, JPG, SVG). Max 10MB.</Notice>
+            <Notice>
+              JPG, PNG, WebP, or GIF — max {Math.round(MAX_AVATAR_SIZE_BYTES / (1024 * 1024))}MB.
+            </Notice>
           </AvatarUpload>
         </Card>
 
@@ -603,8 +619,17 @@ export default function EditProfilePage({ user, onNavigate, onAuthUpdate }: Edit
 
         <ActionRow>
           <Button onClick={handleSave} disabled={loading || uploading}>
-            {loading ? "Saving..." : "Save Changes"}
-            {!loading && <Save size={16} />}
+            {loading ? (
+              <>
+                <LogoLoader compact />
+                Saving...
+              </>
+            ) : (
+              <>
+                Save Changes
+                <Save size={16} />
+              </>
+            )}
           </Button>
         </ActionRow>
       </Container>
