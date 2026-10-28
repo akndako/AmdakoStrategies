@@ -1,5 +1,4 @@
 import Hero from "./Hero";
-import InvestmentPlan from "./InvestmentPlan";
 import ProjectionTable from "./ProjectionTable";
 import Opportunities from "./Opportunities";
 import HowToInvest from "./HowToInvest";
@@ -11,19 +10,14 @@ type MarketingHomeProps = {
   isAuthenticated?: boolean;
 };
 
-export default function MarketingHome({ onNavigate, isAuthenticated }: MarketingHomeProps) {
+export default function MarketingHome({ onNavigate }: MarketingHomeProps) {
   return (
     <>
-      <Hero
-        isAuthenticated={isAuthenticated}
-        onOpenDashboard={() => onNavigate("dashboard")}
-        onNavigate={onNavigate}
-      />
+      <Hero />
 
-      <InvestmentPlan flush />
       <ProjectionTable flush />
 
-      <Opportunities onNavigate={onNavigate} />
+      <Opportunities />
       <HowToInvest />
       <CTA onNavigate={onNavigate} />
     </>
