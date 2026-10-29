@@ -129,8 +129,8 @@ const TrustItem = styled.div`
 
 const quotes = [
   {
-    text: "Payouts hit my account on schedule—I track everything from the investor dashboard.",
-    author: "Private investor, Abuja",
+    text: "I sincerely appreciate the timely alert and the professionalism of Amdako Strategies Nig. Ltd. your consistency and commitment to your investors is truly commendable",
+    author: "Nura A, Abuja",
   },
   {
     text: "Referring two colleagues was straightforward; bonuses cleared after their deposits posted.",
