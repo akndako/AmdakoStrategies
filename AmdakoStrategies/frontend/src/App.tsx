@@ -188,11 +188,24 @@ export default function App() {
   };
 
   const handleNavigate = useCallback((nextPage: PageView) => {
+    if (auth && (nextPage === "home" || nextPage === "contact" || nextPage === "about")) {
+      setDashboardRefreshKey((k) => k + 1);
+      setPage("dashboard");
+      return;
+    }
     if (nextPage === "dashboard") {
       setDashboardRefreshKey((k) => k + 1);
     }
     setPage(nextPage);
-  }, []);
+  }, [auth]);
+
+  // Logged-in users stay in the investor portal — no public home/contact/about
+  useEffect(() => {
+    if (!auth) return;
+    if (page === "home" || page === "contact" || page === "about") {
+      setPage("dashboard");
+    }
+  }, [auth, page]);
 
   const renderPage = () => {
     switch (page) {
@@ -225,7 +238,7 @@ export default function App() {
           <SettingsPage
             user={auth.user}
             onNavigate={setPage}
-            onAuthUpdate={handleAuthUpdate}
+            onLogout={handleLogout}
           />
         ) : (
           <LoginPage onAuthSuccess={handleAuthSuccess} onNavigate={handleNavigate} />

@@ -22,6 +22,22 @@ export async function getAgreement(): Promise<Agreement | null> {
   return data as Agreement | null;
 }
 
+const PENDING_AMOUNT_KEY = "pending_investment_amount";
+
+/** Amount chosen at registration; it becomes real only once an agreement is approved. */
+export async function savePendingInvestmentAmount(amount: number): Promise<void> {
+  const { error } = await supabase.auth.updateUser({ data: { [PENDING_AMOUNT_KEY]: amount } });
+  if (error) {
+    throw new Error(formatErrorForDisplay(error));
+  }
+}
+
+export async function getPendingInvestmentAmount(): Promise<number | null> {
+  const { data } = await supabase.auth.getUser();
+  const value = Number(data.user?.user_metadata?.[PENDING_AMOUNT_KEY]);
+  return Number.isFinite(value) && value > 0 ? value : null;
+}
+
 export type AgreementSubmission = Pick<
   Agreement,
   | "full_name"

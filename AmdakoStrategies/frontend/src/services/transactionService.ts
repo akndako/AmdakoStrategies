@@ -12,7 +12,7 @@ export async function getTransactions(): Promise<Transaction[]> {
     .select("*")
     .eq("user_id", user.id)
     .order("created_at", { ascending: false })
-    .limit(10);
+    .limit(100);
 
   if (error) {
     console.error("Error fetching transactions:", error);

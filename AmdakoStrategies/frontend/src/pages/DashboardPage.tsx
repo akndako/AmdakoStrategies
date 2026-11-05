@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import styled from "styled-components";
-import { PageShell, PageContainer, TableScroll } from "../components/layout/pageLayout";
+import { PageShell, PageContainer } from "../components/layout/pageLayout";
 import {
   FileText,
   TrendingUp,
@@ -8,32 +8,33 @@ import {
   Briefcase,
   Mail,
   Phone,
-  MapPin,
-  Home,
-  Percent,
   ArrowDownRight,
   ArrowUpRight,
-  AlertTriangle,
   Bell,
   CheckCheck,
-  ShieldCheck,
   CreditCard,
   ArrowLeftRight,
   User,
-  Edit,
+  Settings,
   Inbox,
+  Calendar,
+  Gift,
+  CheckCircle,
+  Circle,
+  Clock,
+  ChevronRight,
 } from "lucide-react";
 import type { PageView } from "../App";
 import { theme } from "../theme";
 import { getCurrentProfile } from "../services/profileService";
 import { useResolvedAvatarUrl } from "../hooks/useResolvedAvatarUrl";
-import { getInvestments } from "../services/investmentService";
+import { getInvestments, isConfirmedInvestment } from "../services/investmentService";
 import { getTransactions } from "../services/transactionService";
 import { getAgreement } from "../services/agreementService";
 import { getNotifications, markAllNotificationsAsRead } from "../services/notificationService";
 import { getInvestorAccount } from "../services/investorAccountService";
 import LoadingSpinner from "../components/LoadingSpinner";
-import type { Profile, Investment, Transaction, Agreement, DashboardSummary, InvestorAccount, Notification, AuthUser } from "../types";
+import type { Profile, Investment, Transaction, Agreement, InvestorAccount, Notification, AuthUser } from "../types";
 
 type DashboardPageProps = {
   user: AuthUser;
@@ -42,886 +43,609 @@ type DashboardPageProps = {
   refreshKey?: number;
 };
 
-const Page = PageShell;
+type ActivityTab = "investments" | "transactions" | "notifications";
+type Tone = "good" | "warn" | "bad" | "neutral";
 
-const Container = PageContainer;
+/* ============ LAYOUT ============ */
 
-const MainGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 24px;
-  align-items: start;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const EditProfileButton = styled.button`
-  flex: 1;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  padding: 11px 16px;
-  border-radius: ${theme.radii.medium};
-  border: 1px solid ${theme.colors.border};
-  background: #fff;
-  color: ${theme.colors.text};
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  &:hover {
-    border-color: ${theme.colors.primary};
-    color: ${theme.colors.primary};
-    background: ${theme.colors.primaryLight};
-  }
-`;
-
-const Header = styled.div`
+const TopBar = styled.div`
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  gap: 20px;
-  margin-bottom: 20px;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 24px;
 
-  @media (max-width: 768px) {
+  @media (max-width: 640px) {
     flex-direction: column;
     align-items: flex-start;
-    gap: 16px;
-    margin-bottom: 20px;
   }
+`;
 
-  .eyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: ${theme.colors.gold};
-    margin-bottom: 8px;
-  }
+const Greeting = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-width: 0;
 
-  h2 {
-    font-size: clamp(1.25rem, 4.5vw, 26px);
-    margin-bottom: 8px;
-    overflow-wrap: anywhere;
+  h1 {
+    font-size: clamp(1.35rem, 4vw, 1.75rem);
+    margin: 0;
+    line-height: 1.2;
   }
 
   p {
-    color: ${theme.colors.textSecondary};
-    line-height: 1.6;
-    font-size: 0.9375rem;
+    margin: 4px 0 0;
+    font-size: 0.875rem;
+    color: ${theme.colors.textMuted};
   }
 `;
 
-const Button = styled.button<{ variant?: "primary" | "outline" | "success" }>`
-  appearance: none;
-  border: none;
-  border-radius: ${theme.radii.medium};
-  padding: 12px 20px;
-  font-weight: 600;
-  font-size: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-
-  ${({ variant }) => {
-    switch (variant) {
-      case "success":
-        return `
-          background: ${theme.colors.success};
-          color: #fff;
-          box-shadow: ${theme.shadows.button};
-
-          &:hover {
-            background: #0a6e80;
-            box-shadow: ${theme.shadows.buttonHover};
-            transform: translateY(-1px);
-          }
-        `;
-      case "outline":
-        return `
-          background: #fff;
-          color: ${theme.colors.text};
-          border: 1px solid ${theme.colors.border};
-
-          &:hover {
-            border-color: ${theme.colors.primary};
-            color: ${theme.colors.primary};
-            background: ${theme.colors.primaryLight};
-          }
-        `;
-      default:
-        return `
-          background: ${theme.colors.primary};
-          color: #fff;
-          box-shadow: ${theme.shadows.button};
-
-          &:hover {
-            background: ${theme.colors.primaryDark};
-            box-shadow: ${theme.shadows.buttonHover};
-            transform: translateY(-1px);
-          }
-        `;
-    }
-  }}
-
-  @media (max-width: 480px) {
-    width: 100%;
-  }
-
-  &:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
-  }
-`;
-
-const ErrorBanner = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  background: rgba(179, 64, 58, 0.08);
-  border: 1px solid rgba(179, 64, 58, 0.25);
-  border-radius: ${theme.radii.medium};
-  padding: 14px 18px;
-  margin-bottom: 24px;
-  color: ${theme.colors.danger};
-  font-size: 14px;
-  line-height: 1.5;
-
-  svg {
-    flex-shrink: 0;
-  }
-`;
-
-const LoadingCard = styled.div`
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
-  padding: 40px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 16px;
-  min-height: 300px;
-  color: ${theme.colors.textSecondary};
-  font-size: 15px;
-`;
-
-/* ============ HERO SECTION ============ */
-
-const HeroGrid = styled.div`
-  display: grid;
-  grid-template-columns: 1.6fr 1fr;
-  gap: 24px;
-  margin-bottom: 24px;
-
-  @media (max-width: 900px) {
-    grid-template-columns: 1fr;
-  }
-`;
-
-const PortfolioHero = styled.div`
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
-  border-radius: ${theme.radii.xl};
-  padding: 36px 40px;
-  color: #fff;
-  box-shadow: 0 12px 32px rgba(2, 113, 196, 0.25);
-
-  @media (max-width: 768px) {
-    padding: 28px 24px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 24px 20px;
-  }
-
-  &::after {
-    content: '';
-    position: absolute;
-    top: -40%;
-    right: -10%;
-    width: 320px;
-    height: 320px;
-    background: radial-gradient(circle, rgba(201, 162, 39, 0.18), transparent);
-    border-radius: 50%;
-    pointer-events: none;
-  }
-
-  .hero-eyebrow {
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 14px;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .hero-balance-label {
-    font-size: 13px;
-    color: rgba(255, 255, 255, 0.75);
-    margin-bottom: 6px;
-  }
-
-  .hero-balance {
-    font-size: 38px;
-    font-weight: 700;
-    font-family: 'Inter', sans-serif;
-    font-variant-numeric: tabular-nums;
-    margin-bottom: 20px;
-    letter-spacing: -0.02em;
-
-    @media (max-width: 480px) {
-      font-size: 30px;
-    }
-  }
-
-  .hero-stats {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
-
-    @media (max-width: 480px) {
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
-    }
-  }
-
-  .hero-stat {
-    .label {
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      color: rgba(255, 255, 255, 0.65);
-      margin-bottom: 4px;
-    }
-
-    .value {
-      font-size: 17px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      font-variant-numeric: tabular-nums;
-
-      @media (max-width: 480px) {
-        font-size: 15px;
-      }
-    }
-  }
-
-  .hero-account-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-top: 20px;
-    padding-top: 18px;
-    border-top: 1px solid rgba(255, 255, 255, 0.15);
-
-    svg {
-      color: ${theme.colors.gold};
-      flex-shrink: 0;
-    }
-
-    .account-number {
-      font-size: 14px;
-      font-weight: 600;
-      font-family: 'Inter', sans-serif;
-      font-variant-numeric: tabular-nums;
-      color: rgba(255, 255, 255, 0.9);
-    }
-
-    .account-status {
-      margin-left: auto;
-      font-size: 11px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-      padding: 4px 12px;
-      border-radius: 100px;
-      background: rgba(255, 255, 255, 0.15);
-      color: #fff;
-    }
-  }
-`;
-
-const ProfileSideCard = styled.div`
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
-  padding: 28px;
-  box-shadow: ${theme.shadows.card};
-  display: flex;
-  flex-direction: column;
-
-  @media (max-width: 480px) {
-    padding: 22px;
-  }
-
-  .profile-top {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    margin-bottom: 18px;
-  }
-
-  .profile-name {
-    h3 {
-      font-size: 1.15rem;
-      color: ${theme.colors.text};
-      margin-bottom: 4px;
-    }
-
-    .role {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      color: ${theme.colors.gold};
-    }
-  }
-
-  .profile-details {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    margin-bottom: 18px;
-  }
-
-  .profile-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 9px 12px;
-    background: ${theme.colors.surfaceAlt};
-    border: 1px solid ${theme.colors.borderLight};
-    border-radius: ${theme.radii.medium};
-
-    svg {
-      color: ${theme.colors.primary};
-      flex-shrink: 0;
-    }
-
-    p {
-      font-size: 0.8125rem;
-      color: ${theme.colors.textSecondary};
-      line-height: 1.4;
-      overflow-wrap: anywhere;
-    }
-  }
-
-  .profile-footer {
-    margin-top: auto;
-    display: flex;
-    gap: 10px;
-
-    @media (max-width: 480px) {
-      flex-direction: column;
-    }
-  }
-`;
-
-const Avatar = styled.div`
-  width: 64px;
-  height: 64px;
+const AvatarCircle = styled.div`
+  width: 52px;
+  height: 52px;
   border-radius: 50%;
+  flex-shrink: 0;
+  overflow: hidden;
   background: ${theme.colors.primary};
   color: #fff;
+  font-weight: 700;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 24px;
-  font-weight: 700;
-  font-family: 'Playfair Display', Georgia, serif;
-  border: 3px solid ${theme.colors.gold};
-  flex-shrink: 0;
+  border: 2px solid ${theme.colors.gold};
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
 `;
 
-const AvatarImage = styled.img`
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 3px solid ${theme.colors.gold};
-  flex-shrink: 0;
-`;
-
-const StatusBadge = styled.span<{ tone: "active" | "completed" | "pending" | "failed" | "cancelled" | "approved" | "rejected" }>`
-  display: inline-flex;
-  align-items: center;
-  padding: 4px 10px;
-  border-radius: 100px;
-  font-size: 12px;
-  font-weight: 600;
-  text-transform: capitalize;
-
-  ${({ tone }) => {
-    switch (tone) {
-      case "active":
-      case "completed":
-      case "approved":
-        return `
-          background: rgba(2, 113, 196, 0.1);
-          color: ${theme.colors.primary};
-        `;
-      case "pending":
-        return `
-          background: rgba(201, 162, 39, 0.12);
-          color: ${theme.colors.warning};
-        `;
-      case "failed":
-      case "rejected":
-      case "cancelled":
-        return `
-          background: rgba(179, 64, 58, 0.1);
-          color: ${theme.colors.danger};
-        `;
-    }
-  }}
-`;
-
-const ProfileStatusBadge = styled.span<{ $status: string }>`
+const StatusChip = styled.span<{ $tone: Tone }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  padding: 4px 10px;
+  border-radius: 100px;
   font-size: 11px;
   font-weight: 600;
-  padding: 4px 12px;
-  border-radius: 100px;
-  margin-bottom: 14px;
-
-  ${({ $status }) => {
-    if ($status === "active") {
-      return `
-        background: rgba(2, 113, 196, 0.1);
-        color: ${theme.colors.primary};
-      `;
-    }
-    if ($status === "pending") {
-      return `
-        background: rgba(201, 162, 39, 0.12);
-        color: ${theme.colors.warning};
-      `;
-    }
-    return `
-      background: rgba(179, 64, 58, 0.1);
-      color: ${theme.colors.danger};
-    `;
-  }}
+  text-transform: capitalize;
+  white-space: nowrap;
+  background: ${({ $tone }) =>
+    $tone === "good"
+      ? "rgba(14, 138, 158, 0.12)"
+      : $tone === "warn"
+        ? theme.colors.goldLight
+        : $tone === "bad"
+          ? "rgba(179, 64, 58, 0.1)"
+          : theme.colors.surfaceAlt};
+  color: ${({ $tone }) =>
+    $tone === "good"
+      ? theme.colors.success
+      : $tone === "warn"
+        ? "#8a6d12"
+        : $tone === "bad"
+          ? theme.colors.danger
+          : theme.colors.textSecondary};
 `;
 
-/* ============ STATS GRID ============ */
-
-const StatsGrid = styled.div`
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
-  margin-bottom: 24px;
-
-  @media (max-width: 1024px) {
-    grid-template-columns: repeat(2, 1fr);
-  }
-
-  @media (max-width: 560px) {
-    grid-template-columns: 1fr;
-    gap: 12px;
-  }
-`;
-
-const StatCard = styled.div<{ accent?: "blue" | "gold" | "red" }>`
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.large};
-  padding: 20px;
+const LoadingCard = styled.div`
+  min-height: 360px;
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  transition: all 0.2s ease;
+  align-items: center;
+  justify-content: center;
+`;
 
-  &:hover {
-    border-color: ${theme.colors.primary};
-    box-shadow: ${theme.shadows.cardHover};
-    transform: translateY(-2px);
+const TopGrid = styled.div`
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: 20px;
+  margin-bottom: 20px;
+
+  @media (max-width: 960px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const Card = styled.div`
+  background: ${theme.colors.surface};
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
+  box-shadow: ${theme.shadows.card};
+  padding: 22px;
+  min-width: 0;
+
+  @media (max-width: 480px) {
+    padding: 18px;
+    border-radius: ${theme.radii.large};
+  }
+`;
+
+const CardTitle = styled.h3`
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: ${theme.colors.textMuted};
+  margin: 0 0 14px;
+  font-family: "Inter", sans-serif;
+`;
+
+/* ============ BALANCE ============ */
+
+const BalanceCard = styled.div`
+  position: relative;
+  overflow: hidden;
+  border-radius: ${theme.radii.xl};
+  padding: 26px;
+  color: #fff;
+  background: linear-gradient(135deg, ${theme.colors.primary} 0%, ${theme.colors.primaryDark} 100%);
+  box-shadow: 0 12px 32px rgba(2, 90, 158, 0.25);
+  min-width: 0;
+
+  &::after {
+    content: "";
+    position: absolute;
+    top: -80px;
+    right: -60px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(201, 162, 39, 0.35), transparent 70%);
+    pointer-events: none;
   }
 
   @media (max-width: 480px) {
-    padding: 16px;
+    padding: 20px;
+    border-radius: ${theme.radii.large};
+  }
+`;
+
+const BalanceHead = styled.div`
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+
+  .label {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.75);
   }
 
-  .stat-icon {
-    width: 38px;
-    height: 38px;
+  .account {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.8rem;
+    padding: 5px 10px;
+    border-radius: 100px;
+    background: rgba(255, 255, 255, 0.12);
+    font-family: "Inter", monospace;
+    letter-spacing: 0.5px;
+  }
+`;
+
+const BalanceValue = styled.div`
+  position: relative;
+  z-index: 1;
+  font-size: clamp(1.9rem, 6vw, 2.6rem);
+  font-weight: 700;
+  font-family: "Inter", sans-serif;
+  letter-spacing: -0.02em;
+  margin: 8px 0 20px;
+  word-break: break-word;
+`;
+
+const BalanceStats = styled.div`
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+`;
+
+const MiniStat = styled.div`
+  padding: 12px;
+  border-radius: ${theme.radii.medium};
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  min-width: 0;
+
+  .k {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.72rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 4px;
+  }
+
+  .v {
+    font-size: 0.98rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .n {
+    margin-top: 2px;
+    font-size: 0.7rem;
+    color: #ffd98a;
+  }
+`;
+
+/* ============ SIDE (next payout + actions) ============ */
+
+const SideStack = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  min-width: 0;
+`;
+
+const PayoutCard = styled(Card)`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: ${theme.colors.goldLight};
+  border-color: rgba(201, 162, 39, 0.35);
+
+  .icon {
+    width: 44px;
+    height: 44px;
     border-radius: ${theme.radii.medium};
-    background: ${({ accent }) =>
-      accent === "gold" ? theme.colors.goldLight : accent === "red" ? "rgba(179, 64, 58, 0.08)" : theme.colors.primaryLight};
-    color: ${({ accent }) =>
-      accent === "gold" ? theme.colors.warning : accent === "red" ? theme.colors.danger : theme.colors.primary};
+    background: #fff;
+    color: ${theme.colors.gold};
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
 
-  .stat-body {
-    h3 {
-      font-size: 12px;
-      color: ${theme.colors.textMuted};
-      font-weight: 500;
-      margin-bottom: 6px;
-      font-family: 'Inter', sans-serif;
-    }
-
-    p {
-      font-size: 20px;
-      font-weight: 700;
-      color: ${theme.colors.text};
-      font-variant-numeric: tabular-nums;
-
-      @media (max-width: 480px) {
-        font-size: 17px;
-      }
-    }
+  .k {
+    font-size: 0.8rem;
+    color: ${theme.colors.textSecondary};
   }
 
-  .stat-sub {
-    font-size: 11px;
+  .v {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: ${theme.colors.text};
+  }
+
+  .s {
+    font-size: 0.8rem;
     color: ${theme.colors.textMuted};
-    margin-top: 4px;
-    font-family: 'Inter', sans-serif;
   }
 `;
 
-const SectionCard = styled.div`
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.xl};
-  padding: 24px 28px;
-  box-shadow: ${theme.shadows.card};
-  margin-bottom: 24px;
-  overflow: hidden;
-
-  @media (max-width: 768px) {
-    padding: 20px 18px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 16px 14px;
-  }
+const ActionGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
 `;
 
-const SectionTitle = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-
-  @media (max-width: 600px) {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  h3 {
-    font-size: 1.0625rem;
-    color: ${theme.colors.text};
-    display: flex;
-    align-items: center;
-    gap: 10px;
-
-    svg {
-      color: ${theme.colors.primary};
-    }
-  }
-`;
-
-const TableWrap = TableScroll;
-
-const Table = styled.table`
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 560px;
-
-  @media (max-width: 640px) {
-    min-width: 500px;
-  }
-`;
-
-const Th = styled.th`
-  text-align: left;
-  padding: 10px 14px;
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  color: ${theme.colors.textMuted};
-  background: ${theme.colors.surfaceAlt};
-  border-bottom: 1px solid ${theme.colors.borderLight};
-  white-space: nowrap;
-
-  &:first-child {
-    border-radius: ${theme.radii.small} 0 0 ${theme.radii.small};
-  }
-
-  &:last-child {
-    border-radius: 0 ${theme.radii.small} ${theme.radii.small} 0;
-  }
-`;
-
-const Td = styled.td`
-  padding: 12px 14px;
-  font-size: 0.84375rem;
-  color: ${theme.colors.textSecondary};
-  border-bottom: 1px solid ${theme.colors.borderLight};
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-
-  strong {
-    color: ${theme.colors.text};
-    font-weight: 600;
-  }
-`;
-
-const Tr = styled.tr`
-  transition: background 0.15s ease;
-
-  &:last-child td {
-    border-bottom: none;
-  }
-
-  &:hover {
-    background: ${theme.colors.ivory};
-  }
-`;
-
-const EmptyState = styled.div`
+const ActionTile = styled.button`
   display: flex;
   flex-direction: column;
   align-items: center;
-  text-align: center;
-  padding: 36px 24px;
-  border-radius: ${theme.radii.large};
-  background: ${theme.colors.surfaceAlt};
-  border: 1px dashed ${theme.colors.border};
-
-  .empty-icon {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: ${theme.colors.primaryLight};
-    color: ${theme.colors.primary};
-    margin-bottom: 14px;
-  }
-
-  p {
-    font-size: 0.9rem;
-    color: ${theme.colors.textSecondary};
-    margin-bottom: 16px;
-    max-width: 28rem;
-    line-height: 1.55;
-  }
-`;
-
-const AmountText = styled.span<{ positive?: boolean; negative?: boolean }>`
+  gap: 8px;
+  padding: 14px 8px;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${theme.colors.borderLight};
+  background: ${theme.colors.ivory};
+  color: ${theme.colors.text};
+  font-size: 0.8rem;
   font-weight: 600;
-  color: ${({ positive, negative }) =>
-    positive ? theme.colors.success : negative ? theme.colors.danger : theme.colors.text};
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease;
+
+  svg {
+    color: ${theme.colors.primary};
+  }
+
+  &:hover {
+    border-color: ${theme.colors.primary};
+    background: ${theme.colors.primaryLight};
+  }
 `;
 
-const ProfitLossPill = styled.span<{ positive?: boolean; negative?: boolean }>`
+const ContactLine = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 14px;
+  font-size: 0.82rem;
+  color: ${theme.colors.textSecondary};
+  min-width: 0;
+
+  svg {
+    color: ${theme.colors.textMuted};
+    flex-shrink: 0;
+  }
+
+  span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  & + & {
+    margin-top: 6px;
+  }
+`;
+
+/* ============ NEXT STEPS ============ */
+
+const StepsCard = styled(Card)`
+  margin-bottom: 20px;
+  border-left: 4px solid ${theme.colors.gold};
+`;
+
+const StepsRow = styled.ol`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 720px) {
+    grid-template-columns: 1fr;
+  }
+`;
+
+const StepItem = styled.li<{ $state: "done" | "current" | "todo" }>`
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px;
+  border-radius: ${theme.radii.medium};
+  background: ${({ $state }) => ($state === "current" ? theme.colors.primaryLight : theme.colors.ivory)};
+  border: 1px solid
+    ${({ $state }) => ($state === "current" ? "rgba(2, 113, 196, 0.25)" : theme.colors.borderLight)};
+  opacity: ${({ $state }) => ($state === "todo" ? 0.7 : 1)};
+
+  > svg {
+    flex-shrink: 0;
+    margin-top: 1px;
+    color: ${({ $state }) =>
+      $state === "done" ? theme.colors.success : $state === "current" ? theme.colors.primary : theme.colors.textMuted};
+  }
+
+  .t {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: ${theme.colors.text};
+  }
+
+  .d {
+    font-size: 0.8rem;
+    color: ${theme.colors.textMuted};
+    margin-top: 2px;
+  }
+`;
+
+const StepButton = styled.button`
+  margin-top: 8px;
   display: inline-flex;
   align-items: center;
   gap: 4px;
-  padding: 3px 10px;
-  border-radius: 100px;
-  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: ${theme.radii.small};
+  border: none;
+  background: ${theme.colors.primary};
+  color: #fff;
+  font-size: 0.8rem;
   font-weight: 600;
+  cursor: pointer;
 
-  ${({ positive, negative }) =>
-    positive
-      ? `background: rgba(2, 113, 196, 0.1); color: ${theme.colors.primary};`
-      : negative
-      ? `background: rgba(179, 64, 58, 0.1); color: ${theme.colors.danger};`
-      : `background: ${theme.colors.surfaceAlt}; color: ${theme.colors.textMuted};`}
+  &:hover {
+    background: ${theme.colors.primaryDark};
+  }
 `;
 
-/* ============ NOTIFICATIONS ============ */
+/* ============ ACTIVITY ============ */
 
-const NotificationList = styled.div`
-  max-height: 420px;
-  overflow-y: auto;
-  padding-right: 4px;
+const Tabs = styled.div`
+  display: flex;
+  gap: 6px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  scrollbar-width: none;
 
   &::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  &::-webkit-scrollbar-track {
-    background: ${theme.colors.surfaceAlt};
-    border-radius: 10px;
-  }
-
-  &::-webkit-scrollbar-thumb {
-    background: ${theme.colors.border};
-    border-radius: 10px;
-
-    &:hover {
-      background: ${theme.colors.textMuted};
-    }
+    display: none;
   }
 `;
 
-const NotificationItem = styled.div<{ $unread: boolean }>`
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  padding: 12px 14px;
-  border-radius: ${theme.radii.medium};
-  background: ${({ $unread }) => ($unread ? theme.colors.primaryLight : "#fff")};
-  border: 1px solid ${theme.colors.borderLight};
-  margin-bottom: 8px;
-  transition: all 0.2s ease;
+const TabButton = styled.button<{ $active: boolean }>`
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border-radius: 100px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid ${({ $active }) => ($active ? theme.colors.primary : theme.colors.border)};
+  background: ${({ $active }) => ($active ? theme.colors.primary : "#fff")};
+  color: ${({ $active }) => ($active ? "#fff" : theme.colors.textSecondary)};
 
-  &:last-child {
-    margin-bottom: 0;
-  }
-
-  .notification-icon {
-    flex-shrink: 0;
-    margin-top: 2px;
-    color: ${theme.colors.primary};
-  }
-
-  .notification-content {
-    flex: 1;
-  }
-
-  .notification-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: ${theme.colors.text};
-    margin-bottom: 2px;
-  }
-
-  .notification-message {
-    font-size: 12px;
-    color: ${theme.colors.textSecondary};
-    line-height: 1.5;
-  }
-
-  .notification-time {
+  .count {
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 100px;
     font-size: 11px;
-    color: ${theme.colors.textMuted};
-    margin-top: 4px;
-    font-family: 'Inter', sans-serif;
-  }
-
-  .unread-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: ${theme.colors.primary};
-    flex-shrink: 0;
-    margin-top: 4px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: ${({ $active }) => ($active ? "rgba(255,255,255,0.25)" : theme.colors.danger)};
+    color: #fff;
   }
 `;
 
-/* ============ AGREEMENT BANNER ============ */
-
-const AgreementBanner = styled.div`
+const ActivityHead = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-left: 3px solid ${theme.colors.gold};
-  border-radius: ${theme.radii.large};
-  padding: 16px 24px;
-  margin-bottom: 24px;
+  gap: 12px;
   flex-wrap: wrap;
+`;
 
-  @media (max-width: 640px) {
-    padding: 14px 16px;
-    flex-direction: column;
-    align-items: stretch;
+const LinkButton = styled.button`
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+  padding: 6px 10px;
+  border-radius: ${theme.radii.small};
+  border: 1px solid ${theme.colors.border};
+  background: #fff;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: ${theme.colors.primary};
+  cursor: pointer;
+`;
+
+const List = styled.ul`
+  list-style: none;
+  margin: 0;
+  padding: 0;
+`;
+
+const Row = styled.li<{ $unread?: boolean }>`
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 4px;
+  border-bottom: 1px solid ${theme.colors.borderLight};
+  background: ${({ $unread }) => ($unread ? "rgba(2, 113, 196, 0.04)" : "transparent")};
+  min-width: 0;
+
+  &:last-child {
+    border-bottom: none;
   }
 
-  .agreement-info {
+  .icon {
+    width: 38px;
+    height: 38px;
+    border-radius: ${theme.radii.medium};
+    background: ${theme.colors.primaryLight};
+    color: ${theme.colors.primary};
     display: flex;
     align-items: center;
-    gap: 14px;
+    justify-content: center;
+    flex-shrink: 0;
+  }
 
-    svg {
-      color: ${theme.colors.gold};
-      flex-shrink: 0;
-    }
+  .main {
+    flex: 1;
+    min-width: 0;
+  }
 
-    h4 {
-      font-size: 14px;
-      color: ${theme.colors.text};
-      margin-bottom: 2px;
-      font-family: 'Inter', sans-serif;
-    }
+  .title {
+    font-weight: 600;
+    font-size: 0.92rem;
+    color: ${theme.colors.text};
+    overflow-wrap: anywhere;
+  }
 
-    p {
-      font-size: 12px;
-      color: ${theme.colors.textMuted};
-    }
+  .sub {
+    font-size: 0.8rem;
+    color: ${theme.colors.textMuted};
+    margin-top: 2px;
+    overflow-wrap: anywhere;
+  }
+
+  .end {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+    flex-shrink: 0;
+    text-align: right;
+  }
+`;
+
+const Amount = styled.span<{ $tone: "up" | "down" | "flat" }>`
+  font-weight: 700;
+  font-size: 0.92rem;
+  color: ${({ $tone }) =>
+    $tone === "up" ? theme.colors.success : $tone === "down" ? theme.colors.danger : theme.colors.text};
+  white-space: nowrap;
+`;
+
+const Empty = styled.div`
+  text-align: center;
+  padding: 32px 12px;
+  color: ${theme.colors.textMuted};
+  font-size: 0.9rem;
+
+  svg {
+    color: ${theme.colors.border};
+    margin-bottom: 8px;
   }
 `;
 
 /* ============ UTILITY ============ */
 
-const formatNaira = (value: number): string => {
-  return `₦${value.toLocaleString("en-NG", {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  })}`;
-};
+const formatNaira = (value: number): string =>
+  `₦${value.toLocaleString("en-NG", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-const formatDate = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-GB", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-  });
-};
+const formatDate = (dateStr: string): string =>
+  new Date(dateStr).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
 
-const formatDateTime = (dateStr: string): string => {
-  const date = new Date(dateStr);
-  return date.toLocaleDateString("en-GB", {
+const formatDateTime = (dateStr: string): string =>
+  new Date(dateStr).toLocaleDateString("en-GB", {
     day: "2-digit",
     month: "short",
     year: "numeric",
     hour: "2-digit",
     minute: "2-digit",
   });
-};
 
-const getInitials = (name: string): string => {
-  return name
+const getInitials = (name: string): string =>
+  name
     .split(" ")
     .map((part) => part[0])
     .join("")
     .slice(0, 2)
     .toUpperCase();
+
+const getGreeting = (): string => {
+  const hour = new Date().getHours();
+  if (hour < 12) return "Good morning";
+  if (hour < 17) return "Good afternoon";
+  return "Good evening";
 };
+
+/** Payouts land on the 30th, or the last day of shorter months. */
+const getNextPayoutDate = (): Date => {
+  const now = new Date();
+  const payoutDay = (year: number, month: number) => Math.min(30, new Date(year, month + 1, 0).getDate());
+  const thisMonth = new Date(now.getFullYear(), now.getMonth(), payoutDay(now.getFullYear(), now.getMonth()));
+  if (now.getDate() <= thisMonth.getDate()) return thisMonth;
+  const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+  return new Date(next.getFullYear(), next.getMonth(), payoutDay(next.getFullYear(), next.getMonth()));
+};
+
+const statusTone = (status: string): Tone => {
+  if (["active", "completed", "approved"].includes(status)) return "good";
+  if (status === "pending") return "warn";
+  if (["failed", "cancelled", "rejected", "suspended", "inactive"].includes(status)) return "bad";
+  return "neutral";
+};
+
+const isCredit = (type: Transaction["type"]) => type === "deposit" || type === "profit" || type === "referral";
 
 export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: DashboardPageProps) {
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -930,104 +654,36 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [agreement, setAgreement] = useState<Agreement | null>(null);
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [summary, setSummary] = useState<DashboardSummary>({
-    totalInvested: 0,
-    currentValue: 0,
-    profitLoss: 0,
-    performance: 0,
-    openInvestments: 0,
-  });
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [tab, setTab] = useState<ActivityTab>("investments");
   const profileAvatarUrl = useResolvedAvatarUrl(profile?.avatar_url);
 
   const loadDashboard = useCallback(async () => {
     setLoading(true);
-    setError(null);
 
-    // Fetch each data source independently so one failure doesn't break the entire dashboard
-    const results: {
-      profile: Profile | null;
-      investorAccount: InvestorAccount | null;
-      investments: Investment[];
-      transactions: Transaction[];
-      agreement: Agreement | null;
-      notifications: Notification[];
-    } = {
-      profile: null,
-      investorAccount: null,
-      investments: [],
-      transactions: [],
-      agreement: null,
-      notifications: [],
+    // Each source is fetched independently so one failure doesn't break the whole dashboard
+    const [profileRes, accountRes, investmentsRes, transactionsRes, agreementRes, notificationsRes] =
+      await Promise.allSettled([
+        getCurrentProfile(),
+        getInvestorAccount(),
+        getInvestments(),
+        getTransactions(),
+        getAgreement(),
+        getNotifications(),
+      ]);
+
+    const pick = <T,>(res: PromiseSettledResult<T>, label: string, fallback: T): T => {
+      if (res.status === "fulfilled") return res.value ?? fallback;
+      console.error(`${label} fetch error:`, res.reason);
+      return fallback;
     };
 
-    // Fetch profile
-    try {
-      results.profile = await getCurrentProfile();
-    } catch (err) {
-      console.error("Profile fetch error:", err);
-    }
-
-    // Fetch investor account
-    try {
-      results.investorAccount = await getInvestorAccount();
-    } catch (err) {
-      console.error("Investor account fetch error:", err);
-    }
-
-    // Fetch investments
-    try {
-      results.investments = await getInvestments();
-    } catch (err) {
-      console.error("Investments fetch error:", err);
-    }
-
-    // Fetch transactions
-    try {
-      results.transactions = await getTransactions();
-    } catch (err) {
-      console.error("Transactions fetch error:", err);
-    }
-
-    // Fetch agreement
-    try {
-      results.agreement = await getAgreement();
-    } catch (err) {
-      console.error("Agreement fetch error:", err);
-    }
-
-    // Fetch notifications
-    try {
-      results.notifications = await getNotifications();
-    } catch (err) {
-      console.error("Notifications fetch error:", err);
-    }
-
-    // Update all state
-    setProfile(results.profile);
-    setInvestorAccount(results.investorAccount);
-    setInvestments(results.investments || []);
-    setTransactions(results.transactions || []);
-    setAgreement(results.agreement);
-    setNotifications(results.notifications || []);
-
-    // Calculate summary from real investment data
-    const investmentsList = results.investments || [];
-    const totalInvested = investmentsList.reduce((sum, inv) => sum + Number(inv.amount), 0);
-    const currentValue = investmentsList.reduce((sum, inv) => sum + Number(inv.current_value), 0);
-    const profitLoss = currentValue - totalInvested;
-    const performance = totalInvested > 0 ? (profitLoss / totalInvested) * 100 : 0;
-    const openInvestments = investmentsList.filter((inv) => inv.status === "active").length;
-
-    setSummary({
-      totalInvested,
-      currentValue,
-      profitLoss,
-      performance,
-      openInvestments,
-    });
-
+    setProfile(pick(profileRes, "Profile", null as Profile | null));
+    setInvestorAccount(pick(accountRes, "Investor account", null as InvestorAccount | null));
+    setInvestments(pick(investmentsRes, "Investments", [] as Investment[]));
+    setTransactions(pick(transactionsRes, "Transactions", [] as Transaction[]));
+    setAgreement(pick(agreementRes, "Agreement", null as Agreement | null));
+    setNotifications(pick(notificationsRes, "Notifications", [] as Notification[]));
     setLoading(false);
   }, []);
 
@@ -1044,359 +700,368 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
     }
   };
 
-  const unreadNotificationCount = notifications.filter((n) => !n.is_read).length;
-
   if (loading) {
     return (
-      <Page>
-        <Container>
+      <PageShell>
+        <PageContainer>
           <LoadingCard>
             <LoadingSpinner message="Loading your dashboard..." layout="center" />
           </LoadingCard>
-        </Container>
-      </Page>
+        </PageContainer>
+      </PageShell>
     );
   }
 
   const displayName = profile?.full_name || user.name;
+  const firstName = profile?.first_name || user.firstName || displayName.split(" ")[0];
   const displayPhone = profile?.phone || user.phone;
   const displayEmail = profile?.email || user.email;
   const displayStatus = profile?.status || "active";
-  const displayAddress = profile?.address || user.address || "Not provided";
-  const displayLocation = profile?.location || user.location || "Not provided";
-  const displayStateOfOrigin = profile?.state_of_origin || user.stateOfOrigin || "Not provided";
   const displayMonthlyRoi = profile?.monthly_roi ?? user.monthlyRoi ?? 10;
 
-  const agreementCompleted = agreement != null && agreement.status === "approved";
-  const accountBalance = investorAccount ? Number(investorAccount.available_balance) : summary.currentValue;
+  const roiBalance = Number(investorAccount?.roi_balance ?? 0);
+  const unreadCount = notifications.filter((n) => !n.is_read).length;
+
+  const confirmedInvestments = investments.filter(isConfirmedInvestment);
+  const totalInvested = confirmedInvestments.reduce((sum, inv) => sum + Number(inv.amount), 0);
+  const monthlyRoi = confirmedInvestments.reduce(
+    (sum, inv) => sum + (Number(inv.amount) * Number(inv.monthly_roi ?? displayMonthlyRoi)) / 100,
+    0
+  );
+  const sumCompleted = (type: Transaction["type"]) =>
+    transactions
+      .filter((tx) => tx.type === type && tx.status === "completed")
+      .reduce((sum, tx) => sum + Math.abs(Number(tx.amount)), 0);
+  const roiEarned = sumCompleted("profit");
+  const referralEarned = sumCompleted("referral");
+
+  const agreementState = !agreement ? "todo" : agreement.status === "approved" ? "done" : "review";
+  const hasInvestment = confirmedInvestments.length > 0;
+  const agreementConfirmed = confirmedInvestments.some((inv) => inv.agreement_id === agreement?.id);
+  const awaitingAmount =
+    agreement && agreement.status !== "rejected" && !agreementConfirmed
+      ? Number(agreement.investment_amount ?? 0)
+      : 0;
+  const onboardingDone = agreementState === "done" && hasInvestment;
+  const nextPayout = getNextPayoutDate();
 
   return (
-    <Page>
-      <Container>
-        <Header>
-          <div>
-            <div className="eyebrow">Investor Dashboard</div>
-            <h2>Welcome, {displayName}</h2>
-            <p>Your portfolio, activity, and notifications in one place. Use the menu above for profile and settings.</p>
-          </div>
-        </Header>
-
-        {error && (
-          <ErrorBanner>
-            <AlertTriangle size={18} />
-            <span>{error}</span>
-          </ErrorBanner>
-        )}
-
-        <HeroGrid>
-          <PortfolioHero>
-            <div className="hero-eyebrow">
-              <ShieldCheck size={14} />
-              Portfolio Overview
-            </div>
-            <div className="hero-balance-label">Total Portfolio Balance</div>
-            <div className="hero-balance">{formatNaira(accountBalance)}</div>
-
-            <div className="hero-stats">
-              <div className="hero-stat">
-                <div className="label">Total Invested</div>
-                <div className="value">{formatNaira(summary.totalInvested)}</div>
-              </div>
-              <div className="hero-stat">
-                <div className="label">Current Value</div>
-                <div className="value">{formatNaira(summary.currentValue)}</div>
-              </div>
-              <div className="hero-stat">
-                <div className="label">Performance</div>
-                <div className="value" style={{ color: summary.performance >= 0 ? "#7FD1FF" : "#FFB4A8" }}>
-                  {summary.performance >= 0 ? "+" : ""}
-                  {summary.performance.toFixed(2)}%
-                </div>
-              </div>
-            </div>
-
-            {investorAccount && (
-              <div className="hero-account-row">
-                <CreditCard size={16} />
-                <span className="account-number">{investorAccount.account_number}</span>
-                <span className="account-status">{investorAccount.status}</span>
-              </div>
-            )}
-          </PortfolioHero>
-
-          <ProfileSideCard>
-            <div className="profile-top">
-              {profileAvatarUrl ? (
-                <AvatarImage src={profileAvatarUrl} alt={displayName} />
-              ) : (
-                <Avatar>{getInitials(displayName)}</Avatar>
-              )}
-              <div className="profile-name">
-                <h3>{displayName}</h3>
-                <div className="role">Investor</div>
-              </div>
-            </div>
-
-            <ProfileStatusBadge $status={displayStatus}>{displayStatus}</ProfileStatusBadge>
-
-            <div className="profile-details">
-              <div className="profile-item">
-                <Mail size={15} />
-                <p>{displayEmail}</p>
-              </div>
-              <div className="profile-item">
-                <Phone size={15} />
-                <p>{displayPhone || "Not provided"}</p>
-              </div>
-              <div className="profile-item">
-                <Home size={15} />
-                <p>{displayAddress}</p>
-              </div>
-              <div className="profile-item">
-                <MapPin size={15} />
-                <p>{displayLocation}{displayStateOfOrigin !== "Not provided" ? ` · ${displayStateOfOrigin}` : ""}</p>
-              </div>
-              <div className="profile-item">
-                <Percent size={15} />
-                <p>Monthly ROI: {displayMonthlyRoi}%</p>
-              </div>
-            </div>
-
-            <div className="profile-footer">
-              <EditProfileButton type="button" onClick={() => onNavigate("edit-profile")}>
-                <Edit size={14} aria-hidden />
-                Edit profile
-              </EditProfileButton>
-              <EditProfileButton type="button" onClick={() => switchTab("account")}>
-                <User size={14} aria-hidden />
-                Full details
-              </EditProfileButton>
-            </div>
-          </ProfileSideCard>
-        </HeroGrid>
-
-        {/* ===== STATS GRID ===== */}
-        <StatsGrid>
-          <StatCard accent="blue">
-            <div className="stat-body">
-              <h3>Total Invested</h3>
-              <p>{formatNaira(summary.totalInvested)}</p>
-              <div className="stat-sub">Sum of all investments</div>
-            </div>
-            <div className="stat-icon">
-              <Wallet size={18} />
-            </div>
-          </StatCard>
-
-          <StatCard accent="gold">
-            <div className="stat-body">
-              <h3>Current Value</h3>
-              <p>{formatNaira(summary.currentValue)}</p>
-              <div className="stat-sub">Current portfolio value</div>
-            </div>
-            <div className="stat-icon">
-              <TrendingUp size={18} />
-            </div>
-          </StatCard>
-
-          <StatCard accent="blue">
-            <div className="stat-body">
-              <h3>Open Investments</h3>
-              <p>{summary.openInvestments}</p>
-              <div className="stat-sub">Active investments</div>
-            </div>
-            <div className="stat-icon">
-              <Briefcase size={18} />
-            </div>
-          </StatCard>
-
-          <StatCard accent={summary.profitLoss > 0 ? "gold" : summary.profitLoss < 0 ? "red" : undefined}>
-            <div className="stat-body">
-              <h3>Profit / Loss</h3>
+    <PageShell>
+      <PageContainer>
+        <TopBar>
+          <Greeting>
+            <AvatarCircle>
+              {profileAvatarUrl ? <img src={profileAvatarUrl} alt="" /> : getInitials(displayName)}
+            </AvatarCircle>
+            <div>
+              <h1>
+                {getGreeting()}, {firstName}
+              </h1>
               <p>
-                <AmountText positive={summary.profitLoss > 0} negative={summary.profitLoss < 0}>
-                  {summary.profitLoss >= 0 ? "+" : "-"}
-                  {formatNaira(Math.abs(summary.profitLoss))}
-                </AmountText>
+                <StatusChip $tone={statusTone(displayStatus)}>{displayStatus}</StatusChip>{" "}
+                Investor · {displayMonthlyRoi}% monthly ROI
               </p>
-              <div className="stat-sub">Current value - Total invested</div>
             </div>
-            <div className="stat-icon">
-              {summary.profitLoss >= 0 ? <ArrowUpRight size={18} /> : <ArrowDownRight size={18} />}
-            </div>
-          </StatCard>
-        </StatsGrid>
+          </Greeting>
+        </TopBar>
 
-        {!agreementCompleted && (
-          <AgreementBanner>
-            <div className="agreement-info">
-              <FileText size={20} />
-              <div>
-                <h4>Next step: sign your agreement</h4>
-                <p>Complete this once to activate your investor account.</p>
-              </div>
-            </div>
-            <Button variant="success" onClick={() => onNavigate("agreement")} style={{ width: "auto" }}>
-              <FileText size={16} />
-              Complete agreement
-            </Button>
-          </AgreementBanner>
+        {!onboardingDone && (
+          <StepsCard>
+            <CardTitle>Get started in 3 steps</CardTitle>
+            <StepsRow>
+              <StepItem $state="done">
+                <CheckCircle size={20} />
+                <div>
+                  <div className="t">Create account</div>
+                  <div className="d">Done — welcome aboard</div>
+                </div>
+              </StepItem>
+
+              <StepItem $state={agreementState === "done" ? "done" : "current"}>
+                {agreementState === "done" ? (
+                  <CheckCircle size={20} />
+                ) : agreementState === "review" ? (
+                  <Clock size={20} />
+                ) : (
+                  <Circle size={20} />
+                )}
+                <div>
+                  <div className="t">Sign agreement</div>
+                  <div className="d">
+                    {agreementState === "done"
+                      ? "Signed"
+                      : agreementState === "review"
+                        ? "Saved — sign it to activate your investment"
+                        : "Takes about 5 minutes"}
+                  </div>
+                  {agreementState !== "done" && (
+                    <StepButton type="button" onClick={() => onNavigate("agreement")}>
+                      {agreementState === "review" ? "Finish signing" : "Sign now"}
+                      <ChevronRight size={14} />
+                    </StepButton>
+                  )}
+                </div>
+              </StepItem>
+
+              <StepItem $state={hasInvestment ? "done" : agreementState === "done" ? "current" : "todo"}>
+                {hasInvestment ? <CheckCircle size={20} /> : <Circle size={20} />}
+                <div>
+                  <div className="t">Start earning</div>
+                  <div className="d">
+                    {hasInvestment ? "Investment active" : "Fund from ₦750,000 to receive monthly ROI"}
+                  </div>
+                </div>
+              </StepItem>
+            </StepsRow>
+          </StepsCard>
         )}
 
-        <MainGrid>
-          <div>
-          <SectionCard>
-            <SectionTitle>
-              <h3>
-                <Briefcase size={18} />
-                My investments
-              </h3>
-            </SectionTitle>
-            {investments.length === 0 ? (
-              <EmptyState>
-                <div className="empty-icon" aria-hidden>
-                  <Briefcase size={22} />
-                </div>
-                <p>You do not have any investments yet. Complete your agreement to get started.</p>
-                <Button variant="primary" onClick={() => onNavigate("agreement")} style={{ width: "auto", margin: "0 auto" }}>
-                  <FileText size={16} />
-                  Go to agreement
-                </Button>
-              </EmptyState>
-            ) : (
-              <TableWrap>
-                <Table>
-                  <thead>
-                    <tr>
-                      <Th>Investment</Th>
-                      <Th>Amount</Th>
-                      <Th>Current value</Th>
-                      <Th>Return</Th>
-                      <Th>Status</Th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {investments.map((inv) => {
-                      const returnPct = inv.amount > 0 ? (inv.profit_loss / inv.amount) * 100 : 0;
-                      return (
-                        <Tr key={inv.id}>
-                          <Td>
-                            <strong>{inv.investment_name}</strong>
-                          </Td>
-                          <Td>{formatNaira(inv.amount)}</Td>
-                          <Td>{formatNaira(inv.current_value)}</Td>
-                          <Td>
-                            <ProfitLossPill positive={returnPct > 0} negative={returnPct < 0}>
-                              {returnPct > 0 ? "+" : ""}
-                              {returnPct.toFixed(1)}%
-                            </ProfitLossPill>
-                          </Td>
-                          <Td>
-                            <StatusBadge tone={inv.status}>{inv.status}</StatusBadge>
-                          </Td>
-                        </Tr>
-                      );
-                    })}
-                  </tbody>
-                </Table>
-              </TableWrap>
-            )}
-          </SectionCard>
-
-          <SectionCard>
-            <SectionTitle>
-              <h3>
-                <ArrowLeftRight size={18} />
-                Transaction history
-              </h3>
-            </SectionTitle>
-            {transactions.length === 0 ? (
-              <EmptyState>
-                <div className="empty-icon" aria-hidden>
-                  <ArrowLeftRight size={22} />
-                </div>
-                <p>No transactions yet. Activity will appear here after deposits and payouts.</p>
-              </EmptyState>
-            ) : (
-              <TableWrap>
-                <Table>
-                  <thead>
-                    <tr>
-                      <Th>Date</Th>
-                      <Th>Description</Th>
-                      <Th>Amount</Th>
-                      <Th>Type</Th>
-                      <Th>Status</Th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {transactions.map((tx) => (
-                      <Tr key={tx.id}>
-                        <Td>{formatDate(tx.created_at)}</Td>
-                        <Td>{tx.description || tx.type}</Td>
-                        <Td>
-                          <AmountText positive={tx.type === "deposit" || tx.type === "profit" || tx.type === "referral"}>
-                            {tx.type === "withdrawal" || tx.type === "fee" ? "-" : "+"}
-                            {formatNaira(Math.abs(tx.amount))}
-                          </AmountText>
-                        </Td>
-                        <Td>
-                          <span style={{ textTransform: "capitalize" }}>{tx.type}</span>
-                        </Td>
-                        <Td>
-                          <StatusBadge tone={tx.status}>{tx.status}</StatusBadge>
-                        </Td>
-                      </Tr>
-                    ))}
-                  </tbody>
-                </Table>
-              </TableWrap>
-            )}
-          </SectionCard>
-          </div>
-
-          <div>
-          <SectionCard>
-            <SectionTitle>
-              <h3>
-                <Bell size={18} />
-                Notifications
-              </h3>
-              {unreadNotificationCount > 0 && (
-                <Button variant="outline" onClick={handleMarkAllNotificationsRead} style={{ fontSize: "12px", padding: "8px 14px", width: "auto" }}>
-                  <CheckCheck size={14} />
-                  Mark all read
-                </Button>
+        <TopGrid>
+          <BalanceCard>
+            <BalanceHead>
+              <span className="label">Available ROI balance</span>
+              {investorAccount && (
+                <span className="account">
+                  <CreditCard size={14} />
+                  {investorAccount.account_number}
+                </span>
               )}
-            </SectionTitle>
-            {notifications.length === 0 ? (
-              <EmptyState>
-                <div className="empty-icon" aria-hidden>
-                  <Inbox size={22} />
+            </BalanceHead>
+            <BalanceValue>{formatNaira(roiBalance)}</BalanceValue>
+
+            <BalanceStats>
+              <MiniStat>
+                <div className="k">
+                  <Wallet size={13} /> Total investment
                 </div>
-                <p>You are all caught up — no notifications right now.</p>
-              </EmptyState>
-            ) : (
-              <NotificationList>
-                {notifications.map((notification) => (
-                  <NotificationItem key={notification.id} $unread={!notification.is_read}>
-                    <div className="notification-icon">
-                      <Bell size={15} />
-                    </div>
-                    <div className="notification-content">
-                      <div className="notification-title">{notification.title}</div>
-                      <div className="notification-message">{notification.message}</div>
-                      <div className="notification-time">{formatDateTime(notification.created_at)}</div>
-                    </div>
-                    {!notification.is_read && <div className="unread-dot" />}
-                  </NotificationItem>
-                ))}
-              </NotificationList>
+                <div className="v">{formatNaira(totalInvested + awaitingAmount)}</div>
+                {awaitingAmount > 0 && (
+                  <div className="n">
+                    {totalInvested > 0 ? `${formatNaira(awaitingAmount)} awaiting signature` : "Awaiting signature"}
+                  </div>
+                )}
+              </MiniStat>
+              <MiniStat>
+                <div className="k">
+                  <ArrowUpRight size={13} /> Monthly ROI
+                </div>
+                <div className="v">{formatNaira(monthlyRoi)}</div>
+              </MiniStat>
+              <MiniStat>
+                <div className="k">
+                  <TrendingUp size={13} /> Total ROI earned
+                </div>
+                <div className="v">{formatNaira(roiEarned)}</div>
+              </MiniStat>
+              <MiniStat>
+                <div className="k">
+                  <Gift size={13} /> Referral bonus
+                </div>
+                <div className="v">{formatNaira(referralEarned)}</div>
+              </MiniStat>
+            </BalanceStats>
+          </BalanceCard>
+
+          <SideStack>
+            <PayoutCard>
+              <div className="icon">
+                <Calendar size={20} />
+              </div>
+              <div>
+                <div className="k">Next ROI processing</div>
+                <div className="v">{hasInvestment ? formatNaira(monthlyRoi) : "—"}</div>
+                <div className="s">
+                  {hasInvestment
+                    ? `Scheduled for ${formatDate(nextPayout.toISOString())}`
+                    : awaitingAmount > 0
+                      ? `${formatNaira(awaitingAmount)} starts once you sign the agreement`
+                      : "Starts once your investment is confirmed"}
+                </div>
+              </div>
+            </PayoutCard>
+
+            <Card>
+              <CardTitle>Quick actions</CardTitle>
+              <ActionGrid>
+                <ActionTile type="button" onClick={() => onNavigate("agreement")}>
+                  <FileText size={20} />
+                  Agreement
+                </ActionTile>
+                <ActionTile type="button" onClick={() => onNavigate("edit-profile")}>
+                  <User size={20} />
+                  Profile
+                </ActionTile>
+                <ActionTile type="button" onClick={() => onNavigate("settings")}>
+                  <Settings size={20} />
+                  Settings
+                </ActionTile>
+              </ActionGrid>
+              <ContactLine>
+                <Mail size={14} />
+                <span>{displayEmail}</span>
+              </ContactLine>
+              <ContactLine>
+                <Phone size={14} />
+                <span>{displayPhone || "No phone added"}</span>
+              </ContactLine>
+            </Card>
+          </SideStack>
+        </TopGrid>
+
+        <Card>
+          <ActivityHead>
+            <Tabs role="tablist" aria-label="Account activity">
+              <TabButton
+                type="button"
+                role="tab"
+                aria-selected={tab === "investments"}
+                $active={tab === "investments"}
+                onClick={() => setTab("investments")}
+              >
+                <Briefcase size={15} />
+                Investments
+              </TabButton>
+              <TabButton
+                type="button"
+                role="tab"
+                aria-selected={tab === "transactions"}
+                $active={tab === "transactions"}
+                onClick={() => setTab("transactions")}
+              >
+                <ArrowLeftRight size={15} />
+                Transactions
+              </TabButton>
+              <TabButton
+                type="button"
+                role="tab"
+                aria-selected={tab === "notifications"}
+                $active={tab === "notifications"}
+                onClick={() => setTab("notifications")}
+              >
+                <Bell size={15} />
+                Notifications
+                {unreadCount > 0 && <span className="count">{unreadCount}</span>}
+              </TabButton>
+            </Tabs>
+            {tab === "notifications" && unreadCount > 0 && (
+              <LinkButton type="button" onClick={handleMarkAllNotificationsRead}>
+                <CheckCheck size={14} />
+                Mark all read
+              </LinkButton>
             )}
-          </SectionCard>
-          </div>
-        </MainGrid>
-      </Container>
-    </Page>
+          </ActivityHead>
+
+          {tab === "investments" &&
+            (investments.length === 0 && awaitingAmount === 0 ? (
+              <Empty>
+                <Briefcase size={32} />
+                <div>No investments yet. Sign your agreement to get started.</div>
+              </Empty>
+            ) : (
+              <List>
+                {awaitingAmount > 0 && agreement && (
+                  <Row>
+                    <div className="icon">
+                      <Clock size={17} />
+                    </div>
+                    <div className="main">
+                      <div className="title">Amdako Strategic Investment</div>
+                      <div className="sub">
+                        {formatNaira(awaitingAmount)} · starts {formatDate(agreement.start_date || agreement.created_at)}
+                      </div>
+                    </div>
+                    <div className="end">
+                      <Amount $tone="flat">{formatNaira(awaitingAmount)}</Amount>
+                      <StatusChip $tone="warn">awaiting signature</StatusChip>
+                    </div>
+                  </Row>
+                )}
+                {investments.map((inv) => {
+                  const returnPct = inv.amount > 0 ? (inv.profit_loss / inv.amount) * 100 : 0;
+                  return (
+                    <Row key={inv.id}>
+                      <div className="icon">
+                        <Briefcase size={17} />
+                      </div>
+                      <div className="main">
+                        <div className="title">{inv.investment_name}</div>
+                        <div className="sub">
+                          {formatNaira(inv.amount)} invested · since {formatDate(inv.start_date || inv.created_at)}
+                        </div>
+                      </div>
+                      <div className="end">
+                        <Amount $tone={returnPct > 0 ? "up" : returnPct < 0 ? "down" : "flat"}>
+                          {formatNaira(inv.current_value)}
+                        </Amount>
+                        <StatusChip $tone={statusTone(inv.status)}>{inv.status}</StatusChip>
+                      </div>
+                    </Row>
+                  );
+                })}
+              </List>
+            ))}
+
+          {tab === "transactions" &&
+            (transactions.length === 0 ? (
+              <Empty>
+                <ArrowLeftRight size={32} />
+                <div>No transactions yet. Deposits and payouts will show here.</div>
+              </Empty>
+            ) : (
+              <List>
+                {transactions.map((tx) => {
+                  const credit = isCredit(tx.type);
+                  return (
+                    <Row key={tx.id}>
+                      <div className="icon">
+                        {credit ? <ArrowDownRight size={17} /> : <ArrowUpRight size={17} />}
+                      </div>
+                      <div className="main">
+                        <div className="title" style={{ textTransform: "capitalize" }}>
+                          {tx.description || tx.type}
+                        </div>
+                        <div className="sub">
+                          {formatDate(tx.created_at)}
+                          {tx.reference ? ` · Ref ${tx.reference}` : ""}
+                        </div>
+                      </div>
+                      <div className="end">
+                        <Amount $tone={credit ? "up" : "down"}>
+                          {credit ? "+" : "-"}
+                          {formatNaira(Math.abs(tx.amount))}
+                        </Amount>
+                        <StatusChip $tone={statusTone(tx.status)}>{tx.status}</StatusChip>
+                      </div>
+                    </Row>
+                  );
+                })}
+              </List>
+            ))}
+
+          {tab === "notifications" &&
+            (notifications.length === 0 ? (
+              <Empty>
+                <Inbox size={32} />
+                <div>You're all caught up.</div>
+              </Empty>
+            ) : (
+              <List>
+                {notifications.map((n) => (
+                  <Row key={n.id} $unread={!n.is_read}>
+                    <div className="icon">
+                      <Bell size={17} />
+                    </div>
+                    <div className="main">
+                      <div className="title">{n.title}</div>
+                      <div className="sub">{n.message}</div>
+                      <div className="sub">{formatDateTime(n.created_at)}</div>
+                    </div>
+                  </Row>
+                ))}
+              </List>
+            ))}
+        </Card>
+      </PageContainer>
+    </PageShell>
   );
 }

@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { ArrowRight, X } from "lucide-react";
 import { LogoLoader } from "./LoadingSpinner";
 import { theme } from "../theme";
-import { createInvestment } from "../services/investmentService";
+import { savePendingInvestmentAmount } from "../services/agreementService";
 import { getOrCreateInvestorAccount } from "../services/investorAccountService";
 import type { AuthState } from "../types";
 
@@ -325,19 +325,7 @@ export default function InvestmentSetupModal({
     setError(null);
 
     try {
-      // Create an investment record with the specified amount
-      await createInvestment({
-        investment_name: "Amdako Strategic Investment",
-        description: "Initial investment via registration flow",
-        amount: numericAmount,
-        current_value: numericAmount,
-        profit_loss: 0,
-        monthly_roi: 10,
-        status: "active",
-        start_date: new Date().toISOString().split("T")[0],
-      });
-
-      // Create or retrieve the investor account
+      await savePendingInvestmentAmount(numericAmount);
       await getOrCreateInvestorAccount();
 
       onComplete();

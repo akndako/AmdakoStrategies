@@ -1,292 +1,419 @@
 import { useState, useEffect } from "react";
 import styled from "styled-components";
-import { motion, useReducedMotion } from "framer-motion";
 import {
   User,
-  Mail,
-  Phone,
-  Home,
-  MapPin,
-  Percent,
-  Save,
+  Lock,
+  TrendingUp,
+  LogOut,
   ArrowLeft,
   CheckCircle,
   AlertCircle,
-  Lock,
+  Eye,
+  EyeOff,
+  Edit,
+  PhoneCall,
+  ChevronRight,
 } from "lucide-react";
 import { theme } from "../theme";
 import { changePassword } from "../lib/auth";
-import { updateProfile, getCurrentProfile } from "../services/profileService";
+import { getCurrentProfile } from "../services/profileService";
+import { useResolvedAvatarUrl } from "../hooks/useResolvedAvatarUrl";
 import type { AuthUser, Profile } from "../types";
 import type { PageView } from "../App";
 import { LogoLoader } from "../components/LoadingSpinner";
+import { PageShell, PageContainer } from "../components/layout/pageLayout";
 
 type SettingsPageProps = {
   user: AuthUser;
   onNavigate: (page: PageView) => void;
-  onAuthUpdate: (user: AuthUser) => void;
+  onLogout: () => void;
 };
 
-const Page = styled(motion.section)`
-  min-height: calc(100vh - 68px);
-  min-height: calc(100dvh - 68px);
-  padding: 40px max(16px, env(safe-area-inset-right)) 72px max(16px, env(safe-area-inset-left));
-  overflow-x: clip;
-  background:
-    linear-gradient(135deg, rgba(2, 113, 196, 0.045), transparent 42%),
-    linear-gradient(315deg, rgba(201, 162, 39, 0.055), transparent 36%),
-    ${theme.colors.ivory};
+type Section = "profile" | "security" | "investment" | "account";
 
-  @media (max-width: 768px) {
-    padding: 28px max(20px, env(safe-area-inset-right)) 56px max(20px, env(safe-area-inset-left));
+const SECTIONS: { id: Section; label: string; icon: typeof User }[] = [
+  { id: "profile", label: "Profile", icon: User },
+  { id: "security", label: "Password", icon: Lock },
+  { id: "investment", label: "Investment", icon: TrendingUp },
+  { id: "account", label: "Account", icon: LogOut },
+];
+
+/* ============ LAYOUT ============ */
+
+const Header = styled.div`
+  margin-bottom: 24px;
+
+  h1 {
+    font-size: clamp(1.35rem, 4vw, 1.75rem);
+    margin: 10px 0 4px;
   }
 
-  @media (max-width: 480px) {
-    padding: 20px max(16px, env(safe-area-inset-right)) max(48px, env(safe-area-inset-bottom))
-      max(16px, env(safe-area-inset-left));
-  }
-`;
-
-const Container = styled(motion.div)`
-  width: min(800px, 100%);
-  margin: 0 auto;
-  min-width: 0;
-`;
-
-const Header = styled(motion.div)`
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  margin-bottom: 32px;
-  flex-wrap: wrap;
-
-  .eyebrow {
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: ${theme.colors.gold};
-  }
-
-  h2 {
-    font-size: 28px;
-    color: ${theme.colors.text};
+  p {
     margin: 0;
-    line-height: 1.2;
-
-    @media (max-width: 480px) {
-      font-size: 24px;
-    }
+    color: ${theme.colors.textMuted};
+    font-size: 0.9rem;
   }
 `;
 
 const BackButton = styled.button`
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 8px;
-  background: transparent;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.medium};
-  padding: 10px 18px;
-  font-size: 14px;
+  gap: 6px;
+  padding: 0;
+  border: none;
+  background: none;
+  color: ${theme.colors.primary};
+  font-size: 0.875rem;
   font-weight: 600;
-  color: ${theme.colors.textSecondary};
   cursor: pointer;
-  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease,
-    transform 0.2s ease;
+`;
 
-  &:hover {
-    background: ${theme.colors.primaryLight};
-    color: ${theme.colors.primary};
-    border-color: ${theme.colors.primary};
-    transform: translateY(-1px);
-  }
+const Layout = styled.div`
+  display: grid;
+  grid-template-columns: 220px minmax(0, 1fr);
+  gap: 24px;
+  align-items: start;
 
-  &:focus-visible {
-    outline: 3px solid rgba(2, 113, 196, 0.3);
-    outline-offset: 2px;
+  @media (max-width: 860px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
   }
 `;
 
-const Card = styled(motion.div)`
-  position: relative;
-  overflow: hidden;
-  background: #fff;
-  border: 1px solid ${theme.colors.border};
-  border-radius: ${theme.radii.large};
-  padding: 36px;
-  box-shadow: ${theme.shadows.card};
-  margin-bottom: 24px;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
+const SideNav = styled.nav`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  position: sticky;
+  top: 120px;
 
-  &::before {
-    content: "";
-    position: absolute;
-    inset: 0 0 auto;
-    height: 3px;
-    background: linear-gradient(90deg, ${theme.colors.primary}, ${theme.colors.gold});
-    opacity: 0.7;
-  }
+  @media (max-width: 860px) {
+    position: static;
+    flex-direction: row;
+    overflow-x: auto;
+    scrollbar-width: none;
 
-  &:hover {
-    border-color: ${theme.colors.borderLight};
-    box-shadow: ${theme.shadows.cardHover};
-  }
-
-  @media (max-width: 768px) {
-    padding: 28px;
-  }
-
-  @media (max-width: 480px) {
-    padding: 24px;
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 `;
 
-const CardTitle = styled.h3`
-  font-size: 1.125rem;
-  color: ${theme.colors.text};
-  margin-bottom: 24px;
+const NavItem = styled.button<{ $active: boolean }>`
   display: flex;
   align-items: center;
   gap: 10px;
+  padding: 11px 14px;
+  border-radius: ${theme.radii.medium};
+  border: 1px solid ${({ $active }) => ($active ? theme.colors.primary : "transparent")};
+  background: ${({ $active }) => ($active ? theme.colors.primaryLight : "transparent")};
+  color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.textSecondary)};
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-align: left;
+  cursor: pointer;
+  flex-shrink: 0;
 
-  svg {
-    color: ${theme.colors.gold};
-    flex: 0 0 auto;
+  &:hover {
+    background: ${theme.colors.primaryLight};
+  }
+
+  @media (max-width: 860px) {
+    border-radius: 100px;
+    padding: 8px 14px;
+    border-color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.border)};
+    background: ${({ $active }) => ($active ? theme.colors.primary : "#fff")};
+    color: ${({ $active }) => ($active ? "#fff" : theme.colors.textSecondary)};
   }
 `;
 
-const FormGrid = styled.div`
-  display: grid;
-  gap: 20px;
+const Card = styled.section`
+  background: ${theme.colors.surface};
+  border: 1px solid ${theme.colors.border};
+  border-radius: ${theme.radii.xl};
+  box-shadow: ${theme.shadows.card};
+  padding: 26px;
+  min-width: 0;
+
+  @media (max-width: 480px) {
+    padding: 18px;
+    border-radius: ${theme.radii.large};
+  }
+
+  h2 {
+    font-size: 1.15rem;
+    margin: 0 0 4px;
+  }
+
+  .lead {
+    margin: 0 0 20px;
+    color: ${theme.colors.textMuted};
+    font-size: 0.875rem;
+  }
 `;
 
-const Row = styled.div`
+/* ============ PROFILE ============ */
+
+const ProfileHead = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+
+  .name {
+    font-weight: 700;
+    font-size: 1.05rem;
+  }
+
+  .email {
+    font-size: 0.85rem;
+    color: ${theme.colors.textMuted};
+    overflow-wrap: anywhere;
+  }
+`;
+
+const Avatar = styled.div`
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: ${theme.colors.primary};
+  color: #fff;
+  font-weight: 700;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid ${theme.colors.gold};
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+`;
+
+const InfoList = styled.dl`
+  margin: 0 0 20px;
+  border: 1px solid ${theme.colors.borderLight};
+  border-radius: ${theme.radii.medium};
+  overflow: hidden;
+`;
+
+const InfoRow = styled.div`
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  grid-template-columns: 140px minmax(0, 1fr);
+  gap: 12px;
+  padding: 12px 14px;
+  border-bottom: 1px solid ${theme.colors.borderLight};
+
+  &:last-child {
+    border-bottom: none;
+  }
 
   @media (max-width: 480px) {
     grid-template-columns: 1fr;
+    gap: 2px;
   }
+
+  dt {
+    font-size: 0.82rem;
+    color: ${theme.colors.textMuted};
+  }
+
+  dd {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 500;
+    color: ${theme.colors.text};
+    overflow-wrap: anywhere;
+  }
+
+  .missing {
+    color: ${theme.colors.textMuted};
+    font-weight: 400;
+    font-style: italic;
+  }
+`;
+
+/* ============ FORM ============ */
+
+const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 440px;
 `;
 
 const Field = styled.label`
-  display: grid;
-  gap: 8px;
-  color: ${theme.colors.text};
-  font-size: 14px;
-  font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: ${theme.colors.textSecondary};
 `;
 
-const InputWrapper = styled.div`
+const PasswordWrap = styled.div`
   position: relative;
 
-  svg {
+  input {
+    width: 100%;
+    padding: 12px 44px 12px 14px;
+    border-radius: ${theme.radii.medium};
+    border: 1px solid ${theme.colors.border};
+    background: #fff;
+    font-size: 16px;
+    color: ${theme.colors.text};
+    box-sizing: border-box;
+
+    &:focus {
+      outline: none;
+      border-color: ${theme.colors.primary};
+      box-shadow: 0 0 0 3px rgba(2, 113, 196, 0.12);
+    }
+  }
+
+  button {
     position: absolute;
-    left: 14px;
+    right: 6px;
     top: 50%;
     transform: translateY(-50%);
+    width: 34px;
+    height: 34px;
+    border: none;
+    background: none;
     color: ${theme.colors.textMuted};
-    pointer-events: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
   }
 `;
 
-const Input = styled.input`
-  width: 100%;
-  border-radius: ${theme.radii.medium};
-  border: 1px solid ${theme.colors.border};
-  background: #fff;
-  padding: 14px 16px 14px 44px;
-  color: ${theme.colors.text};
-  font-size: 15px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
-
-  &::placeholder {
-    color: ${theme.colors.textMuted};
-  }
-
-  &:focus {
-    outline: none;
-    border-color: ${theme.colors.primary};
-    box-shadow: 0 0 0 4px ${theme.colors.primaryLight};
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    background: #f7f7f5;
-    color: ${theme.colors.textMuted};
-  }
+const Hint = styled.span`
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: ${theme.colors.textMuted};
 `;
 
-const Button = styled.button`
-  appearance: none;
-  border: none;
+const Message = styled.div<{ $tone: "error" | "success" }>`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 11px 14px;
   border-radius: ${theme.radii.medium};
-  padding: 14px 24px;
-  font-weight: 600;
-  font-size: 15px;
-  background: ${theme.colors.primary};
-  color: #fff;
+  font-size: 0.875rem;
+  background: ${({ $tone }) => ($tone === "error" ? "rgba(179, 64, 58, 0.08)" : "rgba(14, 138, 158, 0.1)")};
+  color: ${({ $tone }) => ($tone === "error" ? theme.colors.danger : theme.colors.success)};
+  border: 1px solid
+    ${({ $tone }) => ($tone === "error" ? "rgba(179, 64, 58, 0.25)" : "rgba(14, 138, 158, 0.25)")};
+`;
+
+const Button = styled.button<{ $variant?: "primary" | "outline" | "danger" }>`
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
+  padding: 12px 20px;
+  border-radius: ${theme.radii.medium};
+  font-size: 0.92rem;
+  font-weight: 600;
   cursor: pointer;
-  transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
-  box-shadow: ${theme.shadows.button};
+  align-self: flex-start;
+  border: 1px solid
+    ${({ $variant }) =>
+      $variant === "outline" ? theme.colors.border : $variant === "danger" ? theme.colors.danger : "transparent"};
+  background: ${({ $variant }) =>
+    $variant === "outline" ? "#fff" : $variant === "danger" ? "#fff" : theme.colors.primary};
+  color: ${({ $variant }) =>
+    $variant === "outline" ? theme.colors.primary : $variant === "danger" ? theme.colors.danger : "#fff"};
 
-  &:hover {
-    background: ${theme.colors.primaryDark};
-    box-shadow: ${theme.shadows.buttonHover};
-    transform: translateY(-1px);
+  &:hover:not(:disabled) {
+    background: ${({ $variant }) =>
+      $variant === "outline"
+        ? theme.colors.primaryLight
+        : $variant === "danger"
+          ? "rgba(179, 64, 58, 0.06)"
+          : theme.colors.primaryDark};
   }
 
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
-    transform: none;
-    box-shadow: none;
   }
 
-  &:focus-visible {
-    outline: 3px solid rgba(2, 113, 196, 0.3);
-    outline-offset: 3px;
+  @media (max-width: 480px) {
+    align-self: stretch;
   }
 `;
 
-const ErrorMessage = styled.div`
-  color: ${theme.colors.danger};
-  background: rgba(214, 69, 69, 0.08);
-  border: 1px solid rgba(214, 69, 69, 0.2);
-  padding: 12px 16px;
-  border-radius: ${theme.radii.medium};
-  margin-top: 8px;
-  font-size: 14px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+/* ============ INVESTMENT / ACCOUNT ============ */
+
+const TermGrid = styled.div`
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  @media (max-width: 560px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
-const SuccessMessage = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(2, 113, 196, 0.08);
-  border: 1px solid rgba(2, 113, 196, 0.25);
+const Term = styled.div`
+  padding: 14px;
   border-radius: ${theme.radii.medium};
-  padding: 12px 16px;
-  margin-bottom: 16px;
-  color: ${theme.colors.success};
-  font-size: 14px;
+  background: ${theme.colors.ivory};
+  border: 1px solid ${theme.colors.borderLight};
+
+  .k {
+    font-size: 0.8rem;
+    color: ${theme.colors.textMuted};
+  }
+
+  .v {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: ${theme.colors.primary};
+    margin-top: 2px;
+  }
+
+  .s {
+    font-size: 0.8rem;
+    color: ${theme.colors.textSecondary};
+    margin-top: 2px;
+  }
 `;
 
-const ActionRow = styled(motion.div)`
+const AccountRow = styled.div`
   display: flex;
+  align-items: center;
   justify-content: space-between;
-  align-items: center;
   gap: 16px;
-  margin-top: 24px;
+  padding: 16px 0;
+  border-bottom: 1px solid ${theme.colors.borderLight};
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-of-type {
+    padding-top: 0;
+  }
+
+  .t {
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  .d {
+    font-size: 0.82rem;
+    color: ${theme.colors.textMuted};
+    margin-top: 2px;
+  }
 
   @media (max-width: 480px) {
     flex-direction: column;
@@ -294,44 +421,54 @@ const ActionRow = styled(motion.div)`
   }
 `;
 
-const Notice = styled.p`
-  color: ${theme.colors.textMuted};
-  font-size: 13px;
-  line-height: 1.6;
-`;
+const getInitials = (name: string): string =>
+  name
+    .split(" ")
+    .map((part) => part[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
-const pageVariants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
+type PasswordFieldProps = {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  autoComplete: string;
+  disabled: boolean;
+  hint?: string;
 };
 
-export default function SettingsPage({ user, onNavigate, onAuthUpdate }: SettingsPageProps) {
-  const shouldReduceMotion = useReducedMotion();
-  const containerVariants = {
-    hidden: {},
-    visible: {
-      transition: { staggerChildren: shouldReduceMotion ? 0 : 0.08 },
-    },
-  };
-  const sectionVariants = {
-    hidden: { opacity: 0, y: shouldReduceMotion ? 0 : 12 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: shouldReduceMotion ? 0 : 0.35 },
-    },
-  };
+function PasswordField({ label, value, onChange, autoComplete, disabled, hint }: PasswordFieldProps) {
+  const [visible, setVisible] = useState(false);
+  return (
+    <Field>
+      {label}
+      <PasswordWrap>
+        <input
+          type={visible ? "text" : "password"}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          autoComplete={autoComplete}
+          disabled={disabled}
+        />
+        <button
+          type="button"
+          onClick={() => setVisible((v) => !v)}
+          aria-label={visible ? `Hide ${label.toLowerCase()}` : `Show ${label.toLowerCase()}`}
+        >
+          {visible ? <EyeOff size={17} /> : <Eye size={17} />}
+        </button>
+      </PasswordWrap>
+      {hint && <Hint>{hint}</Hint>}
+    </Field>
+  );
+}
 
-  const [firstName, setFirstName] = useState(user.firstName || "");
-  const [lastName, setLastName] = useState(user.lastName || "");
-  const [phone, setPhone] = useState(user.phone || "");
-  const [email, setEmail] = useState(user.email || "");
-  const [address, setAddress] = useState(user.address || "");
-  const [location, setLocation] = useState(user.location || "");
-  const [stateOfOrigin, setStateOfOrigin] = useState(user.stateOfOrigin || "");
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<string | null>(null);
+export default function SettingsPage({ user, onNavigate, onLogout }: SettingsPageProps) {
+  const [section, setSection] = useState<Section>("profile");
+  const [profile, setProfile] = useState<Profile | null>(null);
+  const avatarUrl = useResolvedAvatarUrl(profile?.avatar_url ?? user.avatar_url);
+
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -339,95 +476,38 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
   const [pwError, setPwError] = useState<string | null>(null);
   const [pwSuccess, setPwSuccess] = useState<string | null>(null);
 
-  // Load current profile data on mount
   useEffect(() => {
-    const loadProfile = async () => {
-      try {
-        const profile = await getCurrentProfile();
-        if (profile) {
-          setFirstName(profile.first_name || user.firstName || "");
-          setLastName(profile.last_name || user.lastName || "");
-          setEmail(profile.email || user.email || "");
-          setPhone(profile.phone || user.phone || "");
-          setAddress(profile.address || user.address || "");
-          setLocation(profile.location || user.location || "");
-          setStateOfOrigin(profile.state_of_origin || user.stateOfOrigin || "");
-        }
-      } catch (err) {
-        console.error("Error loading profile:", err);
-      }
-    };
-    loadProfile();
+    getCurrentProfile()
+      .then(setProfile)
+      .catch((err) => console.error("Error loading profile:", err));
   }, [user]);
 
-  const handleSave = async () => {
-    setLoading(true);
-    setError(null);
-    setSuccess(null);
+  const handleChangePassword = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setPwError(null);
+    setPwSuccess(null);
 
-    try {
-      const updatedProfile: Partial<Profile> = {
-        first_name: firstName,
-        last_name: lastName,
-        full_name: `${firstName} ${lastName}`.trim(),
-        phone,
-        email,
-        address: address || null,
-        location: location || null,
-        state_of_origin: stateOfOrigin || null,
-      };
-
-      const result = await updateProfile(updatedProfile);
-
-      // Update the auth state with the new user info
-      const updatedUser: AuthUser = {
-        id: user.id,
-        name: result.full_name || `${firstName} ${lastName}`.trim(),
-        firstName: result.first_name || firstName,
-        lastName: result.last_name || lastName,
-        phone: result.phone || phone,
-        email: result.email || email,
-        address: result.address || address,
-        location: result.location || location,
-        stateOfOrigin: result.state_of_origin || stateOfOrigin,
-        monthlyRoi: user.monthlyRoi,
-        avatar_url: user.avatar_url,
-      };
-
-      onAuthUpdate(updatedUser);
-      setSuccess("Settings updated successfully.");
-    } catch (err) {
-      const message =
-        err instanceof Error
-          ? err.message
-          : "Unable to update settings. Please try again.";
-      setError(message);
-    } finally {
-      setLoading(false);
+    if (!currentPassword) {
+      setPwError("Enter your current password.");
+      return;
     }
-  };
-
-  const handleChangePassword = async () => {
     if (newPassword.length < 6) {
-      setPwError("Password must be at least 6 characters long.");
+      setPwError("New password must be at least 6 characters.");
       return;
     }
     if (newPassword !== confirmPassword) {
-      setPwError("Passwords do not match. Please try again.");
+      setPwError("New passwords do not match.");
       return;
     }
 
     setPwLoading(true);
-    setPwError(null);
-    setPwSuccess(null);
-
     try {
       const { error } = await changePassword(currentPassword, newPassword);
       if (error) {
         setPwError(error.message || "Unable to change your password. Please try again.");
         return;
       }
-      setPwSuccess("Your password has been changed successfully.");
+      setPwSuccess("Password changed. Use it next time you sign in.");
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -438,252 +518,190 @@ export default function SettingsPage({ user, onNavigate, onAuthUpdate }: Setting
     }
   };
 
+  const name = profile?.full_name || user.name;
+  const monthlyRoi = profile?.monthly_roi ?? user.monthlyRoi ?? 10;
+  const details: [string, string | null | undefined][] = [
+    ["Full name", name],
+    ["Email", profile?.email || user.email],
+    ["Phone", profile?.phone || user.phone],
+    ["Address", profile?.address || user.address],
+    ["City / Town", profile?.location || user.location],
+    ["State of origin", profile?.state_of_origin || user.stateOfOrigin],
+  ];
+
   return (
-    <Page initial="hidden" animate="visible" variants={pageVariants}>
-      <Container variants={containerVariants}>
-        <Header variants={sectionVariants}>
-          <BackButton onClick={() => onNavigate("dashboard")}>
+    <PageShell>
+      <PageContainer style={{ maxWidth: 980 }}>
+        <Header>
+          <BackButton type="button" onClick={() => onNavigate("dashboard")}>
             <ArrowLeft size={16} />
-            Back to Dashboard
+            Dashboard
           </BackButton>
-          <div>
-            <div className="eyebrow">Account Settings</div>
-            <h2>Settings</h2>
-          </div>
+          <h1>Settings</h1>
+          <p>Manage your details, password, and account.</p>
         </Header>
 
-        {error && (
-          <ErrorMessage>
-            <AlertCircle size={16} />
-            {error}
-          </ErrorMessage>
-        )}
+        <Layout>
+          <SideNav aria-label="Settings sections">
+            {SECTIONS.map(({ id, label, icon: Icon }) => (
+              <NavItem
+                key={id}
+                type="button"
+                $active={section === id}
+                aria-current={section === id ? "page" : undefined}
+                onClick={() => setSection(id)}
+              >
+                <Icon size={17} />
+                {label}
+              </NavItem>
+            ))}
+          </SideNav>
 
-        {success && (
-          <SuccessMessage>
-            <CheckCircle size={16} />
-            {success}
-          </SuccessMessage>
-        )}
-
-        <Card variants={sectionVariants}>
-          <CardTitle>
-            <User size={18} />
-            Personal Information
-          </CardTitle>
-          <FormGrid>
-            <Row>
-              <Field>
-                First name
-                <InputWrapper>
-                  <User size={18} />
-                  <Input
-                    value={firstName}
-                    onChange={(e) => setFirstName(e.target.value)}
-                    type="text"
-                    placeholder="Your first name"
-                    disabled={loading}
-                  />
-                </InputWrapper>
-              </Field>
-
-              <Field>
-                Last name
-                <InputWrapper>
-                  <User size={18} />
-                  <Input
-                    value={lastName}
-                    onChange={(e) => setLastName(e.target.value)}
-                    type="text"
-                    placeholder="Your last name"
-                    disabled={loading}
-                  />
-                </InputWrapper>
-              </Field>
-            </Row>
-
-            <Field>
-              Phone number
-              <InputWrapper>
-                <Phone size={18} />
-                <Input
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  type="tel"
-                  placeholder="Your phone number"
-                  disabled={loading}
-                />
-              </InputWrapper>
-            </Field>
-
-            <Field>
-              Email address
-              <InputWrapper>
-                <Mail size={18} />
-                <Input
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
-                  placeholder="you@example.com"
-                  disabled={loading}
-                />
-              </InputWrapper>
-            </Field>
-
-            <Field>
-              Address
-              <InputWrapper>
-                <Home size={18} />
-                <Input
-                  value={address}
-                  onChange={(e) => setAddress(e.target.value)}
-                  type="text"
-                  placeholder="Your residential address"
-                  disabled={loading}
-                />
-              </InputWrapper>
-            </Field>
-
-            <Row>
-              <Field>
-                Location
-                <InputWrapper>
-                  <MapPin size={18} />
-                  <Input
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    type="text"
-                    placeholder="City / Town"
-                    disabled={loading}
-                  />
-                </InputWrapper>
-              </Field>
-
-              <Field>
-                State of Origin
-                <InputWrapper>
-                  <MapPin size={18} />
-                  <Input
-                    value={stateOfOrigin}
-                    onChange={(e) => setStateOfOrigin(e.target.value)}
-                    type="text"
-                    placeholder="Your state of origin"
-                    disabled={loading}
-                  />
-                </InputWrapper>
-              </Field>
-            </Row>
-          </FormGrid>
-        </Card>
-
-        <Card variants={sectionVariants}>
-          <CardTitle>Investment Information</CardTitle>
-          <FormGrid>
-            <Field>
-              Monthly ROI
-              <InputWrapper>
-                <Percent size={18} />
-                <Input value="10" readOnly disabled />
-              </InputWrapper>
-            </Field>
-            <Notice>
-              Your monthly ROI is fixed at 10% — guaranteed monthly returns on all investments.
-            </Notice>
-          </FormGrid>
-        </Card>
-
-        <Card variants={sectionVariants}>
-          <CardTitle>
-            <Lock size={18} />
-            Change Password
-          </CardTitle>
-          {pwError && (
-            <ErrorMessage>
-              <AlertCircle size={16} /> {pwError}
-            </ErrorMessage>
+          {section === "profile" && (
+            <Card>
+              <h2>Profile</h2>
+              <p className="lead">This is the information on your investor account.</p>
+              <ProfileHead>
+                <Avatar>{avatarUrl ? <img src={avatarUrl} alt="" /> : getInitials(name)}</Avatar>
+                <div>
+                  <div className="name">{name}</div>
+                  <div className="email">{profile?.email || user.email}</div>
+                </div>
+              </ProfileHead>
+              <InfoList>
+                {details.map(([label, value]) => (
+                  <InfoRow key={label}>
+                    <dt>{label}</dt>
+                    <dd>{value ? value : <span className="missing">Not added</span>}</dd>
+                  </InfoRow>
+                ))}
+              </InfoList>
+              <Button type="button" onClick={() => onNavigate("edit-profile")}>
+                <Edit size={16} />
+                Edit profile & photo
+              </Button>
+            </Card>
           )}
-          {pwSuccess && (
-            <SuccessMessage>
-              <CheckCircle size={16} /> {pwSuccess}
-            </SuccessMessage>
-          )}
-          <FormGrid>
-            <Field>
-              Current password
-              <InputWrapper>
-                <Lock size={18} />
-                <Input
+
+          {section === "security" && (
+            <Card>
+              <h2>Change password</h2>
+              <p className="lead">Choose a password you don't use anywhere else.</p>
+              <Form onSubmit={handleChangePassword} noValidate>
+                {pwError && (
+                  <Message $tone="error" role="alert">
+                    <AlertCircle size={16} />
+                    {pwError}
+                  </Message>
+                )}
+                {pwSuccess && (
+                  <Message $tone="success" role="status">
+                    <CheckCircle size={16} />
+                    {pwSuccess}
+                  </Message>
+                )}
+                <PasswordField
+                  label="Current password"
                   value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
-                  type="password"
-                  placeholder="Enter your current password"
-                  disabled={pwLoading}
+                  onChange={setCurrentPassword}
                   autoComplete="current-password"
+                  disabled={pwLoading}
                 />
-              </InputWrapper>
-            </Field>
+                <PasswordField
+                  label="New password"
+                  value={newPassword}
+                  onChange={setNewPassword}
+                  autoComplete="new-password"
+                  disabled={pwLoading}
+                  hint="At least 6 characters"
+                />
+                <PasswordField
+                  label="Confirm new password"
+                  value={confirmPassword}
+                  onChange={setConfirmPassword}
+                  autoComplete="new-password"
+                  disabled={pwLoading}
+                />
+                <Button type="submit" disabled={pwLoading}>
+                  {pwLoading ? (
+                    <>
+                      <LogoLoader compact />
+                      Updating...
+                    </>
+                  ) : (
+                    <>
+                      <Lock size={16} />
+                      Update password
+                    </>
+                  )}
+                </Button>
+              </Form>
+            </Card>
+          )}
 
-            <Row>
-              <Field>
-                New password
-                <InputWrapper>
-                  <Lock size={18} />
-                  <Input
-                    value={newPassword}
-                    onChange={(e) => setNewPassword(e.target.value)}
-                    type="password"
-                    placeholder="Enter a new password"
-                    disabled={pwLoading}
-                    autoComplete="new-password"
-                  />
-                </InputWrapper>
-              </Field>
+          {section === "investment" && (
+            <Card>
+              <h2>Investment terms</h2>
+              <p className="lead">These are fixed for your account.</p>
+              <TermGrid>
+                <Term>
+                  <div className="k">Monthly ROI</div>
+                  <div className="v">{monthlyRoi}%</div>
+                  <div className="s">Of your invested amount</div>
+                </Term>
+                <Term>
+                  <div className="k">Payout date</div>
+                  <div className="v">30th</div>
+                  <div className="s">Every month, to your bank</div>
+                </Term>
+                <Term>
+                  <div className="k">Lock-in period</div>
+                  <div className="v">3 months</div>
+                  <div className="s">Then capital can be withdrawn</div>
+                </Term>
+                <Term>
+                  <div className="k">Referral bonus</div>
+                  <div className="v">$30</div>
+                  <div className="s">Per person who invests</div>
+                </Term>
+              </TermGrid>
+              <div style={{ marginTop: 18 }}>
+                <Button type="button" $variant="outline" onClick={() => onNavigate("agreement")}>
+                  View my agreement
+                  <ChevronRight size={16} />
+                </Button>
+              </div>
+            </Card>
+          )}
 
-              <Field>
-                Confirm new password
-                <InputWrapper>
-                  <Lock size={18} />
-                  <Input
-                    value={confirmPassword}
-                    onChange={(e) => setConfirmPassword(e.target.value)}
-                    type="password"
-                    placeholder="Re-enter your new password"
-                    disabled={pwLoading}
-                    autoComplete="new-password"
-                  />
-                </InputWrapper>
-              </Field>
-            </Row>
-
-            <Button onClick={handleChangePassword} disabled={pwLoading}>
-              {pwLoading ? (
-                <>
-                  <LogoLoader compact />
-                  Updating...
-                </>
-              ) : (
-                "Update Password"
-              )}
-            </Button>
-          </FormGrid>
-        </Card>
-
-        <ActionRow variants={sectionVariants}>
-          <Button onClick={handleSave} disabled={loading}>
-            {loading ? (
-              <>
-                <LogoLoader compact />
-                Saving...
-              </>
-            ) : (
-              <>
-                Save Changes
-                <Save size={16} />
-              </>
-            )}
-          </Button>
-        </ActionRow>
-      </Container>
-    </Page>
+          {section === "account" && (
+            <Card>
+              <h2>Account</h2>
+              <p className="lead">Get help or sign out of this device.</p>
+              <AccountRow>
+                <div>
+                  <div className="t">Need help?</div>
+                  <div className="d">Call our investor support team.</div>
+                </div>
+                <Button as="a" href="tel:08035817324" $variant="outline">
+                  <PhoneCall size={16} />
+                  0803 581 7324
+                </Button>
+              </AccountRow>
+              <AccountRow>
+                <div>
+                  <div className="t">Sign out</div>
+                  <div className="d">You'll need your password to sign back in.</div>
+                </div>
+                <Button type="button" $variant="danger" onClick={onLogout}>
+                  <LogOut size={16} />
+                  Sign out
+                </Button>
+              </AccountRow>
+            </Card>
+          )}
+        </Layout>
+      </PageContainer>
+    </PageShell>
   );
 }

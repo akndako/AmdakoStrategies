@@ -38,38 +38,13 @@ export async function getInvestmentById(id: string): Promise<Investment | null> 
   return data as Investment | null;
 }
 
-export async function createInvestment(data: Partial<Investment>): Promise<Investment> {
-  const user = await getCurrentUser();
-  if (!user) {
-    throw new Error("User not authenticated");
-  }
-
-  const { data: result, error } = await supabase
-    .from("investments")
-    .insert({
-      user_id: user.id,
-      investment_name: data.investment_name || "",
-      description: data.description || null,
-      amount: data.amount || 0,
-      current_value: data.current_value ?? data.amount ?? 0,
-      profit_loss: data.profit_loss ?? 0,
-      monthly_roi: data.monthly_roi ?? 10,
-      status: data.status || "active",
-      start_date: data.start_date || new Date().toISOString().split("T")[0],
-      maturity_date: data.maturity_date || null,
-    })
-    .select()
-    .single();
-
-  if (error) {
-    console.error("Error creating investment:", error);
-    throw new Error(formatErrorForDisplay(error));
-  }
-  return result as Investment;
+/** Investments are created server-side when an agreement is approved; only those earn ROI. */
+export function isConfirmedInvestment(investment: Investment): boolean {
+  return investment.status === "active" && Boolean(investment.confirmed_at);
 }
 
 export async function getDashboardSummary(): Promise<DashboardSummary> {
-  const investments = await getInvestments();
+  const investments = (await getInvestments()).filter(isConfirmedInvestment);
 
   const totalInvested = investments.reduce((sum, inv) => sum + Number(inv.amount), 0);
   const currentValue = investments.reduce((sum, inv) => sum + Number(inv.current_value), 0);

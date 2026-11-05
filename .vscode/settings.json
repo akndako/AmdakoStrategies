@@ -1,5 +1,9 @@
 {
     "chat.tools.terminal.autoApprove": {
-        "npm run build": true
+        "npm run build": true,
+        "/^Get-ChildItem -Name; Get-Content frontend\\\\\\.env\\.example \\| ForEach-Object \\{ if \\(\\$_ -match '\\^\\\\s\\*\\(\\[\\^#=\\]\\+\\)='\\) \\{ \\$matches\\[1\\] \\} \\}; Get-Content frontend\\\\\\.env\\.local \\| ForEach-Object \\{ if \\(\\$_ -match '\\^\\\\s\\*\\(\\[\\^#=\\]\\+\\)='\\) \\{ \\$matches\\[1\\] \\} \\}$/": {
+            "approve": true,
+            "matchCommandLine": true
+        }
     }
 }

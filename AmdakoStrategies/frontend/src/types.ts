@@ -426,6 +426,8 @@ export type Investment = {
   status: "active" | "completed" | "pending" | "cancelled";
   start_date: string;
   maturity_date: string | null;
+  agreement_id: string | null;
+  confirmed_at: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -433,12 +435,15 @@ export type Investment = {
 export type Transaction = {
   id: string;
   user_id: string;
+  investment_id: string | null;
   type: "deposit" | "withdrawal" | "profit" | "referral" | "fee" | "adjustment";
   description: string | null;
   amount: number;
   status: "pending" | "completed" | "failed" | "cancelled";
   reference: string | null;
-  metadata: Record<string, unknown> | null;
+  roi_percentage: number | null;
+  roi_period: string | null;
+  metadata?: Record<string, unknown> | null;
   created_at: string;
   updated_at: string;
 };
@@ -506,6 +511,7 @@ export type InvestorAccount = {
   account_number: string;
   status: "active" | "pending" | "suspended" | "inactive";
   available_balance: number;
+  roi_balance: number;
   created_at: string;
   updated_at: string;
 };

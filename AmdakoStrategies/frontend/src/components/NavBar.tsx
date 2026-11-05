@@ -1,6 +1,6 @@
 ﻿import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { Menu, X, LayoutDashboard, UserPlus, LogIn, ChevronDown, User, Settings, LogOut, FileText } from "lucide-react";
+import { Menu, X, UserPlus, LogIn, ChevronDown, User, Settings, LogOut, FileText } from "lucide-react";
 import { theme } from "../theme";
 import type { AuthState } from "../types";
 import logoImage from "../assets/amdakostrategies.jpeg";
@@ -443,7 +443,10 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
       </TopBar> */}
 
       <Nav>
-        <Brand onClick={() => handleNavigate("home")} aria-label="Go to home">
+        <Brand
+          onClick={() => handleNavigate(auth ? "dashboard" : "home")}
+          aria-label={auth ? "Go to dashboard" : "Go to home"}
+        >
           <BrandMark>
             <img src={logoImage} alt="" />
           </BrandMark>
@@ -454,17 +457,16 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         </Brand>
 
         <NavLinks>
-          {auth && (
-            <NavLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
-              Dashboard
-            </NavLink>
+          {!auth && (
+            <>
+              <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
+                Home
+              </NavLink>
+              <NavLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+                Contact
+              </NavLink>
+            </>
           )}
-          <NavLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
-            Home
-          </NavLink>
-          <NavLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-            Contact
-          </NavLink>
         </NavLinks>
 
         <Actions>
@@ -487,10 +489,6 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
               {dropdownOpen && (
                 <DropdownMenu>
-                  <DropdownItem onClick={() => handleNavigate("dashboard")}>
-                    <LayoutDashboard size={16} />
-                    Dashboard
-                  </DropdownItem>
                   <DropdownItem onClick={() => handleNavigate("agreement")}>
                     <FileText size={16} />
                     Agreement
@@ -548,19 +546,17 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       {menuOpen && (
         <MobileMenu>
-          {auth && (
-            <MobileLink $active={activePage === "dashboard"} onClick={() => handleNavigate("dashboard")}>
-              <LayoutDashboard size={18} />
-              Dashboard
-            </MobileLink>
+          {!auth && (
+            <>
+              <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
+                Home
+              </MobileLink>
+              <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+                Contact
+              </MobileLink>
+              <MobileDivider />
+            </>
           )}
-          <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
-            Home
-          </MobileLink>
-          <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
-            Contact
-          </MobileLink>
-          <MobileDivider />
 
           {auth ? (
             <>

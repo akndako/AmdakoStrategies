@@ -1,7 +1,9 @@
+import { useState, type FormEvent } from "react";
 import styled from "styled-components";
 import { Mail, Phone, MapPin, Globe, Send } from "lucide-react";
 import { theme } from "../theme";
 import { MarketingPageShell, PageContainer } from "../components/layout/pageLayout";
+import { supabase } from "../lib/supabase";
 
 const Page = MarketingPageShell;
 
@@ -231,6 +233,11 @@ const Button = styled.button`
   transition: all 0.2s ease;
   box-shadow: ${theme.shadows.button};
 
+  &:disabled {
+    cursor: wait;
+    opacity: 0.7;
+  }
+
   &:hover {
     background: ${theme.colors.primaryDark};
     box-shadow: ${theme.shadows.buttonHover};
@@ -244,6 +251,43 @@ const Button = styled.button`
 `;
 
 export default function ContactUsPage() {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionStatus, setSubmissionStatus] = useState("");
+  const [hasSubmissionError, setHasSubmissionError] = useState(false);
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    const form = event.currentTarget;
+    const formData = new FormData(form);
+
+    setIsSubmitting(true);
+    setSubmissionStatus("");
+    setHasSubmissionError(false);
+
+    try {
+      const { error } = await supabase.from("contact_messages").insert({
+        name: String(formData.get("name") ?? "").trim(),
+        email: String(formData.get("email") ?? "").trim(),
+        message: String(formData.get("message") ?? "").trim(),
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      form.reset();
+      setSubmissionStatus("Thank you for your message. Our team will be in touch soon.");
+    } catch (error) {
+      console.error("Error submitting contact message:", error);
+      setHasSubmissionError(true);
+      setSubmissionStatus(
+        "We couldn't send your message. Please try again or email amdakoStrategy@gmail.com."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  }
+
   return (
     <Page>
       <Container>
@@ -295,7 +339,7 @@ export default function ContactUsPage() {
             </ContactList>
           </InfoCard>
 
-          <FormCard onSubmit={(event) => event.preventDefault()}>
+          <FormCard onSubmit={handleSubmit}>
             <FormHeader>
               <h3>Send a Message</h3>
               <p>Fill out the form and we'll get back to you as soon as possible.</p>
@@ -303,21 +347,38 @@ export default function ContactUsPage() {
 
             <Field>
               Name
-              <Input type="text" placeholder="Your name" required />
+              <Input name="name" type="text" placeholder="Your name" maxLength={120} required />
             </Field>
 
             <Field>
               Email
-              <Input type="email" placeholder="you@example.com" required />
+              <Input
+                name="email"
+                type="email"
+                placeholder="you@example.com"
+                maxLength={254}
+                required
+              />
             </Field>
 
             <Field>
               Message
-              <TextArea placeholder="Tell us how we can help" required />
+              <TextArea
+                name="message"
+                placeholder="Tell us how we can help"
+                maxLength={5000}
+                required
+              />
             </Field>
 
-            <Button type="submit">
-              Send Message
+            {submissionStatus && (
+              <p role={hasSubmissionError ? "alert" : "status"} aria-live="polite">
+                {submissionStatus}
+              </p>
+            )}
+
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Sending..." : "Send Message"}
               <Send size={16} />
             </Button>
           </FormCard>

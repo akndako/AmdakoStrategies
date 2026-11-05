@@ -10,6 +10,7 @@ import {
   downloadAgreementPdf,
   downloadAgreementSignature,
   getAgreement,
+  getPendingInvestmentAmount,
   saveAgreement,
   saveAgreementPdf,
   saveAgreementSignature,
@@ -34,6 +35,8 @@ type AgreementFormPageProps = {
   };
   onNavigate: (page: PageView) => void;
 };
+
+const MIN_INVESTMENT = 750000;
 
 const Page = PageShell;
 
@@ -416,7 +419,6 @@ function createAgreementPdf(agreement: Agreement, signatureDataUrl?: string | nu
     ["Investment amount", `NGN ${Number(agreement.investment_amount).toLocaleString()}`],
     ["Expected ROI", `${agreement.monthly_roi}% monthly`],
     ["Start date", agreement.start_date],
-    ["Maturity date", agreement.maturity_date || "Open-ended"],
     ["Payment method", agreement.payment_method],
     ["Payment bank", agreement.payment_bank_name || "Not provided"],
     ["Payment account name", agreement.payment_account_name || "Not provided"],
@@ -484,7 +486,6 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
   const [idType, setIdType] = useState<Agreement["id_type"]>(null);
   const [investmentAmount, setInvestmentAmount] = useState("");
   const [startDate, setStartDate] = useState(new Date().toISOString().split("T")[0]);
-  const [maturityDate, setMaturityDate] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Bank Transfer");
   const [paymentBankName, setPaymentBankName] = useState("");
   const [paymentAccountName, setPaymentAccountName] = useState("");
@@ -516,7 +517,7 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
       investment_amount: Number(investmentAmount),
       monthly_roi: user.monthlyRoi || 10,
       start_date: startDate,
-      maturity_date: maturityDate || null,
+      maturity_date: null,
       payment_method: paymentMethod,
       payment_bank_name: paymentBankName.trim() || null,
       payment_account_name: paymentAccountName.trim() || null,
@@ -537,7 +538,6 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
     investmentAmount,
     user.monthlyRoi,
     startDate,
-    maturityDate,
     paymentMethod,
     paymentBankName,
     paymentAccountName,
@@ -552,21 +552,28 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
     if (!name.trim() || !phoneNumber.trim() || !email.trim()) {
       return "Please complete your name, phone, and email on the Your details step.";
     }
-    if (!Number.isFinite(Number(investmentAmount)) || Number(investmentAmount) <= 0) {
-      return "Enter an investment amount greater than zero.";
+    if (!Number.isFinite(Number(investmentAmount)) || Number(investmentAmount) < MIN_INVESTMENT) {
+      return `The minimum investment is ₦${MIN_INVESTMENT.toLocaleString("en-NG")}.`;
     }
-    if (maturityDate && maturityDate < startDate) {
-      return "Maturity date must be on or after the start date.";
+    if (!startDate) {
+      return "Please choose a start date.";
     }
     return null;
-  }, [name, phoneNumber, email, investmentAmount, maturityDate, startDate]);
+  }, [name, phoneNumber, email, investmentAmount, startDate]);
 
   useEffect(() => {
     let active = true;
 
     getAgreement()
-      .then((agreement) => {
-        if (!active || !agreement) return;
+      .then(async (agreement) => {
+        if (!active) return;
+        if (!agreement) {
+          const pendingAmount = await getPendingInvestmentAmount();
+          if (active && pendingAmount) {
+            setInvestmentAmount((current) => current || String(pendingAmount));
+          }
+          return;
+        }
         setSavedAgreement(agreement);
         setName(agreement.full_name);
         setEmail(agreement.email);
@@ -577,7 +584,6 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
         setIdType(agreement.id_type);
         setInvestmentAmount(String(agreement.investment_amount));
         setStartDate(agreement.start_date);
-        setMaturityDate(agreement.maturity_date || "");
         setPaymentMethod(agreement.payment_method);
         setPaymentBankName(agreement.payment_bank_name || "");
         setPaymentAccountName(agreement.payment_account_name || "");
@@ -676,8 +682,14 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
         agreement.id,
         createAgreementPdf(agreement, signatureDataUrl),
       );
-      setSavedAgreement({ ...agreement, document_url: documentPath });
-      setSuccess("Your signed agreement is saved securely. You can download your copy below.");
+      const refreshed = await getAgreement();
+      const latest = refreshed ?? { ...agreement, document_url: documentPath };
+      setSavedAgreement(latest);
+      setSuccess(
+        latest.status === "approved"
+          ? "Your agreement is signed and approved. Your investment is now active — see it on your dashboard."
+          : "Your signed agreement is saved securely. You can download your copy below.",
+      );
     } catch (err) {
       const message = err instanceof Error
         ? err.message
@@ -846,8 +858,8 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               type="number"
               value={investmentAmount}
               onChange={(e) => setInvestmentAmount(e.target.value)}
-              placeholder="Investment amount"
-              min="0.01"
+              placeholder="Minimum ₦750,000"
+              min={MIN_INVESTMENT}
               step="0.01"
               required
             />
@@ -870,16 +882,6 @@ export default function AgreementFormPage({ user, onNavigate }: AgreementFormPag
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
               required
-            />
-          </FormGroup>
-
-          <FormGroup>
-            <label>Maturity Date</label>
-            <input
-              type="date"
-              value={maturityDate}
-              onChange={(e) => setMaturityDate(e.target.value)}
-              min={startDate}
             />
           </FormGroup>
 
