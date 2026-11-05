@@ -156,11 +156,12 @@ export const GlobalStyles = createGlobalStyle`
     max-width: 100%;
   }
 
+  /* iOS Safari zooms into any field under 16px on focus; component styles must not override this. */
   @media (max-width: 768px) {
     input,
     select,
     textarea {
-      font-size: 16px;
+      font-size: 16px !important;
     }
   }
 

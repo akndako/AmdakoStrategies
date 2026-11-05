@@ -189,7 +189,8 @@ const ForgotButton = styled.button`
   appearance: none;
   background: none;
   border: none;
-  padding: 0;
+  padding: 10px 4px;
+  margin: -10px -4px;
   font-size: 14px;
   font-weight: 600;
   color: ${theme.colors.primary};
@@ -311,7 +312,8 @@ const InlineLink = styled.button`
   appearance: none;
   background: none;
   border: none;
-  padding: 0;
+  padding: 10px 4px;
+  margin: -10px -4px;
   font-size: inherit;
   font-weight: 600;
   color: ${theme.colors.primary};

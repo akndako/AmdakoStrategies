@@ -33,9 +33,13 @@ const Top = styled.div`
   }
 
   @media (max-width: 600px) {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     gap: 28px;
     margin-bottom: 28px;
+  }
+
+  > * {
+    min-width: 0;
   }
 `;
 
@@ -78,6 +82,7 @@ const ContactInfo = styled.div`
     display: flex;
     align-items: flex-start;
     gap: 10px;
+    overflow-wrap: anywhere;
     color: rgba(255, 255, 255, 0.65);
     text-decoration: none;
     font-size: 13.5px;
@@ -118,6 +123,11 @@ const LinksColumn = styled.div`
     &:hover {
       color: #fff;
     }
+
+    @media (max-width: 600px) {
+      padding: 6px 0;
+      margin-bottom: 2px;
+    }
   }
 `;
 
@@ -144,8 +154,13 @@ const InputRow = styled.div`
   display: flex;
   gap: 8px;
 
+  @media (max-width: 360px) {
+    flex-direction: column;
+  }
+
   input {
     flex: 1;
+    min-width: 0;
     padding: 11px 14px;
     border-radius: ${theme.radii.small};
     border: 1px solid rgba(255, 255, 255, 0.15);

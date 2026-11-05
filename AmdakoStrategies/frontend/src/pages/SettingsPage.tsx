@@ -59,6 +59,7 @@ const BackButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 40px;
   padding: 0;
   border: none;
   background: none;
@@ -97,6 +98,13 @@ const SideNav = styled.nav`
       display: none;
     }
   }
+
+  @media (max-width: 480px) {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    overflow: visible;
+  }
 `;
 
 const NavItem = styled.button<{ $active: boolean }>`
@@ -119,6 +127,7 @@ const NavItem = styled.button<{ $active: boolean }>`
   }
 
   @media (max-width: 860px) {
+    min-height: 40px;
     border-radius: 100px;
     padding: 8px 14px;
     border-color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.border)};

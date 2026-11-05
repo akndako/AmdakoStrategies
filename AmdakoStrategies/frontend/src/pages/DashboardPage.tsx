@@ -437,6 +437,7 @@ const StepButton = styled.button`
   display: inline-flex;
   align-items: center;
   gap: 4px;
+  min-height: 38px;
   padding: 6px 12px;
   border-radius: ${theme.radii.small};
   border: none;
@@ -463,6 +464,13 @@ const Tabs = styled.div`
   &::-webkit-scrollbar {
     display: none;
   }
+
+  @media (max-width: 480px) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    width: 100%;
+    overflow: visible;
+  }
 `;
 
 const TabButton = styled.button<{ $active: boolean }>`
@@ -470,6 +478,7 @@ const TabButton = styled.button<{ $active: boolean }>`
   display: inline-flex;
   align-items: center;
   gap: 6px;
+  min-height: 40px;
   padding: 8px 14px;
   border-radius: 100px;
   font-size: 0.85rem;
@@ -490,6 +499,24 @@ const TabButton = styled.button<{ $active: boolean }>`
     justify-content: center;
     background: ${({ $active }) => ($active ? "rgba(255,255,255,0.25)" : theme.colors.danger)};
     color: #fff;
+  }
+
+  @media (max-width: 480px) {
+    position: relative;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    min-height: 56px;
+    padding: 8px 4px;
+    border-radius: ${theme.radii.medium};
+    font-size: 0.72rem;
+
+    .count {
+      position: absolute;
+      top: 4px;
+      right: 6px;
+    }
   }
 `;
 
@@ -514,6 +541,12 @@ const LinkButton = styled.button`
   font-weight: 600;
   color: ${theme.colors.primary};
   cursor: pointer;
+
+  @media (max-width: 480px) {
+    width: 100%;
+    justify-content: center;
+    min-height: 40px;
+  }
 `;
 
 const List = styled.ul`
@@ -573,6 +606,14 @@ const Row = styled.li<{ $unread?: boolean }>`
     gap: 4px;
     flex-shrink: 0;
     text-align: right;
+  }
+
+  @media (max-width: 380px) {
+    gap: 10px;
+
+    .icon {
+      display: none;
+    }
   }
 `;
 

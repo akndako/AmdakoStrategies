@@ -66,6 +66,11 @@ const Nav = styled.nav`
     padding: 0 20px;
     height: 62px;
   }
+
+  @media (max-width: 400px) {
+    padding: 0 12px;
+    gap: 8px;
+  }
 `;
 
 const Brand = styled.div`
@@ -73,6 +78,11 @@ const Brand = styled.div`
   align-items: center;
   gap: 12px;
   cursor: pointer;
+  min-width: 0;
+
+  @media (max-width: 400px) {
+    gap: 8px;
+  }
 `;
 
 const BrandMark = styled.div`
@@ -92,6 +102,12 @@ const BrandMark = styled.div`
 `;
 
 const BrandText = styled.div`
+  min-width: 0;
+
+  @media (max-width: 340px) {
+    display: none;
+  }
+
   h3 {
     font-family: 'Playfair Display', Georgia, serif;
     font-size: 16px;
@@ -100,6 +116,10 @@ const BrandText = styled.div`
     color: ${theme.colors.text};
     margin: 0 0 2px;
     line-height: 1.2;
+
+    @media (max-width: 400px) {
+      font-size: 14px;
+    }
 
     span {
       color: ${theme.colors.primary};
@@ -207,9 +227,14 @@ const MobileAuthActions = styled.div`
   @media (max-width: 860px) {
     display: flex;
   }
+
+  @media (max-width: 400px) {
+    gap: 6px;
+  }
 `;
 
 const MobileAuthButton = styled.button<{ $primary?: boolean }>`
+  min-height: 40px;
   padding: 8px 12px;
   border-radius: ${theme.radii.small};
   font-size: 12px;
@@ -226,6 +251,10 @@ const MobileAuthButton = styled.button<{ $primary?: boolean }>`
     background: ${({ $primary }) =>
       $primary ? theme.colors.primaryDark : theme.colors.primaryLight};
     color: ${({ $primary }) => ($primary ? "#fff" : theme.colors.primary)};
+  }
+
+  @media (max-width: 400px) {
+    padding: 8px 10px;
   }
 `;
 

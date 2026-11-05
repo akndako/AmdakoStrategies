@@ -95,6 +95,7 @@ const ClearButton = styled.button`
   align-items: center;
   justify-content: center;
   gap: 6px;
+  min-height: 40px;
   padding: 8px 14px;
   border-radius: ${theme.radii.medium};
   border: 1px solid ${theme.colors.border};
