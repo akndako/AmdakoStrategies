@@ -27,6 +27,7 @@ const Overlay = styled.div`
   align-items: center;
   justify-content: center;
   z-index: 1000;
+  animation: fadeIn 0.25s ease both;
   padding: max(16px, env(safe-area-inset-top)) max(16px, env(safe-area-inset-right))
     max(16px, env(safe-area-inset-bottom)) max(16px, env(safe-area-inset-left));
 
@@ -46,8 +47,10 @@ const Modal = styled.div`
   overflow-y: auto;
   position: relative;
   -webkit-overflow-scrolling: touch;
+  animation: dropIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 600px) {
+    animation-name: sheetUp;
     border-radius: ${theme.radii.xl} ${theme.radii.xl} 0 0;
     max-height: min(92dvh, 720px);
   }

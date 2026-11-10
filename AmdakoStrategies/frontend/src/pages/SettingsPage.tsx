@@ -137,6 +137,7 @@ const NavItem = styled.button<{ $active: boolean }>`
 `;
 
 const Card = styled.section`
+  animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
   background: ${theme.colors.surface};
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.xl};
@@ -299,6 +300,10 @@ const PasswordWrap = styled.div`
     align-items: center;
     justify-content: center;
     cursor: pointer;
+
+    &:not(:disabled):active {
+      transform: translateY(-50%) scale(0.92);
+    }
   }
 `;
 

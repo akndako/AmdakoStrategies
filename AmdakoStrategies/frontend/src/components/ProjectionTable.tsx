@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 import { Table2 } from "lucide-react";
 import { theme } from "../theme";
 
-const Section = styled.section.attrs({ id: "home-projections" })<{ $flush?: boolean }>`
+const Section = styled.section.attrs({ id: "investment-plan" })<{ $flush?: boolean }>`
   padding: ${({ $flush }) => ($flush ? "24px 24px 72px" : "100px 24px")};
   background: ${({ $flush }) => ($flush ? "transparent" : theme.colors.surface)};
 
@@ -187,6 +187,7 @@ const Note = styled.div`
 `;
 
 const rows = [
+  { capital: "₦300,000", monthly: "₦30,000", yearly: "₦360,000", highlight: false },
   { capital: "₦750,000", monthly: "₦75,000", yearly: "₦900,000", highlight: false },
   { capital: "₦1,000,000", monthly: "₦100,000", yearly: "₦1,200,000", highlight: true },
   { capital: "₦5,000,000", monthly: "₦500,000", yearly: "₦6,000,000", highlight: false },
@@ -203,7 +204,7 @@ export default function ProjectionTable({ flush }: ProjectionTableProps) {
       <Container>
         <Header>
           <Eyebrow>At 10% monthly</Eyebrow>
-          <Title>Sample projections</Title>
+          <Title>Capital investment plan</Title>
           <Subtitle>Monthly and annual figures by capital amount.</Subtitle>
         </Header>
 

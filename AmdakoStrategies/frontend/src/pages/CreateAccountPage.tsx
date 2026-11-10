@@ -20,6 +20,7 @@ const Page = styled(AuthPageShell)`
 `;
 
 const Card = styled.div`
+  animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   width: min(640px, 100%);
   min-width: 0;
   background: #fff;
@@ -164,6 +165,10 @@ const PasswordToggle = styled.button`
   &:hover {
     color: ${theme.colors.primary};
     background: ${theme.colors.primaryLight};
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(-50%) scale(0.92);
   }
 
   &:focus-visible {

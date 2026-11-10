@@ -84,6 +84,7 @@ const BackButton = styled.button`
 `;
 
 const Card = styled.div`
+  animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   background: #fff;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.xl};

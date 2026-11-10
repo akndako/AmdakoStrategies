@@ -67,6 +67,7 @@ const BackLink = styled.button`
 `;
 
 const Card = styled.form`
+  animation: popIn 0.45s cubic-bezier(0.22, 1, 0.36, 1) both;
   background: #fff;
   border: 1px solid ${theme.colors.border};
   border-radius: ${theme.radii.xl};

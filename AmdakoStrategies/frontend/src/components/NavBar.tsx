@@ -101,43 +101,12 @@ const BrandMark = styled.div`
   }
 `;
 
-const BrandText = styled.div`
-  min-width: 0;
-
-  @media (max-width: 340px) {
-    display: none;
-  }
-
-  h3 {
-    font-family: 'Playfair Display', Georgia, serif;
-    font-size: 16px;
-    font-weight: 600;
-    letter-spacing: 0.2px;
-    color: ${theme.colors.text};
-    margin: 0 0 2px;
-    line-height: 1.2;
-
-    @media (max-width: 400px) {
-      font-size: 14px;
-    }
-
-    span {
-      color: ${theme.colors.primary};
-    }
-  }
-
-  p {
-    font-size: 10.5px;
-    color: ${theme.colors.textMuted};
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin: 0;
-    line-height: 1.3;
-
-    @media (max-width: 480px) {
-      display: none;
-    }
-  }
+const BrandMonogram = styled.span`
+  color: ${theme.colors.primary};
+  font-family: 'Playfair Display', Georgia, serif;
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
 `;
 
 const NavLinks = styled.div`
@@ -282,6 +251,14 @@ const MobileMenu = styled.div`
   gap: 6px;
   background: #fff;
   border-top: 1px solid ${theme.colors.borderLight};
+  transform-origin: top center;
+  animation: dropIn 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  > * {
+    animation: fadeUp 0.3s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+
+  ${Array.from({ length: 8 }, (_, i) => `> *:nth-child(${i + 2}) { animation-delay: ${(i + 1) * 35}ms; }`).join("\n")}
 
   @media (max-width: 860px) {
     display: flex;
@@ -365,6 +342,8 @@ const DropdownMenu = styled.div`
   box-shadow: 0 10px 40px rgba(26, 26, 24, 0.15);
   padding: 8px;
   z-index: 99;
+  transform-origin: top right;
+  animation: dropIn 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
 
   @media (max-width: 768px) {
     right: 20px;
@@ -479,10 +458,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
           <BrandMark>
             <img src={logoImage} alt="" />
           </BrandMark>
-          <BrandText>
-            <h3>Amdako <span>Strategies</span></h3>
-            <p>Strategic Wealth & Digital Finance</p>
-          </BrandText>
+          <BrandMonogram>AS</BrandMonogram>
         </Brand>
 
         <NavLinks>

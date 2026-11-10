@@ -34,6 +34,7 @@ import { getAgreement } from "../services/agreementService";
 import { getNotifications, markAllNotificationsAsRead } from "../services/notificationService";
 import { getInvestorAccount } from "../services/investorAccountService";
 import LoadingSpinner from "../components/LoadingSpinner";
+import { CountUp, Stagger, StaggerItem, SwapFade } from "../components/motion/Motion";
 import type { Profile, Investment, Transaction, Agreement, InvestorAccount, Notification, AuthUser } from "../types";
 
 type DashboardPageProps = {
@@ -344,15 +345,27 @@ const ActionTile = styled.button`
   font-size: 0.8rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 
   svg {
     color: ${theme.colors.primary};
+    transition: transform 0.2s ease;
   }
 
   &:hover {
     border-color: ${theme.colors.primary};
     background: ${theme.colors.primaryLight};
+  }
+
+  @media (hover: hover) {
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(2, 90, 158, 0.12);
+    }
+
+    &:hover svg {
+      transform: scale(1.1);
+    }
   }
 `;
 
@@ -563,6 +576,8 @@ const Row = styled.li<{ $unread?: boolean }>`
   border-bottom: 1px solid ${theme.colors.borderLight};
   background: ${({ $unread }) => ($unread ? "rgba(2, 113, 196, 0.04)" : "transparent")};
   min-width: 0;
+  animation: fadeUp 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  ${Array.from({ length: 8 }, (_, i) => `&:nth-child(${i + 2}) { animation-delay: ${(i + 1) * 45}ms; }`).join("\n")}
 
   &:last-child {
     border-bottom: none;
@@ -789,6 +804,8 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
   return (
     <PageShell>
       <PageContainer>
+        <Stagger>
+        <StaggerItem>
         <TopBar>
           <Greeting>
             <AvatarCircle>
@@ -805,8 +822,10 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             </div>
           </Greeting>
         </TopBar>
+        </StaggerItem>
 
         {!onboardingDone && (
+          <StaggerItem>
           <StepsCard>
             <CardTitle>Get started in 3 steps</CardTitle>
             <StepsRow>
@@ -855,8 +874,10 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
               </StepItem>
             </StepsRow>
           </StepsCard>
+          </StaggerItem>
         )}
 
+        <StaggerItem>
         <TopGrid>
           <BalanceCard>
             <BalanceHead>
@@ -868,14 +889,14 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
                 </span>
               )}
             </BalanceHead>
-            <BalanceValue>{formatNaira(roiBalance)}</BalanceValue>
+            <BalanceValue><CountUp value={roiBalance} format={formatNaira} /></BalanceValue>
 
             <BalanceStats>
               <MiniStat>
                 <div className="k">
                   <Wallet size={13} /> Total investment
                 </div>
-                <div className="v">{formatNaira(totalInvested + awaitingAmount)}</div>
+                <div className="v"><CountUp value={totalInvested + awaitingAmount} format={formatNaira} /></div>
                 {awaitingAmount > 0 && (
                   <div className="n">
                     {totalInvested > 0 ? `${formatNaira(awaitingAmount)} awaiting signature` : "Awaiting signature"}
@@ -886,19 +907,19 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
                 <div className="k">
                   <ArrowUpRight size={13} /> Monthly ROI
                 </div>
-                <div className="v">{formatNaira(monthlyRoi)}</div>
+                <div className="v"><CountUp value={monthlyRoi} format={formatNaira} /></div>
               </MiniStat>
               <MiniStat>
                 <div className="k">
                   <TrendingUp size={13} /> Total ROI earned
                 </div>
-                <div className="v">{formatNaira(roiEarned)}</div>
+                <div className="v"><CountUp value={roiEarned} format={formatNaira} /></div>
               </MiniStat>
               <MiniStat>
                 <div className="k">
                   <Gift size={13} /> Referral bonus
                 </div>
-                <div className="v">{formatNaira(referralEarned)}</div>
+                <div className="v"><CountUp value={referralEarned} format={formatNaira} /></div>
               </MiniStat>
             </BalanceStats>
           </BalanceCard>
@@ -948,7 +969,9 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             </Card>
           </SideStack>
         </TopGrid>
+        </StaggerItem>
 
+        <StaggerItem>
         <Card>
           <ActivityHead>
             <Tabs role="tablist" aria-label="Account activity">
@@ -992,6 +1015,7 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
             )}
           </ActivityHead>
 
+          <SwapFade swapKey={tab}>
           {tab === "investments" &&
             (investments.length === 0 && awaitingAmount === 0 ? (
               <Empty>
@@ -1101,7 +1125,10 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
                 ))}
               </List>
             ))}
+          </SwapFade>
         </Card>
+        </StaggerItem>
+        </Stagger>
       </PageContainer>
     </PageShell>
   );
