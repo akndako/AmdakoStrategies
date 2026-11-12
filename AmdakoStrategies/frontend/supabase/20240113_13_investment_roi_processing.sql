@@ -240,7 +240,7 @@ begin
       v_agreement.user_id,
       'Investment confirmed',
       'Your investment of ₦' || to_char(v_agreement.investment_amount, 'FM999,999,999,990.00')
-        || ' is confirmed. Monthly ROI is paid on the 30th (last day in February).',
+        || ' is confirmed. Monthly ROI is paid on the 30th (of every month).',
       'investment'
     );
   end if;

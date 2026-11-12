@@ -1118,7 +1118,12 @@ export default function DashboardPage({ user, onNavigate, refreshKey = 0 }: Dash
                     </div>
                     <div className="main">
                       <div className="title">{n.title}</div>
-                      <div className="sub">{n.message}</div>
+                      <div className="sub">
+                        {n.message?.replace(
+                          "Monthly ROI is paid on the 30th (last day in February)",
+                          "Monthly ROI is paid on the 30th (of every month)",
+                        )}
+                      </div>
                       <div className="sub">{formatDateTime(n.created_at)}</div>
                     </div>
                   </Row>
