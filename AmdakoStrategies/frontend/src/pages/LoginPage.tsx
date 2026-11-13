@@ -1,6 +1,6 @@
 import { type FormEvent, useState } from "react";
 import styled from "styled-components";
-import { Mail, Lock, ArrowRight, ArrowLeft, Phone, KeyRound } from "lucide-react";
+import { Mail, Lock, ArrowRight, ArrowLeft, Phone, KeyRound, Eye, EyeOff } from "lucide-react";
 import { LogoLoader } from "../components/LoadingSpinner";
 import { AuthPageShell } from "../components/layout/pageLayout";
 import { theme } from "../theme";
@@ -88,7 +88,7 @@ const Field = styled.label`
 const InputWrapper = styled.div`
   position: relative;
 
-  svg {
+  > svg {
     position: absolute;
     left: 14px;
     top: 50%;
@@ -121,6 +121,50 @@ const Input = styled.input`
   @media (max-width: 480px) {
     padding: 13px 14px 13px 40px;
     font-size: 15px;
+  }
+`;
+
+const PasswordInput = styled(Input)`
+  padding-right: 52px;
+
+  @media (max-width: 480px) {
+    padding-right: 44px;
+  }
+`;
+
+const PasswordToggle = styled.button`
+  position: absolute;
+  top: 50%;
+  right: 8px;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: ${theme.radii.small};
+  background: transparent;
+  color: ${theme.colors.textMuted};
+  cursor: pointer;
+
+  &:hover {
+    color: ${theme.colors.primary};
+    background: ${theme.colors.primaryLight};
+  }
+
+  &:not(:disabled):active {
+    transform: translateY(-50%) scale(0.92);
+  }
+
+  &:focus-visible {
+    outline: 2px solid ${theme.colors.primary};
+    outline-offset: 1px;
+  }
+
+  svg {
+    position: static;
+    transform: none;
   }
 `;
 
@@ -329,6 +373,7 @@ const InlineLink = styled.button`
 export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -621,7 +666,10 @@ export default function LoginPage({ onAuthSuccess, onNavigate }: LoginPageProps)
               </FieldHeader>
               <InputWrapper>
                 <Lock size={18} />
-                <Input value={password} onChange={(e) => setPassword(e.target.value)} type="password" placeholder="Enter your password" required disabled={loading} />
+                <PasswordInput value={password} onChange={(e) => setPassword(e.target.value)} type={showPassword ? "text" : "password"} placeholder="Enter your password" required disabled={loading} />
+                <PasswordToggle type="button" onClick={() => setShowPassword((visible) => !visible)} aria-label={showPassword ? "Hide password" : "Show password"} aria-pressed={showPassword}>
+                  {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                </PasswordToggle>
               </InputWrapper>
             </Field>
 
