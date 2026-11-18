@@ -32,7 +32,8 @@ export const MarketingPageShell = styled.section`
   overflow-x: clip;
 
   @media (max-width: 768px) {
-    padding: 40px max(20px, env(safe-area-inset-right)) 40px max(20px, env(safe-area-inset-left));
+    padding: 40px max(20px, env(safe-area-inset-right)) 40px
+      max(20px, env(safe-area-inset-left));
   }
 
   @media (max-width: 480px) {
@@ -52,11 +53,13 @@ export const PageShell = styled.section`
     radial-gradient(ellipse 80% 40% at 100% 100%, rgba(201, 162, 39, 0.05), transparent 45%);
 
   @media (max-width: 768px) {
-    padding: 28px 20px 56px;
+    padding: 28px max(20px, env(safe-area-inset-right)) 56px
+      max(20px, env(safe-area-inset-left));
   }
 
   @media (max-width: 480px) {
-    padding: 20px 16px 48px;
+    padding: 20px max(16px, env(safe-area-inset-right)) 48px
+      max(16px, env(safe-area-inset-left));
     padding-bottom: max(48px, env(safe-area-inset-bottom));
   }
 `;

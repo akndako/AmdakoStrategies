@@ -1,6 +1,6 @@
 ﻿import { useState, useRef, useEffect } from "react";
 import styled from "styled-components";
-import { Menu, X, UserPlus, LogIn, ChevronDown, User, Settings, LogOut, FileText } from "lucide-react";
+import { Menu, X, UserPlus, LogIn, ChevronDown, User, Settings, LogOut, FileText, LayoutDashboard } from "lucide-react";
 import { theme } from "../theme";
 import type { AuthState } from "../types";
 import logoImage from "../assets/amdakostrategies.jpeg";
@@ -73,10 +73,15 @@ const Nav = styled.nav`
   }
 `;
 
-const Brand = styled.div`
+const Brand = styled.button`
   display: flex;
   align-items: center;
   gap: 12px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
   cursor: pointer;
   min-width: 0;
 
@@ -203,7 +208,7 @@ const MobileAuthActions = styled.div`
 `;
 
 const MobileAuthButton = styled.button<{ $primary?: boolean }>`
-  min-height: 40px;
+  min-height: 44px;
   padding: 8px 12px;
   border-radius: ${theme.radii.small};
   font-size: 12px;
@@ -229,8 +234,8 @@ const MobileAuthButton = styled.button<{ $primary?: boolean }>`
 
 const MobileToggle = styled.button`
   display: none;
-  width: 40px;
-  height: 40px;
+  width: 44px;
+  height: 44px;
   border-radius: ${theme.radii.small};
   border: 1px solid ${theme.colors.border};
   background: #fff;
@@ -244,11 +249,14 @@ const MobileToggle = styled.button`
   }
 `;
 
-const MobileMenu = styled.div`
+const MobileMenu = styled.nav`
   display: none;
   flex-direction: column;
   padding: 12px 20px 20px;
   gap: 6px;
+  max-height: calc(100dvh - 62px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
   background: #fff;
   border-top: 1px solid ${theme.colors.borderLight};
   transform-origin: top center;
@@ -267,6 +275,7 @@ const MobileMenu = styled.div`
 
 const MobileLink = styled.button<{$active?: boolean}>`
   padding: 12px 16px;
+  min-height: 48px;
   border-radius: ${theme.radii.small};
   background: ${({ $active }) => ($active ? theme.colors.primaryLight : "transparent")};
   color: ${({ $active }) => ($active ? theme.colors.primary : theme.colors.text)};
@@ -420,11 +429,17 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
         setMenuOpen(false);
       }
     };
+    const onBreakpointChange = (event: MediaQueryListEvent) => {
+      if (event.matches) setMenuOpen(false);
+    };
+    const desktopBreakpoint = window.matchMedia("(min-width: 861px)");
     document.addEventListener("keydown", onKeyDown);
+    desktopBreakpoint.addEventListener("change", onBreakpointChange);
 
     return () => {
       document.body.style.overflow = previousOverflow;
       document.removeEventListener("keydown", onKeyDown);
+      desktopBreakpoint.removeEventListener("change", onBreakpointChange);
     };
   }, [menuOpen]);
 
@@ -452,6 +467,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
       <Nav>
         <Brand
+          type="button"
           onClick={() => handleNavigate(auth ? "dashboard" : "home")}
           aria-label={auth ? "Go to dashboard" : "Go to home"}
         >
@@ -480,6 +496,8 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
               <AvatarButton
                 onClick={() => setDropdownOpen((current) => !current)}
                 aria-label="Toggle user menu"
+                aria-expanded={dropdownOpen}
+                aria-controls={dropdownOpen ? "user-menu" : undefined}
               >
                 <AvatarCircle>
                   {userAvatarUrl ? (
@@ -493,7 +511,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
               </AvatarButton>
 
               {dropdownOpen && (
-                <DropdownMenu>
+                <DropdownMenu id="user-menu">
                   <DropdownItem onClick={() => handleNavigate("agreement")}>
                     <FileText size={16} />
                     Agreement
@@ -544,19 +562,25 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
           </MobileAuthActions>
         )}
 
-        <MobileToggle onClick={() => setMenuOpen((current) => !current)} aria-label="Toggle navigation menu">
+        <MobileToggle
+          type="button"
+          onClick={() => setMenuOpen((current) => !current)}
+          aria-label={menuOpen ? "Close navigation menu" : "Open navigation menu"}
+          aria-expanded={menuOpen}
+          aria-controls={menuOpen ? "mobile-navigation" : undefined}
+        >
           {menuOpen ? <X size={20} /> : <Menu size={20} />}
         </MobileToggle>
       </Nav>
 
       {menuOpen && (
-        <MobileMenu>
+        <MobileMenu id="mobile-navigation" aria-label="Mobile navigation">
           {!auth && (
             <>
-              <MobileLink $active={activePage === "home"} onClick={() => handleNavigate("home")}>
+              <MobileLink $active={activePage === "home"} aria-current={activePage === "home" ? "page" : undefined} onClick={() => handleNavigate("home")}>
                 Home
               </MobileLink>
-              <MobileLink $active={activePage === "contact"} onClick={() => handleNavigate("contact")}>
+              <MobileLink $active={activePage === "contact"} aria-current={activePage === "contact" ? "page" : undefined} onClick={() => handleNavigate("contact")}>
                 Contact
               </MobileLink>
               <MobileDivider />
@@ -565,15 +589,19 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
 
           {auth ? (
             <>
-              <MobileLink $active={activePage === "agreement"} onClick={() => handleNavigate("agreement")}>
+              <MobileLink $active={activePage === "dashboard"} aria-current={activePage === "dashboard" ? "page" : undefined} onClick={() => handleNavigate("dashboard")}>
+                <LayoutDashboard size={18} />
+                Dashboard
+              </MobileLink>
+              <MobileLink $active={activePage === "agreement"} aria-current={activePage === "agreement" ? "page" : undefined} onClick={() => handleNavigate("agreement")}>
                 <FileText size={18} />
                 Agreement
               </MobileLink>
-              <MobileLink $active={activePage === "edit-profile"} onClick={() => handleNavigate("edit-profile")}>
+              <MobileLink $active={activePage === "edit-profile"} aria-current={activePage === "edit-profile" ? "page" : undefined} onClick={() => handleNavigate("edit-profile")}>
                 <User size={18} />
                 Edit Profile
               </MobileLink>
-              <MobileLink $active={activePage === "settings"} onClick={() => handleNavigate("settings")}>
+              <MobileLink $active={activePage === "settings"} aria-current={activePage === "settings" ? "page" : undefined} onClick={() => handleNavigate("settings")}>
                 <Settings size={18} />
                 Settings
               </MobileLink>
@@ -586,18 +614,7 @@ export default function Navbar({ activePage, auth, onNavigate, onLogout }: Navba
                 Logout
               </MobileLink>
             </>
-          ) : (
-            <>
-              <MobileLink $active={activePage === "login"} onClick={() => handleNavigate("login")}>
-                <LogIn size={18} />
-                Sign In
-              </MobileLink>
-              <MobileLink $active={activePage === "create"} onClick={() => handleNavigate("create")}>
-                <UserPlus size={18} />
-                Register
-              </MobileLink>
-            </>
-          )}
+          ) : null}
         </MobileMenu>
       )}
     </Container>

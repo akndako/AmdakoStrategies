@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import { useEffect, useRef, type ReactNode } from "react";
 import styled from "styled-components";
 import { theme } from "../../theme";
 
@@ -13,6 +13,8 @@ export const TabNav = styled.nav`
   box-shadow: ${theme.shadows.card};
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  overscroll-behavior-x: contain;
   scrollbar-width: none;
 
   &::-webkit-scrollbar {
@@ -40,6 +42,7 @@ export const TabButton = styled.button<{ $active: boolean }>`
   cursor: pointer;
   transition: background 0.15s ease, color 0.15s ease;
   white-space: nowrap;
+  scroll-snap-align: start;
 
   &:hover {
     background: ${({ $active }) => ($active ? theme.colors.primaryLight : theme.colors.surfaceAlt)};
@@ -81,11 +84,30 @@ export function SectionTabNav<T extends string>({
   onChange,
   ariaLabel,
 }: SectionTabNavProps<T>) {
+  const navRef = useRef<HTMLElement>(null);
+  const activeItemRef = useRef<HTMLButtonElement>(null);
+
+  useEffect(() => {
+    const nav = navRef.current;
+    const activeItem = activeItemRef.current;
+    if (!nav || !activeItem) return;
+
+    const navBounds = nav.getBoundingClientRect();
+    const itemBounds = activeItem.getBoundingClientRect();
+
+    if (itemBounds.left < navBounds.left) {
+      nav.scrollBy({ left: itemBounds.left - navBounds.left, behavior: "smooth" });
+    } else if (itemBounds.right > navBounds.right) {
+      nav.scrollBy({ left: itemBounds.right - navBounds.right, behavior: "smooth" });
+    }
+  }, [active]);
+
   return (
-    <TabNav aria-label={ariaLabel}>
+    <TabNav ref={navRef} aria-label={ariaLabel}>
       {items.map((item) => (
         <TabButton
           key={item.id}
+          ref={active === item.id ? activeItemRef : undefined}
           type="button"
           $active={active === item.id}
           onClick={() => onChange(item.id)}
